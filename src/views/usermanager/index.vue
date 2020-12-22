@@ -230,6 +230,7 @@
             <treeselect
               v-if="dialogFormVisible"
               :options="orgsTree"
+              :autoSelectDescendants="true"
               :default-expand-level="3"
               :multiple="true"
               :flat="true"

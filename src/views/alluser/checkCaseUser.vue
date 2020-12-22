@@ -240,6 +240,15 @@
                 </el-select>
               </el-form-item>
             </el-col>
+            <el-col :sm="24" :md="12">
+              <el-form-item label="其他聯絡電話">
+                <el-input
+                  placeholder="其他聯絡電話"
+                  v-model="temp.otherPhone"
+                  disabled
+                ></el-input>
+              </el-form-item>
+            </el-col>
             <el-col :sm="24" :md="24">
               <el-row :gutter="16">
                 <el-col :sm="12" :md="6">
@@ -624,7 +633,7 @@ export default {
     getButtons() {
       let router2 = this.$store.getters.modules;
       let a = router2.filter((r) => {
-        return r.item.name == "個案資料";
+        return r.item.name == "用戶資料";
       });
       let b = a[0].children.filter((r2) => {
         return r2.item.name == "全部個案";
@@ -657,7 +666,7 @@ export default {
         vm.temp = Object.assign({}, res.result); // copy obj
         vm.temp.caseUserStatus = vm.temp.caseUserStatus.toString();
         vm.temp.disabilityLevel = vm.temp.disabilityLevel.toString();
-        // console.log(res);
+        console.log(res);
       });
     },
     // 獲取A單位資料

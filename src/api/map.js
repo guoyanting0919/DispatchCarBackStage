@@ -1,8 +1,8 @@
 import request from "@/utils/request";
 
-export function autoComplete(data) {
+export function placeDetail(data) {
   return request({
-    url: "/Maps/AutoComplete",
+    url: "/Maps/placeDetail",
     method: "post",
     data,
   });

@@ -248,6 +248,14 @@
                 </el-select>
               </el-form-item>
             </el-col>
+            <el-col :sm="24" :md="12">
+              <el-form-item label="其他聯絡電話">
+                <el-input
+                  placeholder="其他聯絡電話"
+                  v-model="temp.otherPhone"
+                ></el-input>
+              </el-form-item>
+            </el-col>
             <el-col :sm="24" :md="24">
               <el-row :gutter="16">
                 <el-col :sm="12" :md="6">
@@ -480,6 +488,7 @@ export default {
         caseUserNo: "", //個案編號
         orgAId: "", //Ａ單位(管理單位)
         orgBIds: "", //B單位
+        otherPhone: "", //其他聯絡電話
         disabilityLevel: "", //失能等級
         county: "", //居住縣市
         district: "", //居住區域
