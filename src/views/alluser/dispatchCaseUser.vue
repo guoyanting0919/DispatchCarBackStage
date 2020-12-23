@@ -17,22 +17,91 @@
         <div class="mapContainer">
           <div id="map" ref="map" style="width: 100%; height: 100%"></div>
         </div>
+
+        <!-- 預估金額 -->
         <div class="discountContainer">
-          <el-table :data="discountData" style="width: 100%">
-            <el-table-column prop="direction" label="去程" width="50">
+          <!-- 本日行程一覽 -->
+          <div class="directionContainer">
+            <h3 class="directionTitle">
+              本日行程一覽
+              <i
+                class="iconfont icon-down tableToggle"
+                @click="tableToggle = !tableToggle"
+              ></i>
+            </h3>
+            <div class="orderAddr">
+              <i class="iconfont icon-circle"></i>
+              <i class="iconfont icon-Vector10"></i>
+              <p class="startAddr">
+                {{ fromAddr }}
+              </p>
+              <p class="endAddr">{{ toAddr }}</p>
+            </div>
+          </div>
+          <el-table
+            v-if="tableToggle"
+            height="103px"
+            :data="discountData"
+            style="width: 100%"
+          >
+            <el-table-column
+              align="center"
+              prop="direction"
+              label="行程"
+              width="50"
+              fixed="left"
+            >
             </el-table-column>
-            <el-table-column prop="distance" label="預估距離" width="100">
+            <el-table-column
+              align="center"
+              prop="distance"
+              label="預估距離"
+              width="100"
+            >
+              <template slot-scope="scope">
+                {{ scope.row.distance | distanceFilter }}公里
+              </template>
             </el-table-column>
-            <el-table-column prop="duration" label="預估時間">
+            <el-table-column
+              width="100"
+              align="center"
+              prop="duration"
+              label="預估時間"
+            >
+              <template slot-scope="scope">
+                {{ scope.row.duration | durationFilter }}分鐘
+              </template>
             </el-table-column>
-            <el-table-column prop="totalAmt" label="車資總額">
+            <el-table-column align="center" prop="totalAmt" label="車資總額">
+              <template slot-scope="scope">
+                $ {{ scope.row.totalAmt }}
+              </template>
             </el-table-column>
-            <el-table-column prop="subsidyAmt" label="政府補助">
+            <el-table-column align="center" prop="subsidyAmt" label="政府補助">
+              <template slot-scope="scope">
+                $ {{ scope.row.subsidyAmt }}
+              </template>
             </el-table-column>
-            <el-table-column prop="selfPayAmt" label="自付額">
+            <el-table-column align="center" prop="selfPayAmt" label="自付額">
+              <template slot-scope="scope">
+                $ {{ scope.row.selfPayAmt }}
+              </template>
             </el-table-column>
-            <el-table-column prop="withAmt" label="陪同總額"> </el-table-column>
-            <el-table-column prop="withAmt" label="個案負擔"> </el-table-column>
+            <el-table-column align="center" prop="" label="陪同總額">
+              <template slot-scope="scope">
+                $ {{ scope.row.withAmt }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              fixed="right"
+              align="center"
+              prop="withAmt"
+              label="個案負擔"
+            >
+              <template slot-scope="scope">
+                $ {{ scope.row.withAmt + scope.row.selfPayAmt }}
+              </template>
+            </el-table-column>
           </el-table>
         </div>
 
@@ -159,7 +228,7 @@
                 <el-col v-if="temp.fromAddrRemark === '其他'" :sm="24" :md="24">
                   <el-form-item label="起點備註-其他">
                     <el-input
-                      v-model="temp.Id"
+                      v-model="temp.remark"
                       placeholder="請輸入起點備註"
                     ></el-input>
                   </el-form-item>
@@ -213,14 +282,14 @@
                 <el-col v-if="temp.toAddrRemark === '其他'" :sm="24" :md="24">
                   <el-form-item label="訖點備註-其他">
                     <el-input
-                      v-model="temp.Id"
+                      v-model="temp.remark"
                       placeholder="請輸入訖點備註"
                     ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="12">
                   <el-form-item label="預約回程(回居住地址)">
-                    <el-radio-group v-model="temp.haveNextOrderFlag">
+                    <el-radio-group v-model="temp.isBack">
                       <el-radio :label="true">是</el-radio>
                       <el-radio :label="false">否</el-radio>
                     </el-radio-group>
@@ -229,6 +298,7 @@
                 <el-col :sm="24" :md="12">
                   <el-form-item label="回程乘車時間">
                     <el-time-select
+                      :disabled="!temp.isBack"
                       v-model="temp.reTime"
                       :picker-options="{
                         start: '08:30',
@@ -322,7 +392,6 @@
             </el-form>
           </div>
           <div class="dispatchFooter">
-            <input type="text" id="auto" />
             <el-button style="height: 40px" type="info" @click="handleSubmit"
               >立即預約</el-button
             >
@@ -364,6 +433,7 @@ export default {
       sessionToken: null, //令牌
       fromAddr: "", //起點詳細地址
       toAddr: "", //迄點詳細地址
+      tableToggle: true,
 
       /* 全域資料 */
       userInfo: "",
@@ -395,7 +465,7 @@ export default {
         toAddr: "",
         toAddrRemark: "",
         remark: "",
-        isBack: true,
+        isBack: false,
         canShared: true,
         carCategoryId: "",
         carCategoryName: "",
@@ -406,7 +476,17 @@ export default {
       rules: {},
     };
   },
-  filters: {},
+  filters: {
+    distanceFilter(val) {
+      return (
+        Math.round(Math.round(val * Math.pow(10, (2 || 0) + 1)) / 10000) /
+        Math.pow(10, 2 || 0)
+      );
+    },
+    durationFilter(val) {
+      return Math.round(val / 60);
+    },
+  },
   methods: {
     /* 初始化google map */
     initMap() {
@@ -635,12 +715,16 @@ export default {
         vm.$cl(params);
         orderCaseUser.getDiscount(params).then((res) => {
           vm.$cl(res);
-          vm.discountData = [res.result];
+          // vm.discountData = [res.result];
+          let back = JSON.parse(JSON.stringify(res.result));
+
+          vm.$set(vm.discountData, 0, res.result);
+          vm.$set(vm.discountData, 1, back);
 
           // vm.discountData[0] = res.result;
-          // vm.discountData[0].direction = "去程";
+          vm.discountData[0].direction = "去程";
           // vm.discountData[1] = res.result;
-          // vm.discountData[1].direction = "回程";
+          vm.discountData[1].direction = "回程";
           // vm.$forceUpdate();
         });
       } else {
@@ -652,7 +736,35 @@ export default {
     /* 立即預約 */
     handleSubmit() {
       const vm = this;
+      vm.temp.reserveDate = `${vm.temp.date} ${vm.temp.time}`;
+      vm.temp.carCategoryName = vm.carCategorysList.filter((i) => {
+        return i.dtValue === vm.temp.carCategoryId;
+      })[0].name;
+      vm.temp.fromAddr = vm.fromAddr;
+      vm.temp.toAddr = vm.toAddr;
+      vm.temp.userId = vm.$route.params.id.split("-")[0];
+      vm.temp.caseUserId = vm.$route.params.id.split("-")[1];
       vm.$cl(vm.temp);
+      orderCaseUser.add(vm.temp).then((res) => {
+        vm.$cl(res);
+
+        //有預約回程時
+        if (vm.temp.isBack) {
+          //複製temp
+          let backTemp = Object.assign({}, vm.temp);
+          //修改時間
+          backTemp.reserveDate = `${backTemp.date} ${backTemp.reTime}`;
+          //修改起點 (去程迄點)
+          backTemp.fromAddr = backTemp.toAddr;
+          //修改迄點 (身份居住地址)
+          backTemp.toAddr = `${vm.roleInfo.county}${vm.roleInfo.district}${vm.roleInfo.addr}`;
+
+          vm.$cl(backTemp);
+          orderCaseUser.add(backTemp).then((res) => {
+            vm.$cl(res);
+          });
+        }
+      });
     },
   },
   mounted() {
@@ -684,9 +796,82 @@ export default {
   width: 45%;
   left: 2%;
   bottom: 1rem;
-  height: 300px;
+  // height: 300px;
   background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0px 0px 1rem #a1a0a0;
   z-index: 99999;
+  opacity: 0.9;
+  transition: 0.5s;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.directionContainer {
+  height: calc(100% - 103px);
+  width: 100%;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.directionTitle {
+  text-align: center;
+  padding: 0.5rem 0;
+  background: $lightMain;
+  position: relative;
+}
+
+.tableToggle {
+  position: absolute;
+  right: 0.5rem;
+  cursor: pointer;
+}
+
+.orderAddr {
+  padding-left: 1rem;
+  margin: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 100px;
+  border-left: 3px dotted $primary;
+  position: relative;
+
+  .icon-circle {
+    font-weight: 500;
+    color: $primary;
+    position: absolute;
+    left: -9px;
+    top: -1px;
+    background: #fff;
+  }
+
+  .icon-Vector10 {
+    font-weight: 500;
+    color: $primary;
+    position: absolute;
+    left: -9px;
+    background: #fff;
+    bottom: -1px;
+  }
+}
+
+.startAddr {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.endAddr {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dispatchContainer {
