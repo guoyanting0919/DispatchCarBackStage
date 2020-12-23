@@ -119,21 +119,21 @@ export default {
   vertical-align: middle;
 }
 .el-menu-item:focus.dark {
-  background: $--color-primary-dark-2;
+  background: $--color-primary-dark-1;
 }
 .el-menu-item:hover.dark {
-  background: $--color-primary-dark-3;
+  background: $--color-primary-dark-2;
 }
 .dark.el-menu-item {
   color: #ffffff;
-  background: $--color-primary-dark-3;
+  background: $--color-primary-dark-2;
 
   &:hover {
-    background: $--color-primary-dark-3;
+    background: $--color-primary-dark-2;
   }
 
   &:focus {
-    background: $--color-primary-dark-5;
+    background: $--color-primary-dark-3;
   }
 }
 
@@ -142,11 +142,11 @@ export default {
 }
 
 ::v-deep .dark .el-submenu__title:hover {
-  background: $--color-primary-dark-3 !important;
+  background: $--color-primary-dark-2 !important;
 }
 
 ::v-deep .dark .is-active {
-  background: $--color-primary-dark-5 !important;
+  background: $--color-primary-dark-3 !important;
 }
 
 ::v-deep .dark .el-submenu__title {
