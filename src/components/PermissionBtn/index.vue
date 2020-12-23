@@ -24,7 +24,7 @@
         v-bind:key="btn.Id"
         class="filter-item"
         @click="$emit('btn-event', btn.domId)"
-        plain
+        :plain="themeStatusBoolen"
       >
         <i :class="`iconfont icon-${btn.icon}`"></i>
         {{ btn.name }}
@@ -35,10 +35,16 @@
 
 <script>
 import waves from "@/directive/waves"; // 水波紋指令
-// import JsonExcel from "vue-json-excel";
+import { mapGetters } from "vuex";
 export default {
   name: "permission-btn",
   components: {},
+  computed: {
+    ...mapGetters(["themeStatus"]),
+    themeStatusBoolen() {
+      return this.themeStatus ? true : false;
+    },
+  },
   props: {
     moduleName: {
       type: String,
@@ -61,7 +67,6 @@ export default {
       buttons: [],
     };
   },
-  computed: {},
   directives: {
     waves,
   },

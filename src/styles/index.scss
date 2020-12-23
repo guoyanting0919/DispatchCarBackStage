@@ -129,7 +129,10 @@ code {
 
 //main-container全局样式
 .app-container {
-  padding: 20px;
+  background-color: #efefef;
+  padding: 8px 16px;
+  padding-bottom: 0;
+  padding-top: 8px;
 }
 
 .components-container {
@@ -141,6 +144,7 @@ code {
   text-align: center;
 }
 
+//左側menu
 .sub-navbar {
   height: 50px;
   line-height: 50px;
@@ -149,7 +153,6 @@ code {
   text-align: right;
   padding-right: 20px;
   transition: 600ms ease position;
-  // background: linear-gradient(90deg, rgba(32, 182, 249, 1) 0%, rgba(32, 182, 249, 1) 0%, rgba(33, 120, 241, 1) 100%, rgba(33, 120, 241, 1) 100%);
   background: #d0d0d0;
   .subtitle {
     font-size: 20px;
@@ -165,10 +168,10 @@ code {
 
 .link-type,
 .link-type:focus {
-  color: $primary;
+  color: $--color-primary;
   cursor: pointer;
   &:hover {
-    color: #ff9c10;
+    color: $--color-primary-light-8;
   }
 }
 
@@ -201,11 +204,11 @@ code {
   z-index: 1000 !important;
 }
 
-//table 头部居中
+//table
 table thead th {
   text-align: center !important;
 }
-// table td 上下间距减小
+// table td
 .el-table td {
   padding: 3px 0 !important;
 }
@@ -216,7 +219,7 @@ table thead th {
   padding: 10px 5px;
 }
 
-//分页间距修改
+//pagination
 .pagination-container {
   background: #fff;
   padding: 10px !important;
@@ -242,13 +245,6 @@ table thead th {
   padding: 0 !important;
   margin: -1px !important;
   padding-bottom: 10px !important;
-}
-
-.app-container {
-  background-color: #efefef;
-  padding: 8px 16px;
-  padding-bottom: 0;
-  padding-top: 8px;
 }
 
 .el-card__header {
@@ -359,6 +355,7 @@ table thead th {
 .ls-border {
   border: 1px solid #ebeef5;
 }
+
 // 垂直居中
 .VMB {
   &::before {
@@ -380,99 +377,15 @@ table thead th {
   text-overflow: ellipsis;
   display: inline-block;
 }
-.navbar {
-  background: #409eff;
-  .hamburger-container {
-    line-height: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    padding: 0 10px;
-    // margin-right: auto;
-  }
-  .avatar-container {
-    height: 50px;
-    display: block;
-    line-height: 50px;
-    margin-left: auto;
-    margin-right: 4px;
-    order: 10;
-    .avatar-wrapper {
-      cursor: pointer;
-      position: relative;
-      .el-icon-caret-bottom {
-        font-size: 16px;
-      }
-    }
-  }
-  .logo {
-    width: 200px;
-    text-align: center;
 
-    @include rwd($md) {
-      order: 1;
-      width: 200px;
-      margin-left: auto;
-    }
-    .user-avatar {
-      width: 200px;
-      height: 50px;
-    }
-
-    .user-avatar-text {
-      width: 200px;
-      height: 50px;
-      font-weight: 700;
-      vertical-align: middle;
-      margin-right: 5px;
-    }
-  }
-  .hamburger-container {
-    color: white;
-  }
-  .avatar-container {
-    color: white;
-  }
-  .logo {
-    color: white;
-  }
+.custom-theme .el-table th.is-leaf {
+  border-bottom: 1px solid #ebeef5;
+  background: #fef7ee;
+  color: #8c8c8c;
 }
-.custom-theme {
-  #app {
-    .sidebar-container .nest-menu .el-submenu > .el-submenu__title,
-    .sidebar-container .el-submenu .el-menu-item {
-      background-color: $subMenuBg !important;
-      &:hover {
-        background-color: $menuHover !important;
-      }
-    }
-  }
-  .el-submenu__title,
-  .submenu-title-noDropdown {
-    font-size: 0.95rem;
-    // font-weight: 700;
-  }
-  .el-submenu__title:hover,
-  .el-menu-item:hover {
-    background-color: $menuHover !important;
-  }
-  .navbar {
-    border-bottom: 0 !important;
-    display: flex;
-    // justify-content: center;
-    background-color: #fff;
-    box-shadow: 0 0 5px #222;
 
-    .hamburger-container {
-      color: #6b655c;
-    }
-    .avatar-container {
-      color: $primary;
-    }
-    .logo {
-      color: $primary;
-    }
-  }
+.el-pagination {
+  text-align: right;
 }
 
 // margin

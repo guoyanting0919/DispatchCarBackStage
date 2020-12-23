@@ -300,6 +300,6 @@ export default {
 
 <style lang="scss" scoped>
 .colorPrimary {
-  color: $primary;
+  color: $--color-primary;
 }
 </style>

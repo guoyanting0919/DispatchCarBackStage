@@ -821,7 +821,7 @@ export default {
 .directionTitle {
   text-align: center;
   padding: 0.5rem 0;
-  background: $lightMain;
+  background: $--color-primary-light-8;
   position: relative;
 }
 
@@ -839,12 +839,12 @@ export default {
   justify-content: space-between;
   align-items: center;
   height: 100px;
-  border-left: 3px dotted $primary;
+  border-left: 3px dotted $--color-primary;
   position: relative;
 
   .icon-circle {
     font-weight: 500;
-    color: $primary;
+    color: $--color-primary;
     position: absolute;
     left: -9px;
     top: -1px;
@@ -853,7 +853,7 @@ export default {
 
   .icon-Vector10 {
     font-weight: 500;
-    color: $primary;
+    color: $--color-primary;
     position: absolute;
     left: -9px;
     background: #fff;
@@ -892,7 +892,7 @@ export default {
   font-weight: 700;
   align-items: center;
   font-size: 2rem;
-  color: $primary;
+  color: $--color-primary;
 }
 
 .dispatchDetail {
@@ -937,7 +937,7 @@ export default {
   align-items: center;
   justify-content: center;
   height: 60px;
-  background: $lightMain;
+  background: $--color-primary-light-8;
   border: 1px solid #ddd;
 }
 
@@ -951,7 +951,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: $primary;
+  background: $--color-primary;
   opacity: 0.7;
 }
 </style>

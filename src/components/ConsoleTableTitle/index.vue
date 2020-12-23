@@ -33,7 +33,7 @@ export default {
       position: absolute;
       width: 100px;
       height: 3px;
-      background: $primary;
+      background: $--color-primary;
       top: -1.5px;
     }
   }

@@ -1175,12 +1175,12 @@ export default {
   justify-content: space-between;
   align-items: flex-start;
   height: 45px;
-  border-left: 3px dotted $primary;
+  border-left: 3px dotted $--color-primary;
   position: relative;
 
   .icon-circle {
     font-weight: 500;
-    color: $primary;
+    color: $--color-primary;
     position: absolute;
     left: -9px;
     top: -1px;
@@ -1189,7 +1189,7 @@ export default {
 
   .icon-Vector10 {
     font-weight: 500;
-    color: $primary;
+    color: $--color-primary;
     position: absolute;
     left: -9px;
     bottom: -1px;

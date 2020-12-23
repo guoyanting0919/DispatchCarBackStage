@@ -108,7 +108,6 @@
                   v-for="(item, idx) in scope.row.userTypes"
                   :key="idx"
                   type="primary"
-                  effect="dark"
                 >
                   {{ userRoleMap[item] }}
                 </el-tag>

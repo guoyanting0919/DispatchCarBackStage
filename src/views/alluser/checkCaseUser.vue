@@ -774,7 +774,7 @@ export default {
 }
 .formTitle {
   font-size: 18px;
-  color: $primary;
+  color: $--color-primary;
   font-weight: 700;
   margin-bottom: 1rem;
   margin-top: 1rem;
@@ -785,7 +785,7 @@ export default {
     margin-right: 1rem;
     font-size: 16px;
     padding: 0px 16px;
-    border: 1px solid $primary;
+    border: 1px solid $--color-primary;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -805,7 +805,7 @@ export default {
   align-items: center;
   font-size: 14px;
   color: #606266;
-  border-bottom: 1px dashed $primary;
+  border-bottom: 1px dashed $--color-primary;
   margin-bottom: 1rem;
 }
 </style>

@@ -6,11 +6,11 @@ import "normalize.css/normalize.css"; // A modern alternative to CSS resets
 import ElementUI from "element-ui";
 // import "@/assets/custom-theme/index.css";
 
-//theme1 基本style
-import "element-ui/lib/theme-chalk/index.css";
+/* 基本style */
+import "./assets/custom-theme/basicElementUi.scss";
 //theme2
 // import "@/assets/custom-theme/custom.scss";
-import "@/assets/custom-theme/custom2.scss";
+// import "@/assets/custom-theme/custom2.scss";
 
 import locale from "element-ui/lib/locale/lang/zh-TW";
 import VueSweetalert2 from "vue-sweetalert2";

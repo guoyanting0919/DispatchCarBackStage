@@ -1,8 +1,8 @@
 <template>
   <el-menu class="navbar" mode="horizontal">
     <div class="logo" style="height: 50px">
-      <img class="user-avatar" :src="logo" />
-      <!-- <div class="user-avatar-text">LOGO</div> -->
+      <!-- <img class="user-avatar" :src="logo" /> -->
+      <div class="user-avatar-text">LOGO</div>
     </div>
     <hamburger
       class="hamburger-container"
@@ -14,12 +14,16 @@
       <el-breadcrumb separator="/" class="breadItems">
         <el-breadcrumb-item
           class="breadLink"
+          :class="{ dark: !themeStatus }"
           v-for="(item, index) in $route.matched"
           :key="index"
         >
-          <router-link :to="item.path" class="breadLink">{{
-            item.meta.title || item.name
-          }}</router-link>
+          <router-link
+            :class="{ dark: !themeStatus }"
+            :to="item.path"
+            class="breadLink"
+            >{{ item.meta.title || item.name }}</router-link
+          >
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
@@ -143,22 +147,114 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
-// .navbar {
-//   display: flex;
-//   align-items: center;
-// }
-// .breads {
-//   height: 64px;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   margin-left: 0.5rem;
-//   @include rwd($md) {
-//     display: none;
-//   }
+.breadLink.dark {
+  color: #ffffff;
 
-//   .breadLink {
-//     pointer-events: none;
-//   }
-// }
+  .el-breadcrumb__inner {
+    color: #ffffff !important;
+
+    a {
+      color: #ffffff !important;
+    }
+  }
+}
+</style>
+<style lang="scss">
+@import "~@/assets/css/basic/_mixin.scss";
+.navbar {
+  background: $--color-primary;
+  .hamburger-container {
+    line-height: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+  }
+  .avatar-container {
+    height: 50px;
+    display: block;
+    line-height: 50px;
+    margin-left: auto;
+    margin-right: 4px;
+    order: 10;
+    .avatar-wrapper {
+      cursor: pointer;
+      position: relative;
+      .el-icon-caret-bottom {
+        font-size: 16px;
+      }
+    }
+  }
+  .logo {
+    width: 200px;
+    text-align: center;
+
+    @include rwd($md) {
+      order: 1;
+      width: 200px;
+      margin-left: auto;
+    }
+    .user-avatar {
+      width: 200px;
+      height: 50px;
+    }
+
+    .user-avatar-text {
+      width: 200px;
+      height: 50px;
+      line-height: 50px;
+      font-weight: 700;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+  }
+  .hamburger-container {
+    color: white;
+  }
+  .avatar-container {
+    color: white;
+  }
+  .logo {
+    color: white;
+  }
+}
+
+/* 淺色navbar */
+.custom-theme {
+  #app {
+    .sidebar-container .nest-menu .el-submenu > .el-submenu__title,
+    .sidebar-container .el-submenu .el-menu-item {
+      background-color: $--color-primary-light-9 !important;
+      &:hover {
+        background-color: $--color-primary-light-8 !important;
+      }
+    }
+  }
+  .el-submenu__title,
+  .submenu-title-noDropdown {
+    font-size: 0.95rem;
+    // font-weight: 700;
+  }
+  .el-submenu__title:hover,
+  .el-menu-item:hover {
+    background-color: $--color-primary-light-8 !important;
+  }
+  .navbar {
+    border-bottom: 0 !important;
+    display: flex;
+    // justify-content: center;
+    background-color: #fff;
+    box-shadow: 0 0 5px #222;
+
+    .hamburger-container {
+      color: #6b655c;
+    }
+    .avatar-container {
+      color: $--color-primary;
+    }
+    .logo {
+      color: $--color-primary;
+    }
+  }
+}
 </style>

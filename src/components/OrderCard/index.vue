@@ -66,15 +66,15 @@ export default {
   margin-right: 0.5rem;
   height: auto;
   background: #fff;
-  border: 2px solid $primary;
-  border-top: 5px solid $primary;
+  border: 2px solid $--color-primary;
+  border-top: 5px solid $--color-primary;
   border-radius: 0px 0px 8px 8px;
   margin-bottom: 1rem;
 }
 .orderCardTitle {
   height: 38px;
   color: #fff;
-  background: $primary;
+  background: $--color-primary;
   padding: 0.5rem;
   display: flex;
   font-size: 14px;
@@ -89,7 +89,7 @@ export default {
   font-weight: 700;
 }
 .orderInfo {
-  color: $primary;
+  color: $--color-primary;
   display: flex;
   margin-bottom: 0.5rem;
 
@@ -111,12 +111,12 @@ export default {
   justify-content: space-between;
   align-items: flex-start;
   height: 45px;
-  border-left: 3px dotted $primary;
+  border-left: 3px dotted $--color-primary;
   position: relative;
 
   .icon-circle {
     font-weight: 500;
-    color: $primary;
+    color: $--color-primary;
     position: absolute;
     left: -9px;
     top: -1px;
@@ -125,7 +125,7 @@ export default {
 
   .icon-Vector10 {
     font-weight: 500;
-    color: $primary;
+    color: $--color-primary;
     position: absolute;
     left: -9px;
     bottom: -1px;

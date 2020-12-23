@@ -11,24 +11,31 @@ $colorBlack: #232323;
 $colorGray: #f5f5f5;
 $colorOrange: #f2961a;
 
-/* color var f2961a */
-$primary: #f2961a;
-$primaryHover: #f4ac28;
-$primaryActive: #e79600;
-$primaryPlain: #e9cd99;
-$success: #409167;
-$successHover: #66a785;
-$warning: #13c2c2;
-$warningHover: #31c9c9;
-$danger: #d63737;
-$dangerHover: #de5f5f;
-$info: #227294;
-$infoHover: #3b91b6;
-$disableGray: #949494;
+/* element UI variables */
+$--color-primary: #f2961a;
+$--color-success: #409167;
+$--color-warning: #13c2c2;
+$--color-danger: #d63737;
+$--color-info: #227294;
+$--color-white: #ffffff !default;
+$--color-black: #000000 !default;
 
-//sidebar
-$subMenuBg: lighten($primary, 44%);
-$menuHover: lighten($primary, 40%);
+$--color-primary-light-1: mix($--color-white, $--color-primary, 10%) !default;
+$--color-primary-light-2: mix($--color-white, $--color-primary, 20%) !default;
+$--color-primary-light-3: mix($--color-white, $--color-primary, 30%) !default;
+$--color-primary-light-4: mix($--color-white, $--color-primary, 40%) !default;
+$--color-primary-light-5: mix($--color-white, $--color-primary, 50%) !default;
+$--color-primary-light-6: mix($--color-white, $--color-primary, 60%) !default;
+$--color-primary-light-7: mix($--color-white, $--color-primary, 70%) !default;
+$--color-primary-light-8: mix($--color-white, $--color-primary, 80%) !default;
+$--color-primary-light-9: mix($--color-white, $--color-primary, 90%) !default;
 
-/* lightMain */
-$lightMain: lighten($primary, 44%);
+$--color-primary-dark-1: mix($--color-black, $--color-primary, 10%) !default;
+$--color-primary-dark-2: mix($--color-black, $--color-primary, 20%) !default;
+$--color-primary-dark-3: mix($--color-black, $--color-primary, 30%) !default;
+$--color-primary-dark-4: mix($--color-black, $--color-primary, 40%) !default;
+$--color-primary-dark-5: mix($--color-black, $--color-primary, 50%) !default;
+$--color-primary-dark-6: mix($--color-black, $--color-primary, 60%) !default;
+$--color-primary-dark-7: mix($--color-black, $--color-primary, 70%) !default;
+$--color-primary-dark-8: mix($--color-black, $--color-primary, 80%) !default;
+$--color-primary-dark-9: mix($--color-black, $--color-primary, 90%) !default;

@@ -129,7 +129,7 @@
       border-radius: 200px;
       border: none;
       font-size: 1.1rem;
-      background: $primary;
+      background: $--color-primary;
       font-weight: 700;
       height: 54px;
     }
@@ -210,8 +210,8 @@
     }
 
     &.OkRole {
-      color: $primary;
-      text-shadow: 0 0 2px $primary;
+      color: $--color-primary;
+      text-shadow: 0 0 2px $--color-primary;
 
       .fa-check {
         opacity: 1;
@@ -222,8 +222,8 @@
   .fa-check {
     opacity: 0;
     margin-right: 0.15rem;
-    color: $primary;
-    text-shadow: 0 0 2px $primary;
+    color: $--color-primary;
+    text-shadow: 0 0 2px $--color-primary;
     transition: 0.5s;
   }
 
@@ -246,7 +246,7 @@
     }
 
     .el-dialog__header {
-      background: $primary;
+      background: $--color-primary;
       border-radius: 10px 10px 0 0;
       padding: 1rem;
     }

@@ -4,17 +4,24 @@
       <router-link
         ref="tag"
         class="tags-view-item"
-        :class="isActive(tag)?'active':''"
+        :class="isActive(tag) ? 'active' : ''"
         v-for="tag in Array.from(visitedViews)"
         :to="tag"
         :key="tag.path"
-        @contextmenu.prevent.native="openMenu(tag,$event)"
+        @contextmenu.prevent.native="openMenu(tag, $event)"
       >
-        {{tag.title}}
-        <span class="el-icon-close" @click.prevent.stop="closeSelectedTag(tag)"></span>
+        {{ tag.title }}
+        <span
+          class="el-icon-close"
+          @click.prevent.stop="closeSelectedTag(tag)"
+        ></span>
       </router-link>
     </scroll-pane>
-    <ul class="contextmenu" v-show="visible" :style="{left:left+'px',top:top+'px'}">
+    <ul
+      class="contextmenu"
+      v-show="visible"
+      :style="{ left: left + 'px', top: top + 'px' }"
+    >
       <li @click="closeSelectedTag(selectedTag)">關閉</li>
       <li @click="closeOthersTags">關閉其他</li>
       <li @click="closeAllTags">全部關閉</li>
@@ -131,11 +138,11 @@ export default {
     .tags-view-wrapper {
       .tags-view-item {
         &.active {
-          color: #333;
-          background-color: #efefef;
+          color: $--color-primary;
+          background-color: $--color-primary-light-9;
           border-color: #dcdfe6;
           &::before {
-            background: #606266;
+            background: $--color-primary;
           }
         }
       }
@@ -165,8 +172,8 @@ export default {
       // margin-top: 4px;
       &.active {
         color: #fff;
-        background-color: #409eff;
-        border-color: #409eff;
+        background-color: $--color-primary;
+        border-color: $--color-primary;
         &::before {
           content: "";
           background: #fff;
