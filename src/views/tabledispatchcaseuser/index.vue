@@ -42,7 +42,7 @@
           ></el-table-column>
           <el-table-column
             align="center"
-            property="userId"
+            property="userName"
             label="姓名"
             width="120"
           >
@@ -543,7 +543,7 @@ export default {
     getList() {
       const vm = this;
       vm.listLoading = true;
-      orderCaseUser.load(vm.listQuery).then((res) => {
+      orderCaseUser.loadDespatch(vm.listQuery).then((res) => {
         vm.list = res.data.map((d) => {
           d.despatchNo = d.despatchNo ? d.despatchNo : d.orderNo;
           return d;

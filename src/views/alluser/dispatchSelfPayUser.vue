@@ -44,9 +44,9 @@
                   style="width: 100%"
                   v-model="temp.time"
                   :picker-options="{
-                    start: '08:30',
-                    step: '00:15',
-                    end: '18:30',
+                    start: '06:00',
+                    step: '00:10',
+                    end: '20:00',
                   }"
                   placeholder="選擇時間"
                 >
@@ -346,11 +346,11 @@ export default {
         reserveDate: "",
         noticePhone: "",
         fromAddr: "", //新北市板橋區中山路二段109號
-        fromLon: 121.4724972,
-        fromLat: 25.0129298,
+        fromLon: 0,
+        fromLat: 0,
         toAddr: "", //新北市板橋區板新路109號
-        toLon: 121.3645382,
-        toLat: 25.0589911,
+        toLon: 0,
+        toLat: 0,
         passengerNum: 0,
         canShared: true,
         status: 1,
@@ -479,6 +479,12 @@ export default {
     //起訖點互換
     handleChange() {
       let ex = this.temp.fromAddr;
+      let exFlon = this.temp.fromLon;
+      let exFlat = this.temp.fromLat;
+      this.temp.fromLon = this.temp.toLon;
+      this.temp.fromLat = this.temp.toLat;
+      this.temp.toLon = exFlon;
+      this.temp.toLat = exFlat;
       this.temp.fromAddr = this.temp.toAddr;
       this.temp.toAddr = ex;
     },

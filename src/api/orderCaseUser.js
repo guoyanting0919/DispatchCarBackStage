@@ -56,17 +56,9 @@ export function remove(data) {
   });
 }
 
-export function roster(data) {
-  return request({
-    url: "/despatchOfSelfPayUsers/addOrUpdate",
-    method: "post",
-    data,
-  });
-}
-
 export function loadDespatch(params) {
   return request({
-    url: "/despatchOfSelfPayUsers/load",
+    url: "/orderOfCaseUsers/loadwithdespatch",
     method: "get",
     params,
   });

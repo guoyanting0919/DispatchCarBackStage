@@ -48,7 +48,7 @@
             <div class="orderLeft">
               <div class="orderLeftTitle">訂單編號 {{ order.orderNo }}</div>
               <div class="orderLeftDetail">
-                <p>單位：{{ order.orgName }}</p>
+                <p>承接單位：{{ order.orgName }}</p>
                 <p>車種類型：{{ order.carCategoryName }}</p>
                 <p>預約時間：{{ order.reserveDate | dateFilter }}</p>
                 <p>建立時間：{{ order.createDate | dateFilter }}</p>
