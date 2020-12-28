@@ -199,7 +199,7 @@
             </el-table-column>
             <el-table-column
               property="orgName"
-              label="所屬單位"
+              label="承接單位"
               align="center"
               width="180"
             >
