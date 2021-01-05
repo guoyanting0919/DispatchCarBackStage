@@ -250,7 +250,7 @@ export default {
     },
   },
   methods: {
-    // 獲取司機
+    /* 獲取司機 */
     async getList() {
       const vm = this;
       await drivers.get({ id: vm.$route.params.id }).then((res) => {
@@ -269,7 +269,8 @@ export default {
         console.log(vm.temp);
       });
     },
-    // 獲取司機證照
+
+    /* 獲取司機證照 */
     getDriverLicenses() {
       const vm = this;
       let query = {
@@ -293,7 +294,8 @@ export default {
         });
       });
     },
-    //獲取所有保險項目
+
+    /* 獲取所有保險項目 */
     getDriverInsurances() {
       const vm = this;
       let query = {
@@ -319,16 +321,14 @@ export default {
       });
     },
 
-    // 確認編輯司機
+    /* 確認編輯司機 */
     handleSave() {
       const vm = this;
-      vm.temp.account = vm.temp.uid;
-      vm.temp.password = vm.temp.phone;
-      console.log(vm.temp);
+      vm.temp.account = vm.temp.phone;
+      vm.temp.password = vm.temp.uid.slice(-4);
       let obj = JSON.parse(JSON.stringify(vm.temp));
       obj.driverLicenses = vm.driverLicensesChecked;
       obj.driverInsurance = vm.driverInsurancesChecked;
-      console.log(obj);
       drivers.update(obj).then(() => {
         // console.log(res);
         vm.$router.push("/driver/index");
@@ -339,7 +339,7 @@ export default {
       });
     },
 
-    // 檢查是否勾選
+    /* 檢查是否勾選 */
     hasChecked(id) {
       return !this.temp.driverLicenses.includes(id);
     },
