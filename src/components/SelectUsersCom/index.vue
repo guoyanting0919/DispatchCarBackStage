@@ -1,11 +1,11 @@
 <template>
-  <div style="height: 100%;" class="select-users-wrap">
-    <div class="flex-row" style="height: 100%;">
+  <div style="height: 100%" class="select-users-wrap">
+    <div class="flex-row" style="height: 100%">
       <div class="part-box" v-if="loginKey === 'loginUser' && !orgId">
         <el-card
           shadow="never"
           class="body-small custom-card"
-          style="height: 100%;"
+          style="height: 100%"
         >
           <div slot="header" class="clearfix">
             <el-button type="text" style="padding: 0 11px" @click="getAllUsers"
@@ -24,13 +24,13 @@
       <div class="flex-item table-box">
         <div
           class="flex-row"
-          style="align-items: center;"
+          style="align-items: center"
           v-if="loginKey === 'loginUser'"
           @keyup.13="handleSearchUser"
         >
           <el-input
             size="mini"
-            style="margin: 10px;width: 200px;"
+            style="margin: 10px; width: 200px"
             placeholder="請輸入內容"
             v-model="searchKey"
           >
@@ -44,7 +44,7 @@
             >查詢</el-button
           >
           <div
-            style="text-align: right;padding: 5px 10px;"
+            style="text-align: right; padding: 5px 10px"
             :title="names"
             v-if="names"
             class="flex-item ellipsis"
@@ -59,7 +59,7 @@
           :data="tableData.datas"
           tooltip-effect="dark"
           v-loading="tableData.loading"
-          style="width: 100%;border-top: 1px solid #e4e4e4;"
+          style="width: 100%; border-top: 1px solid #e4e4e4"
           @row-click="rowClick"
           @select="handleSelectionUser"
           @select-all="handleSelectionUser"
@@ -112,7 +112,7 @@
           tooltip-effect="dark"
           v-loading="tableData.loading"
           border
-          style="width: 100%;"
+          style="width: 100%"
           @row-click="rowClick"
           @select="handleSelectionUser"
           @select-all="handleSelectionUser"
@@ -158,11 +158,11 @@
           :total="tableData.total"
           :page-size="tableData.listQuery.limit"
           @current-change="handlePageSearch"
-          style="margin-top: 3px;text-align: right;"
+          style="margin-top: 3px; text-align: right"
         ></el-pagination>
       </div>
     </div>
-    <div style="text-align:right;margin-top: 10px;" v-if="!hiddenFooter">
+    <div style="text-align: right; margin-top: 10px" v-if="!hiddenFooter">
       <el-button size="small" type="cancel" @click="handleClose"
         >取消</el-button
       >
@@ -194,11 +194,11 @@ export default {
       searchKey: "",
       statusOptions: [
         {
-          key: true,
+          key: 0,
           display_name: "停用",
         },
         {
-          key: false,
+          key: 1,
           display_name: "正常",
         },
       ],
@@ -247,7 +247,7 @@ export default {
     userStatusFilter(status) {
       var res = "color-success";
       switch (status) {
-        case 1:
+        case 0:
           res = "color-danger";
           break;
         default:
@@ -328,7 +328,7 @@ export default {
     // 獲取部門信息
     getPartData() {
       login.getOrgs().then((response) => {
-        this.partDatas = response.result.map(function(item) {
+        this.partDatas = response.result.map(function (item) {
           return {
             id: item.id,
             label: item.name,

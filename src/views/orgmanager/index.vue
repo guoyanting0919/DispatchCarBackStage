@@ -142,11 +142,11 @@
                 fixed="right"
                 align="center"
                 :label="'操作'"
-                width="120"
+                width="150"
                 class-name="small-padding fixed-width"
               >
                 <template slot-scope="scope">
-                  <div class="buttonFlexBox">
+                  <!-- <div class="buttonFlexBox">
                     <el-tooltip
                       effect="dark"
                       content="編輯"
@@ -193,9 +193,9 @@
                         <i class="iconfont icon-Vector11"></i>
                       </div>
                     </el-tooltip>
-                  </div>
-                  <!-- <el-button
-                    type="primary"
+                  </div> -->
+                  <el-button
+                    type="info"
                     size="mini"
                     @click="handleUpdate(scope.row)"
                     >編輯</el-button
@@ -206,7 +206,7 @@
                     type="danger"
                     @click="handleModifyStatus(scope.row, 1)"
                     >停用</el-button
-                  >-->
+                  >
                 </template>
               </el-table-column>
             </el-table>
