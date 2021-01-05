@@ -299,9 +299,9 @@
                   style="width: 100%"
                   v-model="temp.time"
                   :picker-options="{
-                    start: '08:30',
-                    step: '00:15',
-                    end: '18:30',
+                    start: '06:00',
+                    step: '00:10',
+                    end: '20:00',
                   }"
                   placeholder="選擇時間"
                 >
@@ -744,6 +744,16 @@ export default {
         case "carPool":
           this.isShare();
           break;
+        case "batch":
+          if (this.multipleSelection.length == 0) {
+            this.$alertT.fire({
+              icon: "error",
+              title: `請勾選欲排班之訂單`,
+            });
+            return;
+          }
+          this.handleBatch(this.multipleSelection);
+          break;
         default:
           break;
       }
@@ -861,6 +871,50 @@ export default {
           vm.passengerArr = JSON.parse(vm.temp.remark);
         });
       });
+    },
+
+    /* 批量排班 */
+    handleBatch(items) {
+      const vm = this;
+      vm.$cl(items);
+
+      // 確認司機車輛都已勾選
+      let flag = true;
+      items.forEach((i) => {
+        if (i.driverInfoId == null || i.carId == null) {
+          flag = false;
+        }
+      });
+      if (!flag) {
+        vm.$alertM.fire({
+          icon: "error",
+          title: `請確認已勾選訂單都已確實選擇司機車輛`,
+        });
+      } else {
+        //批次送出排班API
+        for (let index = 0; index < items.length; index++) {
+          let data = {
+            id: [items[index].despatchNo],
+            driverInfoId: items[index].driverInfoId,
+            carId: items[index].carId,
+            driverInfoName: vm.driverList.filter((d) => {
+              return d.id == items[index].driverInfoId;
+            })[0].userName,
+            carNo: vm.carList.filter((c) => {
+              return c.id == items[index].carId;
+            })[0].carNo,
+          };
+          dispatchs.addOrUpdate(data).then((res) => {
+            vm.$alertT.fire({
+              icon: "success",
+              title: res.message,
+            });
+            if (index == items.length - 1) {
+              vm.getList();
+            }
+          });
+        }
+      }
     },
 
     /* 批次刪除訂單 */

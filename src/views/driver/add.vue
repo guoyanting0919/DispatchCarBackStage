@@ -253,8 +253,8 @@ export default {
     handleSave() {
       const vm = this;
       vm.temp.orgId = vm.defaultorgid;
-      vm.temp.account = vm.temp.uid;
-      vm.temp.password = vm.temp.phone;
+      vm.temp.account = vm.temp.phone;
+      vm.temp.password = vm.temp.uid.slice(-4);
       console.log(vm.temp);
       let obj = JSON.parse(JSON.stringify(vm.temp));
       obj.driverLicenses = vm.driverLicensesChecked;

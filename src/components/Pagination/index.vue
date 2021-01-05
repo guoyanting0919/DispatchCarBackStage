@@ -1,10 +1,11 @@
 <template>
-  <div :class="{'hidden':hidden}" class="pagination-container">
+  <div :class="{ hidden: hidden }" class="pagination-container">
     <el-pagination
       :background="background"
       :current-page.sync="currentPage"
       :page-size.sync="pageSize"
       :layout="layoutData"
+      :page-sizes="[10, 20, 30, 40, 50, 100, 999]"
       :total="total"
       :small="isSmall"
       :pager-count="5"
