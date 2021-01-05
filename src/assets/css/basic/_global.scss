@@ -2,9 +2,30 @@
 .swal2-container {
   z-index: 9999;
 }
+
 //文字水平置中
 .textCenter {
   text-align: center;
+}
+
+/* NProgress */
+#nprogress .bar {
+  background: transparent !important; //自定义颜色
+  background-image: linear-gradient(
+    to right,
+    $--color-primary-light-7,
+    $--color-primary-light-1
+  ) !important;
+  height: 0.25rem;
+}
+
+#nprogress .peg {
+  box-shadow: none !important;
+}
+
+/* tr hover */
+.hover-row > td {
+  background-color: $--color-primary-light-9 !important;
 }
 
 // 共用scrollBar

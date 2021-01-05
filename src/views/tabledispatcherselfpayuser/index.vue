@@ -1212,9 +1212,9 @@ export default {
 };
 </script>
 <style lang='scss' scoped>
-::v-deep .hover-row > td {
-  background-color: initial !important;
-}
+// ::v-deep .hover-row > td {
+//   background-color: initial !important;
+// }
 .newOrderContainer {
   display: flex;
   flex-wrap: wrap;

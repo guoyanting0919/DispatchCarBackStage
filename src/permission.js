@@ -87,7 +87,6 @@ const whiteList = [
 ]; // 不重定向白名單
 
 router.beforeEach((to, from, next) => {
-  console.log("router before each");
   NProgress.start();
 
   store
