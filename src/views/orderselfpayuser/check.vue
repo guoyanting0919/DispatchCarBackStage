@@ -100,7 +100,7 @@
                 <div class="inputLable">乘車名單</div>
                 <div class="passengerList">
                   <p v-for="item in passengerList" :key="item.key">
-                    {{ item.name }} {{ item.birth }}
+                    {{ item.name }} {{ item.birth }} {{ item.phone }}
                   </p>
                 </div>
               </div>

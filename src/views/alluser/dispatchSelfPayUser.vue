@@ -14,7 +14,6 @@
 
     <div class="app-container flex-item">
       <Title title="白牌車預約"></Title>
-
       <!-- 預約表單 -->
       <div class="dispatchContainer bg-white">
         <SubTitle title="預約表單"></SubTitle>
@@ -116,7 +115,7 @@
                 :key="item.key"
               >
                 <el-row :gutter="16">
-                  <el-col :sm="4" :md="8" :offset="4">
+                  <el-col :sm="4" :md="6" :offset="3">
                     <el-form-item label="姓名">
                       <el-input
                         style="width: 100%"
@@ -127,7 +126,7 @@
                     </el-form-item>
                   </el-col>
 
-                  <el-col :sm="4" :md="8">
+                  <el-col :sm="4" :md="6">
                     <el-form-item label="生日">
                       <el-date-picker
                         style="width: 100%"
@@ -137,6 +136,17 @@
                         value-format="yyyy-MM-dd"
                       >
                       </el-date-picker>
+                    </el-form-item>
+                  </el-col>
+
+                  <el-col :sm="4" :md="6">
+                    <el-form-item label="聯絡電話">
+                      <el-input
+                        style="width: 100%"
+                        v-model="item.phone"
+                        placeholder="輸入聯絡電話"
+                      >
+                      </el-input>
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -229,17 +239,17 @@
             align="center"
           >
             <template slot-scope="scope">
-              <span>{{ scope.row.createDate | dateFilter }}</span>
+              <span>{{ scope.row.reserveDate | dateFilter }}</span>
             </template>
           </el-table-column>
           <el-table-column
             property="reserveDate"
             label="預約時間"
-            width="150"
+            width="100"
             align="center"
           >
             <template slot-scope="scope">
-              <span>{{ scope.row.createDate | dateFilter }}</span>
+              <span>{{ scope.row.reserveDate | timeFilter }}</span>
             </template>
           </el-table-column>
           <el-table-column
@@ -255,10 +265,12 @@
             align="center"
           >
           </el-table-column>
-          <el-table-column
-            property="canShared"
-            label="是否共乘"
-          ></el-table-column>
+          <el-table-column property="canShared" label="是否共乘">
+            <template slot-scope="scope">
+              <span v-if="scope.row.canShared">是</span>
+              <span v-else>否</span>
+            </template>
+          </el-table-column>
           <el-table-column
             property="passengerNum"
             label="搭乘人數"
@@ -303,6 +315,7 @@ import Title from "@/components/ConsoleTableTitle";
 import Pagination from "@/components/Pagination";
 import SubTitle from "@/components/SubTitle";
 import * as categorys from "@/api/categorys";
+import * as user from "@/api/users";
 import * as orderSelfPayUser from "@/api/orderSelfPayUser";
 export default {
   name: "dispatchSelfPay",
@@ -317,6 +330,9 @@ export default {
       buttons: [],
       //車輛類別
       carCategorysList: [],
+
+      /* 用戶資料 */
+      userInfo: "",
 
       // table相關
       list: [],
@@ -369,6 +385,10 @@ export default {
       let res = moment(date).format("YYYY-MM-DD");
       return res;
     },
+    timeFilter(date) {
+      let res = moment(date).format("YYYY-MM-DDThh:mm").split("T")[1];
+      return res;
+    },
   },
   watch: {
     "temp.passengerNum"(val, oldVal) {
@@ -378,7 +398,12 @@ export default {
         num = val - oldVal;
         console.log(val, oldVal, num);
         for (let index = oldVal + 1; index <= val; index++) {
-          let obj = { name: "", birth: "", key: index };
+          let obj = {
+            name: "",
+            birth: "",
+            phone: vm.userInfo.phone,
+            key: index,
+          };
           vm.passengerArr.push(obj);
         }
       } else {
@@ -391,17 +416,19 @@ export default {
   },
 
   methods: {
-    // 獲取本路由下所有功能按鈕
+    /* 獲取本路由下所有功能按鈕 */
     getButtons() {
       this.$route.meta.elements.forEach((el) => {
         this.buttons.push(el.domId);
       });
     },
-    // 是否擁有按鈕功能權限
+
+    /* 是否擁有按鈕功能權限 */
     hasButton(domId) {
       return this.buttons.includes(domId);
     },
-    //獲取歷史訂單
+
+    /* 獲取歷史訂單 */
     getList() {
       const vm = this;
       vm.listQuery.key = vm.$route.params.id.split("-")[0];
@@ -412,7 +439,8 @@ export default {
         console.log(vm.list);
       });
     },
-    //獲取所有車輛類別
+
+    /* 獲取所有車輛類別 */
     getCarCategorys() {
       const vm = this;
       let query = {
@@ -424,7 +452,17 @@ export default {
         vm.carCategorysList = res.data;
       });
     },
-    //預約訂單
+
+    /* 獲取用戶資料 */
+    async getUser() {
+      await user
+        .getClient({ id: this.$route.params.id.split("-")[0] })
+        .then((res) => {
+          this.userInfo = res.result;
+        });
+    },
+
+    /* 預約訂單 */
     handleReservation() {
       // console.log(this.passengerArr);
       const vm = this;
@@ -449,10 +487,11 @@ export default {
         vm.$router.push("/alluser/index");
       });
     },
-    //複製訂單
+
+    /* 複製訂單 */
     handleCopy(order) {
       this.temp = Object.assign({}, order); // copy obj
-      this.temp.remark = [{ name: "", birth: "" }];
+      this.temp.remark = [{ name: "", birth: "", phone: "" }];
       this.$nextTick(() => {
         this.passengerArr = [];
         console.log(this.passengerArr);
@@ -462,7 +501,7 @@ export default {
       });
     },
 
-    // 換頁
+    /* 換頁 */
     handleCurrentChange(val) {
       this.listQuery.page = val.page;
       this.listQuery.limit = val.limit;
@@ -476,7 +515,7 @@ export default {
       this.$refs.mainTable.toggleRowSelection(row);
     },
 
-    //起訖點互換
+    /* 起訖點互換 */
     handleChange() {
       let ex = this.temp.fromAddr;
       let exFlon = this.temp.fromLon;
@@ -525,11 +564,17 @@ export default {
       console.log(ev);
     },
   },
-  mounted() {
+  async mounted() {
     this.restaurants = this.loadAll();
     this.getCarCategorys();
     this.getList();
-    // this.temp.passengerNum = 1;
+    await this.getUser();
+    this.temp.passengerNum = 1;
+    this.$nextTick(() => {
+      this.passengerArr[0].name = this.userInfo.name;
+      this.passengerArr[0].birth = this.userInfo.birthday;
+      this.passengerArr[0].phone = this.userInfo.phone;
+    });
   },
 };
 </script>

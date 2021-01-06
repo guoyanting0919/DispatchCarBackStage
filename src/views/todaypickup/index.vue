@@ -46,7 +46,7 @@
       <!-- 本日接送 -->
       <div class="todayContainer">
         <Title title="本日接送狀況"></Title>
-        <div class="todayDataContainer ">
+        <div class="todayDataContainer">
           <div class="dataBox">
             <i class="iconfont icon-console"></i>
             <p>總趟次</p>

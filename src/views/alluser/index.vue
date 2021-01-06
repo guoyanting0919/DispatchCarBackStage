@@ -36,11 +36,11 @@
           @selection-change="handleSelectionChange"
           @row-click="rowClick"
         >
-          <el-table-column
+          <!-- <el-table-column
             type="selection"
             width="55"
             align="center"
-          ></el-table-column>
+          ></el-table-column> -->
 
           <el-table-column label="預約" width="100" align="center" fixed="left">
             <template slot-scope="scope">
@@ -58,7 +58,7 @@
               >
             </template>
           </el-table-column>
-          <el-table-column
+          <!-- <el-table-column
             property="lock"
             label="鎖定狀態"
             width="100"
@@ -66,14 +66,12 @@
           >
             <template slot-scope="scope">
               <div>
-                <!-- 未鎖定 -->
                 <i
                   style="color: #409167"
                   :key="scope.row.id"
                   v-if="isLock(scope.row.unLockDate)"
                   class="iconfont icon-Vector21"
                 ></i>
-                <!-- 鎖定 -->
                 <i
                   :key="scope.row.id"
                   style="color: #d63737"
@@ -82,13 +80,23 @@
                 ></i>
               </div>
             </template>
-          </el-table-column>
-          <el-table-column property="name" label="姓名" width="130">
+          </el-table-column> -->
+          <el-table-column property="name" label="姓名" width="200">
             <template slot-scope="scope">
               <div class="buttomColum">
-                <p>
+                <p style="margin-right: auto">
                   {{ scope.row.name }}
                 </p>
+                <!-- 解鎖 -->
+                <el-button
+                  size="mini"
+                  class="xsBtn"
+                  @click="handleUnlock(scope.row)"
+                  type="danger"
+                  v-if="hasButton('unlock') && !isLock(scope.row.unLockDate)"
+                >
+                  <i class="iconfont icon-Vector21"></i>
+                </el-button>
                 <el-button
                   size="mini"
                   class="xsBtn"
@@ -144,7 +152,7 @@
               <span>{{ scope.row.birthday | dateFilter }}</span>
             </template>
           </el-table-column> -->
-          <el-table-column
+          <!-- <el-table-column
             property="sex"
             label="性別"
             width="100"
@@ -164,7 +172,7 @@
                 ></i>
               </div>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column
             property="phone"
             label="手機"
@@ -1014,15 +1022,32 @@ export default {
     },
     // 帳號解鎖
     handleUnlock(user) {
-      console.log(user);
       const vm = this;
-      users.unlock({ id: user.id }).then((res) => {
-        console.log(res);
-        vm.$alertT.fire({
-          icon: "success",
-          title: `用戶${user.name} 解鎖成功`,
-        });
-        vm.getList();
+      vm.$swal({
+        title: "解鎖提示",
+        text: `確認解鎖用戶 ${user.name} ?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#227294",
+        cancelButtonColor: "#d63737",
+        confirmButtonText: "確定",
+        cancelButtonText: "取消",
+      }).then((result) => {
+        if (result.value) {
+          users.unlock({ id: user.id }).then((res) => {
+            console.log(res);
+            vm.$alertT.fire({
+              icon: "success",
+              title: `用戶${user.name} 解鎖成功`,
+            });
+            vm.getList();
+          });
+        } else {
+          vm.$alertT.fire({
+            icon: "info",
+            title: `已取消解鎖`,
+          });
+        }
       });
     },
 
@@ -1342,7 +1367,7 @@ export default {
     display: flex;
     width: 100%;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 
   .roleButtomColum {

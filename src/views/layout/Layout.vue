@@ -20,6 +20,13 @@
           <tags-view class="custom-tags-view"></tags-view>
           <app-main></app-main>
         </div>
+        <span>
+          <a
+            target="_blank"
+            href="https://www.notion.so/151c9a29382346b7b67871f4bf5e84e0?v=499ab17cd2854340a28dd2946045f695"
+            >.</a
+          >
+        </span>
         <p class="webVersion">{{ webStatus }} version-{{ webVersion }}</p>
       </el-container>
     </el-container>

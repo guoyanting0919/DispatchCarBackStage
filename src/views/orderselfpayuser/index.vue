@@ -253,7 +253,7 @@
                 :key="item.key"
               >
                 <el-row :gutter="16">
-                  <el-col :sm="4" :md="8" :offset="4">
+                  <el-col :sm="4" :md="6" :offset="3">
                     <el-form-item label="姓名">
                       <el-input
                         style="width: 100%"
@@ -264,7 +264,7 @@
                     </el-form-item>
                   </el-col>
 
-                  <el-col :sm="4" :md="8">
+                  <el-col :sm="4" :md="6">
                     <el-form-item label="生日">
                       <el-date-picker
                         style="width: 100%"
@@ -274,6 +274,17 @@
                         value-format="yyyy-MM-dd"
                       >
                       </el-date-picker>
+                    </el-form-item>
+                  </el-col>
+
+                  <el-col :sm="4" :md="6">
+                    <el-form-item label="聯絡電話">
+                      <el-input
+                        style="width: 100%"
+                        v-model="item.phone"
+                        placeholder="輸入聯絡電話"
+                      >
+                      </el-input>
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -448,7 +459,13 @@ export default {
       const vm = this;
       if (val > oldVal) {
         for (let index = oldVal + 1; index <= val; index++) {
-          let obj = { name: "", birth: "", key: index };
+          let obj = {
+            name: "",
+            birth: "",
+            //TODO:這邊暫時用第一筆資料的電話當預設聯絡電話
+            phone: vm.passengerArr[0]?.phone || "",
+            key: index,
+          };
           vm.passengerArr.push(obj);
         }
       } else {

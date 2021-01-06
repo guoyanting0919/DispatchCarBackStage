@@ -75,7 +75,7 @@
               }}</span>
             </template>
           </el-table-column>
-          <el-table-column
+          <!-- <el-table-column
             property="status"
             label="狀態"
             width="130"
@@ -87,7 +87,7 @@
                 <el-tag v-else type="danger">不可派發</el-tag>
               </div>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column
             property="setting"
             label="操作"

@@ -52,6 +52,38 @@
 
         <!-- 調度台 -->
         <SubTitle title="調度台"></SubTitle>
+
+        <!-- 條件篩選 -->
+        <el-date-picker
+          size="mini"
+          style="width: 350px; margin: 0 1rem"
+          v-model="temp.dateRange"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="起始日期"
+          end-placeholder="结束日期"
+        >
+        </el-date-picker>
+
+        <el-select size="mini" v-model="value" placeholder="請選擇訂單狀態">
+          <el-option label="新訂單" value="1"></el-option>
+          <el-option label="已排班" value="2"></el-option>
+          <el-option label="已抵達" value="3"></el-option>
+          <el-option label="客上" value="4"></el-option>
+          <el-option label="完成" value="5"></el-option>
+          <el-option label="已取消" value="9"> </el-option>
+        </el-select>
+
+        <el-button
+          type="primary"
+          style="margin: 0 1rem"
+          size="mini"
+          @click="getList"
+        >
+          <i class="iconfont icon-search"></i>
+        </el-button>
+
+        <!-- table -->
         <div class="bg-white formContainer" style="height: 100%">
           <el-table
             ref="mainTable"
@@ -74,7 +106,7 @@
               align="center"
               property="userName"
               label="姓名"
-              width="100"
+              width="120"
             >
             </el-table-column>
             <el-table-column
@@ -371,7 +403,7 @@
                 :key="item.key"
               >
                 <el-row :gutter="16">
-                  <el-col :sm="4" :md="8" :offset="4">
+                  <el-col :sm="4" :md="6" :offset="3">
                     <el-form-item label="姓名">
                       <el-input
                         style="width: 100%"
@@ -382,7 +414,7 @@
                     </el-form-item>
                   </el-col>
 
-                  <el-col :sm="4" :md="8">
+                  <el-col :sm="4" :md="6">
                     <el-form-item label="生日">
                       <el-date-picker
                         style="width: 100%"
@@ -392,6 +424,17 @@
                         value-format="yyyy-MM-dd"
                       >
                       </el-date-picker>
+                    </el-form-item>
+                  </el-col>
+
+                  <el-col :sm="4" :md="6">
+                    <el-form-item label="聯絡電話">
+                      <el-input
+                        style="width: 100%"
+                        v-model="item.phone"
+                        placeholder="輸入聯絡電話"
+                      >
+                      </el-input>
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -638,6 +681,8 @@ export default {
       total: 0,
       listQuery: {
         page: 1,
+        StartDate: "",
+        EndDate: "",
         limit: 10,
         key: undefined,
       },
@@ -655,6 +700,7 @@ export default {
         /* vue.$set */
         date: "",
         time: "",
+        dateRange: [],
 
         id: "",
         selfPayUserId: "",
@@ -715,7 +761,13 @@ export default {
       const vm = this;
       if (val > oldVal) {
         for (let index = oldVal + 1; index <= val; index++) {
-          let obj = { name: "", birth: "", key: index };
+          let obj = {
+            name: "",
+            birth: "",
+            //TODO:這邊暫時用第一筆資料的電話當預設聯絡電話
+            phone: vm.passengerArr[0]?.phone || "",
+            key: index,
+          };
           vm.passengerArr.push(obj);
         }
       } else {
@@ -764,6 +816,12 @@ export default {
       const vm = this;
       vm.pos = "";
       vm.listLoading = true;
+      vm.listQuery.StartDate = moment(vm.temp.dateRange?.[0]).format(
+        "yyyy-MM-DD"
+      );
+      vm.listQuery.EndDate = moment(vm.temp.dateRange?.[1])
+        .add(24, "h")
+        .format("yyyy-MM-DD");
       orderSelfPayUser.load(vm.listQuery).then((res) => {
         vm.spanArr = [];
 
@@ -1197,6 +1255,8 @@ export default {
     },
   },
   async mounted() {
+    this.$set(this.temp.dateRange, 0, moment(new Date()).format("yyyy-MM-DD"));
+    this.$set(this.temp.dateRange, 1, moment(new Date()).format("yyyy-MM-DD"));
     this.connectHub();
     this.getDriverList();
     this.getCarList();
