@@ -20,7 +20,7 @@
           <tags-view class="custom-tags-view"></tags-view>
           <app-main></app-main>
         </div>
-        <span style="cursor: crosshair; height: 1rem; color: #fff" @click="See">
+        <span style="cursor: ew-resize; height: 1rem; color: #fff" @click="See">
           .
         </span>
         <p class="webVersion">{{ webStatus }} version-{{ webVersion }}</p>
