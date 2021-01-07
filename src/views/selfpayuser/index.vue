@@ -20,8 +20,8 @@
     </sticky>
 
     <div class="app-container flex-item">
-      <!-- 白牌個案 -->
-      <Title title="白牌個案"></Title>
+      <!-- 白牌用戶 -->
+      <Title title="白牌用戶"></Title>
       <div class="bg-white" style="height: calc(100% - 50px)">
         <el-table
           ref="mainTable"
@@ -48,9 +48,15 @@
             align="center"
           ></el-table-column>
           <el-table-column
+            property="phone"
+            label="手機"
+            width="200"
+            align="center"
+          ></el-table-column>
+          <el-table-column
             property="sex"
             label="性別"
-            width="150"
+            width="50"
             align="center"
           >
             <template slot-scope="scope">

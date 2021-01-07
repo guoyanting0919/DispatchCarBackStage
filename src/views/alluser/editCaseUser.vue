@@ -435,7 +435,7 @@ export default {
       });
       console.log(a);
       let b = a[0].children.filter((r2) => {
-        return r2.item.name == "全部個案";
+        return r2.item.name == "全部用戶";
       });
       this.buttons = b[0].item.elements.map((btn) => {
         return btn.domId;

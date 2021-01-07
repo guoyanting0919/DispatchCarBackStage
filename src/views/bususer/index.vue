@@ -20,8 +20,8 @@
     </sticky>
 
     <div class="app-container flex-item">
-      <!-- 長照個案 -->
-      <Title title="巴士個案"></Title>
+      <!-- 巴士用戶 -->
+      <Title title="巴士用戶"></Title>
       <div class="bg-white" style="height: calc(100% - 50px)">
         <el-table
           ref="mainTable"
@@ -72,7 +72,7 @@
             label="卡號"
             align="center"
           ></el-table-column>
-          <el-table-column
+          <!-- <el-table-column
             property="status"
             label="狀態"
             width="130"
@@ -84,7 +84,7 @@
                 <el-tag v-else type="danger">不可派發</el-tag>
               </div>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <el-table-column
             property="setting"
             label="操作"

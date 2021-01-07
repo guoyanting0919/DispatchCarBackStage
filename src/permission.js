@@ -8,30 +8,39 @@ import Layout from "@/views/layout/Layout";
 let secondRouter = [];
 let secondRouterObj = [];
 let routerMappingList = [
+  /* 預約訂單 */
   {
     path: "/allorder/index",
     title: "預約訂單 / 全部資料",
   },
   {
-    path: "/todayorder/index",
-    title: "預約訂單 / 本日任務",
+    path: "/orderselfpayuser/index",
+    title: "預約訂單 / 白牌車訂單",
   },
   {
+    path: "/orderbususer/index",
+    title: "預約訂單 / 巴士訂單",
+  },
+
+  /* 用戶資料 */
+  {
     path: "/alluser/index",
-    title: "個案資料 / 全部個案",
+    title: "用戶資料 / 全部用戶",
   },
   {
     path: "/caseuser/index",
-    title: "個案資料 / 長照個案",
+    title: "用戶資料 / 長照用戶",
   },
   {
     path: "/selfpayuser/index",
-    title: "個案資料 / 自費個案",
+    title: "用戶資料 / 自費用戶",
   },
   {
     path: "/bususer/index",
-    title: "個案資料 / 巴士個案",
+    title: "用戶資料 / 巴士用戶",
   },
+
+  /* 司機車輛管理 */
   {
     path: "/driver/index",
     title: "司機車輛管理 / 司機資料",
@@ -40,6 +49,8 @@ let routerMappingList = [
     path: "/car/index",
     title: "司機車輛管理 / 車輛資料",
   },
+
+  /* 路線及站點管理 */
   {
     path: "/busstop/index",
     title: "路線及站點管理 / 站點管理",
@@ -48,10 +59,8 @@ let routerMappingList = [
     path: "/busroute/index",
     title: "路線及站點管理 / 路線管理",
   },
-  {
-    path: "/orderselfpayuser/index",
-    title: "預約訂單 / 白牌車訂單",
-  },
+
+  /* 前台頁面管理 */
   {
     path: "/news/index",
     title: "前台頁面管理 / 最新消息管理",

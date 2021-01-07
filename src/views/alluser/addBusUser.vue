@@ -18,7 +18,7 @@
     </sticky>
 
     <div class="app-container flex-item">
-      <Title title="新增幸福巴士個案基本資料"></Title>
+      <Title title="新增幸福巴士用戶基本資料"></Title>
       <div class="formContainer bg-white customScrollBar">
         <el-form
           :label-position="labelPosition"
@@ -33,7 +33,7 @@
               <el-form-item label="姓名">
                 <el-input
                   disabled
-                  placeholder="請輸入個案姓名"
+                  placeholder="請輸入用戶姓名"
                   v-model="basicTemp.name"
                 ></el-input>
               </el-form-item>
@@ -57,7 +57,7 @@
                 <el-input
                   disabled
                   v-model="basicTemp.uid"
-                  placeholder="請輸入個案身分證字號"
+                  placeholder="請輸入用戶身分證字號"
                 ></el-input>
               </el-form-item>
             </el-col>
@@ -176,7 +176,7 @@ export default {
         return r.item.name == "用戶資料";
       });
       let b = a[0].children.filter((r2) => {
-        return r2.item.name == "全部個案";
+        return r2.item.name == "全部用戶";
       });
       this.buttons = b[0].item.elements.map((btn) => {
         return btn.domId;

@@ -1,4 +1,5 @@
-.orderSelfPayUser {
+.orderSelfPayUser,
+.orderBusUser {
   .orderTableContainer {
     height: calc(100% - 52px);
     overflow: auto;
