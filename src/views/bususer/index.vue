@@ -6,7 +6,7 @@
         <el-input
           style="width: 200px; margin-right: 0.5rem"
           size="mini"
-          v-model="value"
+          v-model="listQuery.key"
           clearable
           placeholder="請輸入關鍵字"
         ></el-input>
@@ -35,18 +35,18 @@
           @selection-change="handleSelectionChange"
           @row-click="rowClick"
         >
-          <el-table-column
+          <!-- <el-table-column
             type="selection"
             width="55"
             align="center"
-          ></el-table-column>
+          ></el-table-column> -->
           <el-table-column
             property="name"
             label="用戶姓名"
             width="200"
             align="center"
           ></el-table-column>
-          <el-table-column
+          <!-- <el-table-column
             property="sex"
             label="性別"
             width="100"
@@ -66,7 +66,20 @@
                 ></i>
               </div>
             </template>
-          </el-table-column>
+          </el-table-column> -->
+          <el-table-column
+            property="uid"
+            label="身分證字號"
+            width="200"
+            align="center"
+          ></el-table-column>
+          <el-table-column
+            property="phone"
+            label="手機"
+            width="200"
+            align="center"
+          ></el-table-column>
+
           <el-table-column
             property="cardNo"
             label="卡號"
@@ -225,8 +238,8 @@ export default {
     },
     onBtnClicked(domId) {
       switch (domId) {
-        case "violationBtn":
-          this.violationDialog = true;
+        case "search":
+          this.getList();
           break;
         default:
           break;

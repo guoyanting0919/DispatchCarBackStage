@@ -20,60 +20,7 @@
           ref="form"
         >
           <SubTitle title="基本資料"></SubTitle>
-          <el-row :gutter="16">
-            <el-col :sm="12" :md="3">
-              <el-form-item label="姓名">
-                <el-input
-                  disabled
-                  placeholder="請輸入個案姓名"
-                  v-model="basicTemp.name"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="3">
-              <el-form-item label="性別">
-                <el-select
-                  disabled
-                  clearable
-                  v-model="basicTemp.sex"
-                  placeholder="請選擇性別"
-                  style="width: 100%"
-                >
-                  <el-option :value="1" :label="'男'">男</el-option>
-                  <el-option :value="0" :label="'女'">女</el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="6">
-              <el-form-item label="身份證字號">
-                <el-input
-                  disabled
-                  v-model="basicTemp.uid"
-                  placeholder="請輸入個案身分證字號"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="6">
-              <el-form-item label="生日">
-                <el-date-picker
-                  disabled
-                  v-model="basicTemp.birthday"
-                  type="date"
-                  placeholder="請選擇生日"
-                  style="width: 100%"
-                ></el-date-picker>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="6">
-              <el-form-item label="手機">
-                <el-input
-                  disabled
-                  v-model="basicTemp.phone"
-                  placeholder="請輸入手機"
-                ></el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
+          <DisabledUserInfo :temp="basicTemp"></DisabledUserInfo>
 
           <SubTitle title="白牌資料"></SubTitle>
           <el-row :gutter="16">
@@ -145,6 +92,7 @@
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import SubTitle from "@/components/SubTitle";
+import DisabledUserInfo from "@/components/DisabledUserInfo";
 import * as taiwan from "@/assets/taiwan.js";
 import * as users from "@/api/users";
 import * as selfPayUsers from "@/api/selfPayUsers";
@@ -154,6 +102,7 @@ export default {
     Sticky,
     Title,
     SubTitle,
+    DisabledUserInfo,
   },
   data() {
     return {
@@ -218,7 +167,7 @@ export default {
               icon: "success",
               title: `用戶${vm.basicTemp.name} 白牌身份編輯成功`,
             });
-            vm.$router.push("/selfpayuser/index");
+            vm.$router.push("/alluser/index");
             // vm.getSelfPayUser();
           });
         } else {

@@ -6,6 +6,9 @@
         <el-button size="mini" @click="handleReservation" type="primary" plain
           >預約</el-button
         >
+        <el-button size="mini" @click="handleBack" type="success" plain
+          >回列表</el-button
+        >
       </div>
     </sticky>
 
@@ -21,26 +24,31 @@
         >
           <el-row :gutter="16">
             <el-col :sm="12" :md="8">
-              <el-form-item label="預約日期">
+              <el-form-item label="預約日期" prop="date">
                 <el-date-picker
                   style="width: 100%"
                   v-model="temp.date"
                   type="date"
                   placeholder="選擇日期"
                   value-format="yyyy-MM-dd"
+                  :picker-options="{
+                    disabledDate(time) {
+                      return time.getTime() < Date.now() - 8.64e7;
+                    },
+                  }"
                 >
                 </el-date-picker>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="8">
-              <el-form-item label="預約時間">
+              <el-form-item label="預約時間" prop="time">
                 <el-time-select
                   style="width: 100%"
                   v-model="temp.time"
                   :picker-options="{
-                    start: '08:00',
-                    step: '00:30',
-                    end: '16:00',
+                    start: timeStartTime,
+                    step: '00:10',
+                    end: '20:00',
                   }"
                   placeholder="選擇時間"
                 >
@@ -66,7 +74,7 @@
             </el-col>
 
             <el-col :sm="12" :md="8">
-              <el-form-item label="選擇路線">
+              <el-form-item label="選擇路線" prop="stationLineId">
                 <el-select
                   style="width: 100%"
                   v-model="temp.stationLineId"
@@ -84,12 +92,12 @@
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="8">
-              <el-form-item label="選擇起點站牌">
+              <el-form-item label="選擇起點站牌" prop="fromStationId">
                 <el-select
                   :disabled="temp.stationLineId == ''"
                   style="width: 100%"
                   v-model="temp.fromStationId"
-                  placeholder="選擇路線"
+                  placeholder="選擇站牌"
                   @change="handleFromChange"
                 >
                   <el-option
@@ -103,12 +111,12 @@
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="8">
-              <el-form-item label="選擇終點站牌">
+              <el-form-item label="選擇終點站牌" prop="toStationId">
                 <el-select
                   :disabled="temp.fromStationId == ''"
                   style="width: 100%"
                   v-model="temp.toStationId"
-                  placeholder="選擇路線"
+                  placeholder="選擇站牌"
                 >
                   <el-option
                     :disabled="type.disabled"
@@ -144,6 +152,9 @@ export default {
   },
   data() {
     return {
+      /* 今天日期 */
+      today: "",
+
       //路線
       lineList: [],
 
@@ -175,15 +186,47 @@ export default {
         fromStationName: "",
         toStationId: "",
         toStationName: "",
-        passengerNum: 0,
+        passengerNum: 1,
         remark: "",
       },
       rules: {
+        date: [{ required: true, message: "必填欄位", tigger: "change" }],
+        time: [{ required: true, message: "必填欄位", tigger: "change" }],
+        stationLineId: [
+          { required: true, message: "必填欄位", tigger: "change" },
+        ],
+        fromStationId: [
+          { required: true, message: "必填欄位", tigger: "change" },
+        ],
+        toStationId: [
+          { required: true, message: "必填欄位", tigger: "change" },
+        ],
         // Id: [{ required: true, message: "請輸入個案編號", trigger: "blur" }],
         caseUserNo: [{ required: true, message: "必填欄位", tigger: "blur" }],
         orgAId: [{ required: true, message: "必填欄位", tigger: "change" }],
       },
     };
+  },
+
+  computed: {
+    timeStartTime() {
+      let time;
+      if (this.temp.date !== this.today) {
+        time = "06:00";
+      } else {
+        let nowHr = moment().format("hh");
+        let nowMin =
+          (Math.floor(moment().format("hh:mm").split(":")[1] / 10) + 1) * 10;
+
+        if (nowMin == 60) {
+          nowMin = "00";
+          nowHr++;
+        }
+
+        time = `${nowHr}:${nowMin}`;
+      }
+      return time;
+    },
   },
 
   methods: {
@@ -215,6 +258,14 @@ export default {
         vm.stopList = res.data;
       });
     },
+
+    /* 回列表 */
+    handleBack() {
+      //TODO:白牌用戶頁面跳轉記得換路徑
+      this.$router.push("/alluser/index");
+      // this.$router.push("/bususer/index");
+    },
+
     // 選擇路線
     handleLineChange() {
       const vm = this;
@@ -252,42 +303,47 @@ export default {
           obj.disabled = false;
         }
       });
-      // console.log(cloneObj);
-      // cloneObj.splice(0, idFlag + 1, ...[]);
       vm.toLineStop = cloneObj;
     },
-    //預約訂單 58985e5b-a659-4ac4-94aa-352ccabb3198  58985e5b-a659-4ac4-94aa-352ccabb319
+    //預約訂單
     handleReservation() {
-      const vm = this;
-      let date = moment(vm.temp.date).format("yyyy-MM-DD");
-      vm.temp.busUserId = vm.$route.params.id.split("-")[1];
-      vm.temp.userId = vm.$route.params.id.split("-")[0];
-      vm.temp.reserveDate = `${date} ${vm.temp.time}`;
-      vm.temp.stationLineName = vm.lineList.filter((l) => {
-        return l.id === vm.temp.stationLineId;
-      })[0].name;
-      vm.temp.fromStationName = vm.lineStop.filter((s) => {
-        return s.id === vm.temp.fromStationId;
-      })[0].stationName;
-      vm.temp.toStationName = vm.toLineStop.filter((s) => {
-        return s.id === vm.temp.toStationId;
-      })[0].stationName;
-      vm.temp.orgId = vm.lineList.filter((item) => {
-        return item.id === vm.temp.stationLineId;
-      })[0].orgId;
-      console.log(vm.temp.orgId);
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          const vm = this;
+          let date = moment(vm.temp.date).format("yyyy-MM-DD");
+          vm.temp.busUserId = vm.$route.params.id.split("-")[1];
+          vm.temp.userId = vm.$route.params.id.split("-")[0];
+          vm.temp.reserveDate = `${date} ${vm.temp.time}`;
+          vm.temp.stationLineName = vm.lineList.filter((l) => {
+            return l.id === vm.temp.stationLineId;
+          })[0].name;
+          vm.temp.fromStationName = vm.lineStop.filter((s) => {
+            return s.id === vm.temp.fromStationId;
+          })[0].stationName;
+          vm.temp.toStationName = vm.toLineStop.filter((s) => {
+            return s.id === vm.temp.toStationId;
+          })[0].stationName;
+          vm.temp.orgId = vm.lineList.filter((item) => {
+            return item.id === vm.temp.stationLineId;
+          })[0].orgId;
+          console.log(vm.temp.orgId);
 
-      orderBusUser.add(vm.temp).then((res) => {
-        // console.log(res);
-        vm.$alertT.fire({
-          icon: "success",
-          title: res.message,
-        });
-        vm.$router.push("/alluser/index");
+          orderBusUser.add(vm.temp).then((res) => {
+            // console.log(res);
+            vm.$alertT.fire({
+              icon: "success",
+              title: res.message,
+            });
+            //TODO:更換島夜路由
+            vm.$router.push("/alluser/index");
+            // vm.$router.push("/bususer/index");
+          });
+        }
       });
     },
   },
   mounted() {
+    this.today = moment().format("yyyy-MM-DD");
     this.getLineList();
     this.getStopList();
     // this.temp.passengerNum = 1;

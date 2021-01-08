@@ -396,6 +396,12 @@
                 placeholder="請選擇生日"
                 value-format="yyyy-MM-dd"
                 style="width: 100%"
+                :picker-options="{
+                  disabledDate(time) {
+                    return time.getTime() > Date.now();
+                  },
+                }"
+                :disabled="userDialogTitle == 'edit'"
               ></el-date-picker>
             </el-form-item>
           </el-col>
@@ -403,6 +409,7 @@
             <el-form-item label="身分證字號" prop="uid">
               <el-input
                 v-model="userTemp.uid"
+                :disabled="userDialogTitle == 'edit'"
                 placeholder="請輸入身分證字號"
               ></el-input>
             </el-form-item>
@@ -426,6 +433,15 @@
               <el-input
                 placeholder="格式:0987654321"
                 v-model="userTemp.phone"
+              ></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :sm="24" :md="12">
+            <el-form-item label="市話" prop="tel">
+              <span slot="label">市話</span>
+              <el-input
+                placeholder="格式:0232134232"
+                v-model="userTemp.tel"
               ></el-input>
             </el-form-item>
           </el-col>
@@ -740,6 +756,7 @@ export default {
         birthday: "",
         uid: "",
         phone: "",
+        tel: "",
         sex: "",
         status: 1,
         organizationIds: "",
@@ -1213,6 +1230,9 @@ export default {
     onBtnClicked(domId) {
       console.log(domId);
       switch (domId) {
+        case "search":
+          this.getList();
+          break;
         case "unitB":
           if (this.multipleSelection.length !== 1) {
             this.$message({

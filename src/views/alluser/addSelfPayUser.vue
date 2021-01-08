@@ -230,7 +230,7 @@ export default {
         // Id: [{ required: true, message: "請輸入個案編號", trigger: "blur" }],
         county: [{ required: true, message: "必填欄位", tigger: "change" }],
         district: [{ required: true, message: "必填欄位", tigger: "change" }],
-        addr: [{ required: true, message: "必填欄位", tigger: "blur" }],
+        addr: [{ required: true, message: "必填欄位", tigger: "change" }],
       },
     };
   },

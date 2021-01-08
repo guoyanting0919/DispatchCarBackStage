@@ -9,6 +9,9 @@
         <el-button size="mini" @click="handleChange" type="info" plain
           >起訖點互換</el-button
         >
+        <el-button size="mini" @click="handleBack" type="success" plain
+          >回列表</el-button
+        >
       </div>
     </sticky>
 
@@ -26,24 +29,29 @@
         >
           <el-row :gutter="16">
             <el-col :sm="12" :md="8">
-              <el-form-item label="預約日期">
+              <el-form-item label="預約日期" prop="date">
                 <el-date-picker
                   style="width: 100%"
                   v-model="temp.date"
                   type="date"
                   placeholder="選擇日期"
                   value-format="yyyy-MM-dd"
+                  :picker-options="{
+                    disabledDate(time) {
+                      return time.getTime() < Date.now() - 8.64e7;
+                    },
+                  }"
                 >
                 </el-date-picker>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="8">
-              <el-form-item label="預約時間">
+              <el-form-item label="預約時間" prop="time">
                 <el-time-select
                   style="width: 100%"
                   v-model="temp.time"
                   :picker-options="{
-                    start: '06:00',
+                    start: timeStartTime,
                     step: '00:10',
                     end: '20:00',
                   }"
@@ -54,7 +62,7 @@
             </el-col>
 
             <el-col :sm="12" :md="8">
-              <el-form-item label="車輛類型">
+              <el-form-item label="車輛類型" prop="carCategoryId">
                 <el-select
                   style="width: 100%"
                   v-model="temp.carCategoryId"
@@ -71,7 +79,7 @@
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="8">
-              <el-form-item label="聯絡電話">
+              <el-form-item label="聯絡電話" prop="noticePhone">
                 <el-input
                   style="width: 100%"
                   v-model="temp.noticePhone"
@@ -134,6 +142,11 @@
                         type="date"
                         placeholder="選擇生日"
                         value-format="yyyy-MM-dd"
+                        :picker-options="{
+                          disabledDate(time) {
+                            return time.getTime() > Date.now();
+                          },
+                        }"
                       >
                       </el-date-picker>
                     </el-form-item>
@@ -153,7 +166,7 @@
               </el-col>
             </template>
             <el-col :sm="12" :md="18">
-              <el-form-item label="起點">
+              <el-form-item label="起點" prop="fromAddr">
                 <el-input
                   style="width: 100%"
                   v-model="temp.fromAddr"
@@ -183,7 +196,7 @@
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="18">
-              <el-form-item label="訖點">
+              <el-form-item label="訖點" prop="toAddr">
                 <el-input
                   style="width: 100%"
                   v-model="temp.toAddr"
@@ -218,11 +231,10 @@
 
       <!-- 歷史訂單 -->
 
-      <div class="bg-white dispatchContainer" style="height: calc(100% - 50px)">
+      <div class="bg-white dispatchContainer">
         <SubTitle title="歷史訂單"></SubTitle>
         <el-table
           ref="mainTable"
-          height="calc(100% - 52px)"
           :data="list"
           border
           fit
@@ -296,13 +308,13 @@
             </template>
           </el-table-column>
         </el-table>
-        <pagination
+        <!-- <pagination
           v-if="total > 0"
           :total="total"
           :page.sync="listQuery.page"
           :limit.sync="listQuery.limit"
           @pagination="handleCurrentChange"
-        />
+        /> -->
       </div>
     </div>
   </div>
@@ -312,7 +324,7 @@
 import moment from "moment";
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
-import Pagination from "@/components/Pagination";
+// import Pagination from "@/components/Pagination";
 import SubTitle from "@/components/SubTitle";
 import * as categorys from "@/api/categorys";
 import * as user from "@/api/users";
@@ -323,10 +335,12 @@ export default {
     Sticky,
     Title,
     SubTitle,
-    Pagination,
   },
   data() {
     return {
+      /* 今天日期 */
+      today: "",
+
       buttons: [],
       //車輛類別
       carCategorysList: [],
@@ -375,6 +389,17 @@ export default {
         remark: [{ name: "", birth: "" }],
       },
       rules: {
+        date: [{ required: true, message: "必填欄位", tigger: "change" }],
+        time: [{ required: true, message: "必填欄位", tigger: "change" }],
+        carCategoryId: [
+          { required: true, message: "必填欄位", tigger: "change" },
+        ],
+        noticePhone: [
+          { required: true, message: "必填欄位", tigger: "change" },
+        ],
+        fromAddr: [{ required: true, message: "必填欄位", tigger: "change" }],
+        toAddr: [{ required: true, message: "必填欄位", tigger: "change" }],
+        required: [{ required: true, message: "必填欄位", tigger: "change" }],
         caseUserNo: [{ required: true, message: "必填欄位", tigger: "blur" }],
         orgAId: [{ required: true, message: "必填欄位", tigger: "change" }],
       },
@@ -396,7 +421,6 @@ export default {
       let num;
       if (val > oldVal) {
         num = val - oldVal;
-        console.log(val, oldVal, num);
         for (let index = oldVal + 1; index <= val; index++) {
           let obj = {
             name: "",
@@ -415,6 +439,26 @@ export default {
     },
   },
 
+  computed: {
+    timeStartTime() {
+      let time;
+      if (this.temp.date !== this.today) {
+        time = "06:00";
+      } else {
+        let nowHr = moment().format("hh");
+        let nowMin =
+          (Math.floor(moment().format("hh:mm").split(":")[1] / 10) + 1) * 10;
+
+        if (nowMin == 60) {
+          nowMin = "00";
+          nowHr++;
+        }
+
+        time = `${nowHr}:${nowMin}`;
+      }
+      return time;
+    },
+  },
   methods: {
     /* 獲取本路由下所有功能按鈕 */
     getButtons() {
@@ -465,26 +509,32 @@ export default {
     /* 預約訂單 */
     handleReservation() {
       // console.log(this.passengerArr);
-      const vm = this;
-      vm.temp.id = "";
-      vm.temp.orgId = "";
-      vm.temp.orgName = "";
-      let date = moment(vm.temp.date).format("yyyy-MM-DD");
-      vm.temp.selfPayUserId = vm.$route.params.id.split("-")[1];
-      vm.temp.userId = vm.$route.params.id.split("-")[0];
-      vm.temp.reserveDate = `${date} ${vm.temp.time}`;
-      vm.temp.CarCategoryName = vm.carCategorysList.filter((car) => {
-        return car.dtValue === vm.temp.carCategoryId;
-      })[0].name;
-      vm.temp.remark = JSON.stringify(vm.passengerArr);
-      console.log(vm.temp, JSON.parse(vm.temp.remark));
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          const vm = this;
+          vm.temp.id = "";
+          vm.temp.orgId = "";
+          vm.temp.orgName = "";
+          let date = moment(vm.temp.date).format("yyyy-MM-DD");
+          vm.temp.selfPayUserId = vm.$route.params.id.split("-")[1];
+          vm.temp.userId = vm.$route.params.id.split("-")[0];
+          vm.temp.reserveDate = `${date} ${vm.temp.time}`;
+          vm.temp.CarCategoryName = vm.carCategorysList.filter((car) => {
+            return car.dtValue === vm.temp.carCategoryId;
+          })[0].name;
+          vm.temp.remark = JSON.stringify(vm.passengerArr);
+          console.log(vm.temp, JSON.parse(vm.temp.remark));
 
-      orderSelfPayUser.add(vm.temp).then((res) => {
-        vm.$alertT.fire({
-          icon: "success",
-          title: res.message,
-        });
-        vm.$router.push("/alluser/index");
+          orderSelfPayUser.add(vm.temp).then((res) => {
+            vm.$alertT.fire({
+              icon: "success",
+              title: res.message,
+            });
+            //TODO:白牌用戶頁面跳轉記得換路徑
+            // vm.$router.push("/alluser/index");
+            vm.$router.push("/selfpayuser/index");
+          });
+        }
       });
     },
 
@@ -499,6 +549,13 @@ export default {
         this.passengerArr = JSON.parse(order.remark);
         console.log(this.passengerArr);
       });
+    },
+
+    /* 回列表 */
+    handleBack() {
+      //TODO:白牌用戶頁面跳轉記得換路徑
+      // this.$router.push("/alluser/index");
+      this.$router.push("/selfpayuser/index");
     },
 
     /* 換頁 */
@@ -565,6 +622,7 @@ export default {
     },
   },
   async mounted() {
+    this.today = moment().format("yyyy-MM-DD");
     this.restaurants = this.loadAll();
     this.getCarCategorys();
     this.getList();

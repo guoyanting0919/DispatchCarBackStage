@@ -6,7 +6,7 @@
         <el-input
           style="width: 200px; margin-right: 0.5rem"
           size="mini"
-          v-model="value"
+          v-model="listQuery.key"
           clearable
           placeholder="請輸入關鍵字"
         ></el-input>
@@ -35,15 +35,21 @@
           @selection-change="handleSelectionChange"
           @row-click="rowClick"
         >
-          <el-table-column
+          <!-- <el-table-column
             type="selection"
             width="55"
             align="center"
-          ></el-table-column>
+          ></el-table-column> -->
 
           <el-table-column
             property="name"
             label="姓名"
+            width="200"
+            align="center"
+          ></el-table-column>
+          <el-table-column
+            property="uid"
+            label="身分證字號"
             width="200"
             align="center"
           ></el-table-column>
@@ -53,28 +59,8 @@
             width="200"
             align="center"
           ></el-table-column>
-          <el-table-column
-            property="sex"
-            label="性別"
-            width="50"
-            align="center"
-          >
-            <template slot-scope="scope">
-              <div>
-                <i
-                  style="color: #d63737"
-                  v-if="!scope.row.sex"
-                  class="iconfont icon-Vector5"
-                ></i>
-                <i
-                  style="color: #227294"
-                  v-else
-                  class="iconfont icon-Vector6"
-                ></i>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column property="addr" label="地址" align="center">
+
+          <el-table-column property="addr" label="居住地址" align="center">
             <template slot-scope="scope">
               <span>{{
                 scope.row.county + scope.row.district + scope.row.addr
@@ -226,6 +212,9 @@ export default {
       switch (domId) {
         case "violationBtn":
           this.violationDialog = true;
+          break;
+        case "search":
+          this.getList();
           break;
         default:
           break;
