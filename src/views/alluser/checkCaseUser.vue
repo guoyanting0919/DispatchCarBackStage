@@ -521,7 +521,7 @@ export default {
       wealTypeDialog: false,
       // A單位
       unitAs: "",
-      unitAId: "8ccf3297-8e45-43eb-8cc1-17476538b70a",
+      unitAId: ".0.1.1.",
       // 表單相關
       labelPosition: "top",
       basicTemp: {
@@ -619,13 +619,11 @@ export default {
         console.log(res);
       });
     },
-    // 獲取A單位資料
-    async getUnitAs() {
+    /* 獲取A單位資料 */
+    getUnitAs() {
       const vm = this;
-      await orgs.getSubOrgs({ orgId: vm.unitAId }).then((res) => {
-        vm.unitAs = res.data.filter((org) => {
-          return org.id !== vm.unitAId;
-        });
+      orgs.getOrgNoPermission({ orgCascadeId: vm.unitAId }).then((res) => {
+        vm.unitAs = res.result;
       });
     },
     handleSave() {

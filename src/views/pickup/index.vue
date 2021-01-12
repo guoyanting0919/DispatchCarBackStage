@@ -1,14 +1,14 @@
 <template>
-  <div class="flex-column todaypickup">
+  <div class="flex-column pickup">
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
-        <!-- 區域選擇 -->
+        <!-- 用戶身份選擇 -->
         <el-select
           size="mini"
           @change="end = end + 200"
           v-model="value"
           clearable
-          placeholder="請選擇區域"
+          placeholder="請選擇用戶身份"
         >
           <el-option
             v-for="item in options"
@@ -18,12 +18,12 @@
           ></el-option>
         </el-select>
 
-        <!-- 公司選擇 -->
+        <!-- 服務單位選擇 -->
         <el-select
           size="mini"
           v-model="value"
           clearable
-          placeholder="請選擇公司"
+          placeholder="請選擇服務單位"
         >
           <el-option
             v-for="item in options"
@@ -32,6 +32,7 @@
             :value="item.value"
           ></el-option>
         </el-select>
+
         <!-- 日期選擇 -->
         <el-date-picker
           size="mini"
@@ -39,16 +40,23 @@
           type="date"
           placeholder="選擇日期"
         ></el-date-picker>
+
+        <!-- 權限按鈕 -->
+        <permission-btn
+          moduleName="builderTables"
+          size="mini"
+          v-on:btn-event="onBtnClicked"
+        ></permission-btn>
       </div>
     </sticky>
 
     <div class="app-container flex-item">
-      <!-- 本日接送 -->
-      <div class="todayContainer">
-        <Title title="本日接送狀況"></Title>
-        <div class="todayDataContainer">
-          <div class="dataBox">
-            <i class="iconfont icon-console"></i>
+      <!-- 接送數據 -->
+      <div class="chartContainer">
+        <Title title="接送數據"></Title>
+        <div class="cardContainer">
+          <div class="dataCard">
+            <i class="iconfont icon-chart"></i>
             <p>總趟次</p>
             <count-to
               class="card-panel-num"
@@ -57,10 +65,10 @@
               :duration="2000"
             ></count-to>
           </div>
-          <div class="dataBox">
-            <i class="iconfont icon-console"></i>
-            <p>總趟次</p>
 
+          <div class="dataCard">
+            <i class="iconfont icon-success"></i>
+            <p>已完成(共乘)</p>
             <count-to
               class="card-panel-num"
               :startVal="0"
@@ -68,9 +76,10 @@
               :duration="2000"
             ></count-to>
           </div>
-          <div class="dataBox">
-            <i class="iconfont icon-console"></i>
-            <p>總趟次</p>
+
+          <div class="dataCard">
+            <i class="iconfont icon-success"></i>
+            <p>已完成(非共乘)</p>
             <count-to
               class="card-panel-num"
               :startVal="0"
@@ -78,9 +87,10 @@
               :duration="2000"
             ></count-to>
           </div>
-          <div class="dataBox">
-            <i class="iconfont icon-console"></i>
-            <p>總趟次</p>
+
+          <div class="dataCard">
+            <i class="iconfont icon-Frame1304"></i>
+            <p>空趟</p>
             <count-to
               class="card-panel-num"
               :startVal="0"
@@ -88,9 +98,21 @@
               :duration="2000"
             ></count-to>
           </div>
-          <div class="dataBox">
-            <i class="iconfont icon-console"></i>
-            <p>總趟次</p>
+
+          <div class="dataCard">
+            <i class="iconfont icon-InfoCircle"></i>
+            <p>未執行</p>
+            <count-to
+              class="card-panel-num"
+              :startVal="0"
+              :endVal="end"
+              :duration="2000"
+            ></count-to>
+          </div>
+
+          <div class="dataCard">
+            <i class="iconfont icon-Star"></i>
+            <p>達成率</p>
             <count-to
               class="card-panel-num"
               :startVal="0"
@@ -102,10 +124,10 @@
       </div>
 
       <!-- 本週接送 -->
-      <div class="weeklyContainer">
+      <!-- <div class="weeklyContainer">
         <Title title="本周接送狀況"></Title>
         <ve-line class="chartMargin" :data="chartData"></ve-line>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -114,12 +136,14 @@
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import CountTo from "vue-count-to";
+import permissionBtn from "@/components/PermissionBtn";
 export default {
   name: "todaypickup",
   components: {
     Sticky,
     CountTo,
     Title,
+    permissionBtn,
   },
   data() {
     return {
@@ -127,24 +151,24 @@ export default {
       value1: "",
       options: [
         {
-          value: "选项1",
-          label: "黄金糕",
+          value: "選項1",
+          label: "選項1",
         },
         {
-          value: "选项2",
-          label: "双皮奶",
+          value: "選項2",
+          label: "選項2",
         },
         {
-          value: "选项3",
-          label: "蚵仔煎",
+          value: "選項3",
+          label: "選項3",
         },
         {
-          value: "选项4",
-          label: "龙须面",
+          value: "選項4",
+          label: "選項4",
         },
         {
-          value: "选项5",
-          label: "北京烤鸭",
+          value: "選項5",
+          label: "選項5",
         },
       ],
       end: 395,
@@ -160,34 +184,61 @@ export default {
       },
     };
   },
+  methods: {
+    /* 權限按鈕 */
+    onBtnClicked(domId) {
+      switch (domId) {
+        case "violationBtn":
+          this.violationDialog = true;
+          break;
+        case "search":
+          this.getList();
+          break;
+        default:
+          break;
+      }
+    },
+  },
 };
 </script>
+ 
+<style lang="scss" scoped>
+.cardContainer {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
 
-<style lang="scss">
-// .ttt {
-//   &::-webkit-scrollbar {
-//     z-index: 11;
-//     width: 6px;
+.dataCard {
+  background: #fff;
+  width: 200px;
+  height: 250px;
+  margin: 0.5rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
 
-//     &:horizontal {
-//       height: 6px;
-//     }
-//   }
+  p {
+    font-weight: 600;
+    font-size: 1.25rem;
+    line-height: 1.5rem;
+    color: #444141;
+  }
+}
 
-//   &::-webkit-scrollbar-thumb {
-//     border-radius: 5px;
-//     width: 6px;
-//     background: #ff7b00;
-//   }
+.iconfont {
+  font-size: 4rem;
+  font-weight: 700;
+  color: $--color-primary;
+}
 
-//   &::-webkit-scrollbar-corner,
-//   &::-webkit-scrollbar-track {
-//     background: #fff;
-//   }
-
-//   &::-webkit-scrollbar-track-piece {
-//     background: #fff;
-//     width: 6px;
-//   }
-// }
+.card-panel-num {
+  font-weight: 600;
+  font-size: 2rem;
+  color: $--color-primary;
+}
 </style>

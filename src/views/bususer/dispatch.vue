@@ -323,6 +323,7 @@ export default {
           vm.temp.toStationName = vm.toLineStop.filter((s) => {
             return s.id === vm.temp.toStationId;
           })[0].stationName;
+          //FIXME:reset org id / all user bus user dispatch
           vm.temp.orgId = vm.lineList.filter((item) => {
             return item.id === vm.temp.stationLineId;
           })[0].orgId;

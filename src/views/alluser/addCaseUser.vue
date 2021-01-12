@@ -151,6 +151,7 @@
                     type="info"
                     size="mini"
                     v-if="temp.addr"
+                    @click="handleTransfer"
                     >轉換經緯度</el-button
                   >
                 </span>
@@ -451,6 +452,7 @@
 </template>
 
 <script>
+// import moment from "moment";
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import SubTitle from "@/components/SubTitle";
@@ -458,6 +460,7 @@ import * as taiwan from "@/assets/taiwan.js";
 import * as users from "@/api/users";
 import * as caseUsers from "@/api/caseUsers";
 import * as orgs from "@/api/orgs";
+import * as mapss from "@/api/map";
 export default {
   name: "allUserAdd",
   components: {
@@ -473,7 +476,7 @@ export default {
       rolesDialog: false,
       taiwanCity: "",
       unitAs: "",
-      unitAId: "8ccf3297-8e45-43eb-8cc1-17476538b70a",
+      unitAId: ".0.1.1.",
       // 表單相關
       labelPosition: "top",
       basicTemp: {
@@ -486,6 +489,7 @@ export default {
         userId: "", //用戶id
         id: "", //身份id
         caseUserNo: "", //個案編號
+        birthday: "", //用戶生日
         orgAId: "", //Ａ單位(管理單位)
         orgBIds: "", //B單位
         otherPhone: "", //其他聯絡電話
@@ -532,7 +536,7 @@ export default {
     };
   },
   methods: {
-    //獲取特殊修改權限
+    /* 獲取特殊修改權限 */
     getButtons() {
       let router2 = this.$store.getters.modules;
       let a = router2.filter((r) => {
@@ -545,33 +549,48 @@ export default {
         return btn.domId;
       });
     },
-    // 是否擁有按鈕功能權限
+
+    /* 是否擁有按鈕功能權限 */
     hasButton(domId) {
       return this.buttons.includes(domId);
     },
-    // 獲取用戶基本資料
+
+    /* 獲取用戶基本資料 */
     getUserBasic() {
       const vm = this;
-      // console.log(vm.$route.params);
       users.getClient({ id: vm.$route.params.id }).then((res) => {
-        // console.log(res);
         vm.basicTemp = Object.assign({}, res.result); // copy obj
       });
     },
-    // 獲取A單位資料
+
+    /* 獲取A單位資料 */
     getUnitAs() {
       const vm = this;
-      orgs.getSubOrgs({ orgId: vm.unitAId }).then((res) => {
-        vm.unitAs = res.data.filter((org) => {
-          return org.id !== vm.unitAId;
-        });
+      orgs.getOrgNoPermission({ orgCascadeId: vm.unitAId }).then((res) => {
+        vm.unitAs = res.result;
       });
     },
+
+    /* 轉換經緯度 */
+    handleTransfer() {
+      const vm = this;
+      let params = {
+        _addr: `${vm.temp.county}${vm.temp.district}${vm.temp.addr}`,
+      };
+      mapss.geocode(params).then((res) => {
+        vm.$cl(res);
+        vm.temp.lat = res.result.lat;
+        vm.temp.lon = res.result.lon;
+      });
+    },
+
+    /* 儲存身份資料 */
     handleSave() {
       const vm = this;
       vm.$refs.form.validate((valid) => {
         if (valid) {
           vm.temp.userId = vm.$route.params.id;
+          // vm.temp.birthday = moment(vm.basicTemp.birthday).format("yyyy-MM-DD");
           // vm.temp.reviewDate = moment(vm.temp.reviewDate).format('yyyy')
           console.log(vm.temp);
           caseUsers.add(vm.temp).then(() => {
@@ -588,27 +607,14 @@ export default {
         }
       });
     },
-    addLun() {
-      this.temp.lun.push({
-        value1: "",
-        value2: "",
-        value3: "",
-        value4: "",
-        value5: "",
-        key: Date.now(),
-      });
-    },
-    delLun(item) {
-      let index = this.temp.lun.indexOf(item);
-      if (index !== -1) {
-        this.temp.lun.splice(index, 1);
-      }
-    },
+
+    /* 儲存並快速新增其他身份 */
     handleFastSave(myRoute) {
       const vm = this;
       vm.$refs.form.validate((valid) => {
         if (valid) {
           vm.temp.userId = vm.$route.params.id;
+          // vm.temp.birthday = moment(vm.basicTemp.birthday).format("yyyy-MM-DD");
           // vm.temp.reviewDate = moment(vm.temp.reviewDate).format('yyyy')
           console.log(vm.temp);
           caseUsers.add(vm.temp).then(() => {
@@ -627,7 +633,8 @@ export default {
         }
       });
     },
-    // 替用戶添加身份
+
+    /* 替用戶添加身份 */
     handleRole(role) {
       console.log(role);
       switch (role) {

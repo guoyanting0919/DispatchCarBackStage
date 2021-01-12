@@ -58,3 +58,12 @@ export function getOrgB(data) {
     params: data,
   });
 }
+
+/* 獲取特定單位（無權限） */
+export function getOrgNoPermission(data) {
+  return request({
+    url: "/orgs/LoadOrgB",
+    method: "get",
+    params: data,
+  });
+}

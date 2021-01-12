@@ -20,7 +20,7 @@
       </div>
     </sticky>
 
-    <!-- 幸福巴士調度台 -->
+    <!-- 長照調度台 -->
     <div class="app-container flex-item">
       <Title title="長照調度台"></Title>
       <div class="bg-white" style="height: calc(100% - 50px)">
@@ -40,6 +40,7 @@
             width="55"
             align="center"
           ></el-table-column>
+
           <el-table-column
             align="center"
             property="userName"
@@ -47,6 +48,7 @@
             width="120"
           >
           </el-table-column>
+
           <el-table-column
             align="center"
             property="status"
@@ -85,6 +87,7 @@
               </el-select>
             </template>
           </el-table-column>
+
           <el-table-column
             property="car"
             label="車輛"
@@ -101,6 +104,7 @@
               >
                 <el-option
                   v-for="car in carList"
+                  :disabled="checkCarType(scope.row, car)"
                   :key="car.id"
                   :label="car.carNo"
                   :value="car.id"
@@ -114,15 +118,53 @@
           </el-table-column>
 
           <el-table-column
+            align="center"
             property="reserveDate"
             label="預約乘車時間"
-            width="200"
+            width="130"
+          >
+            <template slot-scope="scope">
+              <span>
+                {{ scope.row.reserveDate | reserveFilter }}
+              </span>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            align="center"
+            property="expectedMinute"
+            label="預估時間"
+            width="120"
+          >
+            <template slot-scope="scope">
+              <span>
+                {{ scope.row.expectedMinute | minFilter }}
+              </span>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            property="totalAmt"
+            label="預估總額"
+            width="100"
             align="center"
           >
             <template slot-scope="scope">
-              <span style="margin-left: 10px"
-                >{{ scope.row.reserveDate | dateFilter }}
-              </span>
+              <span> ${{ scope.row.totalAmt }} </span>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            align="center"
+            property="carCategoryName"
+            label="車種"
+            width="150"
+          >
+            <template slot-scope="scope">
+              <div style="text-align: left">
+                <p>{{ scope.row.carCategoryName }}</p>
+                <p>{{ scope.row.wheelchairType }}</p>
+              </div>
             </template>
           </el-table-column>
 
@@ -145,6 +187,18 @@
             width="100"
             align="center"
           >
+          </el-table-column>
+
+          <el-table-column
+            property="canShared"
+            label="共乘"
+            width="100"
+            align="center"
+          >
+            <template slot-scope="scope">
+              <p v-if="scope.row.canShared">是</p>
+              <p v-else>否</p>
+            </template>
           </el-table-column>
 
           <el-table-column
@@ -289,66 +343,6 @@
       </span>
     </el-dialog>
 
-    <!-- roster dialog -->
-    <el-dialog title="批量排班" :visible.sync="rosterDialog" width="800px">
-      <div class="rosterDialogBody">
-        <el-form
-          :label-position="labelPosition"
-          label-width="200px"
-          :model="temp"
-          ref="form"
-        >
-          <el-row :gutter="16">
-            <el-col :sm="12" :md="12">
-              <el-form-item label="司機">
-                <el-select
-                  v-model="rosterDriver"
-                  filterable
-                  placeholder="選擇司機"
-                  style="width: 100%"
-                >
-                  <el-option
-                    v-for="driver in driverList"
-                    :key="driver.id"
-                    :label="`${driver.userName} / ${driver.phone}`"
-                    :value="driver.id"
-                  >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-
-            <el-col :sm="12" :md="12">
-              <el-form-item label="車輛">
-                <el-select
-                  v-model="rosterCar"
-                  filterable
-                  placeholder="選擇車輛"
-                  style="width: 100%"
-                >
-                  <el-option
-                    v-for="car in carList"
-                    :key="car.id"
-                    :label="`${car.carCategoryName || '一般車'} / ${
-                      car.seatNum
-                    }人座 / ${car.carNo}`"
-                    :value="car.id"
-                  >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </el-form>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="rosterDialog = false">取 消</el-button>
-        <el-button type="primary" @click="handleRosterOrders()"
-          >確 定</el-button
-        >
-      </span>
-    </el-dialog>
-
     <!-- change dialog -->
     <el-dialog title="變更司機車輛" :visible.sync="changeDialog" width="800px">
       <div class="changeDialogBody">
@@ -387,6 +381,7 @@
                 >
                   <el-option
                     v-for="car in carList"
+                    :disabled="checkCarType(orderTemp, car)"
                     :key="car.id"
                     :label="`${car.carCategoryName || '一般車'} / ${
                       car.seatNum
@@ -406,6 +401,35 @@
         >
       </span>
     </el-dialog>
+
+    <!-- dispatch dialog -->
+    <el-dialog
+      title="請選擇預約乘車個案"
+      :visible.sync="dispatchDialog"
+      width="400px"
+    >
+      <div class="dispatchDialogBody">
+        <el-select
+          style="width: 300px"
+          v-model="dispatchCaseUser"
+          filterable
+          size="mini"
+          placeholder="選擇預約乘車個案"
+        >
+          <el-option
+            v-for="user in caseUserList"
+            :key="user.caseUserId"
+            :label="`${user.name}/${user.caseUserNo}`"
+            :value="user.userId"
+          >
+          </el-option>
+        </el-select>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dispatchDialog = false">取 消</el-button>
+        <el-button type="primary" @click="handleDispatch">確 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template> 
 
@@ -417,11 +441,11 @@ import Title from "@/components/ConsoleTableTitle";
 import permissionBtn from "@/components/PermissionBtn";
 import Pagination from "@/components/Pagination";
 import OrderStatusTag from "@/components/OrderStatusTag";
-import * as orderBusUser from "@/api/orderBusUser";
 import * as orderCaseUser from "@/api/orderCaseUser";
 import * as drivers from "@/api/drivers";
 import * as cars from "@/api/cars";
 import * as dispatchs from "@/api/dispatchs";
+import * as caseUsers from "@/api/caseUsers";
 export default {
   name: "dispatch",
   components: {
@@ -435,14 +459,25 @@ export default {
     ...mapGetters(["defaultorgid"]),
   },
   filters: {
-    dateFilter(date) {
-      let day = moment(date).format("yyyy-MM-DD");
-      let time = moment(date).format("HH:mm");
-      return `${day} ${time}`;
+    reserveFilter(date) {
+      let time = date.split(" ")[1];
+      let hr = time.split(":")[0];
+      let min = time.split(":")[1];
+      return `${hr}:${min}`;
+    },
+    minFilter(min) {
+      // let selfMin = min.toString().split(".")[0];
+      // let selSen = min.toString().split(".")[1] * 6;
+      // return `${selfMin}分${selSen}秒`;
+      let selfMin = Math.ceil(min);
+      return `${selfMin}分鐘`;
     },
   },
   data() {
     return {
+      /* 長照個案列表 */
+      caseUserList: [],
+      dispatchCaseUser: "",
       /* 司機列表 */
       driverList: [],
       /* 車輛列表 */
@@ -462,10 +497,6 @@ export default {
         key: undefined,
       },
       multipleSelection: [],
-
-      /* 批次排班 */
-      rosterDriver: "",
-      rosterCar: "",
 
       /*  order temp */
       /* 表單相關 */
@@ -516,8 +547,8 @@ export default {
 
       /* dialog */
       editDialog: false,
-      rosterDialog: false,
       changeDialog: false,
+      dispatchDialog: false,
 
       value: "",
     };
@@ -530,9 +561,18 @@ export default {
         case "delete":
           this.handleDeleteOrders(this.multipleSelection);
           break;
-        case "roster":
-          this.handleCanRoster();
-
+        case "batch":
+          if (this.multipleSelection.length == 0) {
+            this.$alertT.fire({
+              icon: "error",
+              title: `請勾選欲排班之訂單`,
+            });
+            return;
+          }
+          this.handleBatch(this.multipleSelection);
+          break;
+        case "dispatch":
+          this.dispatchDialog = true;
           break;
         default:
           break;
@@ -572,6 +612,16 @@ export default {
       });
     },
 
+    /* 獲取長照用戶資料 */
+    getCaseUserList() {
+      const vm = this;
+      vm.listLoading = true;
+      caseUsers.load({ limit: 9999, page: 1 }).then((res) => {
+        console.log(res.data);
+        vm.caseUserList = res.data;
+      });
+    },
+
     /* 批次刪除訂單 */
     handleDeleteOrders(car) {
       const vm = this;
@@ -587,7 +637,7 @@ export default {
       }).then((result) => {
         if (result.value) {
           let ids = car.map((c) => c.id);
-          orderBusUser.remove(ids).then((res) => {
+          orderCaseUser.remove(ids).then((res) => {
             vm.$alertT.fire({
               icon: "success",
               title: res.message,
@@ -601,6 +651,15 @@ export default {
           });
         }
       });
+    },
+
+    /* 檢查車輛類別是否吻合訂單所需車種 */
+    checkCarType(order, car) {
+      if (order.carCategoryId === "SYS_CAR_GENERAL") {
+        return false;
+      } else {
+        return order.carCategoryId !== car.carCategoryId;
+      }
     },
 
     /* 排班 */
@@ -634,46 +693,46 @@ export default {
     },
 
     /* 批量排班 */
-    handleRosterOrders() {
+    handleBatch(items) {
       const vm = this;
-      if (vm.rosterCar == "" || vm.rosterDriver == "") {
+      vm.$cl(items);
+      // 確認司機車輛都已勾選
+      let flag = true;
+      items.forEach((i) => {
+        if (i.driverInfoId == null || i.carId == null) {
+          flag = false;
+        }
+      });
+      if (!flag) {
         vm.$alertM.fire({
           icon: "error",
-          title: `請確實選擇司機及車輛`,
+          title: `請確認已勾選訂單都已確實選擇司機車輛`,
         });
-        return;
-      }
-      let ids = [];
-      vm.multipleSelection.forEach((o) => {
-        ids.push(o.despatchNo);
-      });
-      let idLength = ids.length;
-      let flag = 1;
-      ids.forEach((id) => {
-        let data = {
-          id: [id],
-          driverInfoId: vm.rosterDriver,
-          carId: vm.rosterCar,
-          driverInfoName: vm.driverList.filter((d) => {
-            return d.id == vm.rosterDriver;
-          })[0].userName,
-          carNo: vm.carList.filter((c) => {
-            return c.id == vm.rosterCar;
-          })[0].carNo,
-        };
-        dispatchs.addOrUpdate(data).then((res) => {
-          if (flag < idLength) {
-            flag++;
-          } else {
+      } else {
+        //批次送出排班API
+        for (let index = 0; index < items.length; index++) {
+          let data = {
+            id: [items[index].despatchNo],
+            driverInfoId: items[index].driverInfoId,
+            carId: items[index].carId,
+            driverInfoName: vm.driverList.filter((d) => {
+              return d.id == items[index].driverInfoId;
+            })[0].userName,
+            carNo: vm.carList.filter((c) => {
+              return c.id == items[index].carId;
+            })[0].carNo,
+          };
+          dispatchs.addOrUpdate(data).then((res) => {
             vm.$alertT.fire({
               icon: "success",
               title: res.message,
             });
-            vm.rosterDialog = false;
-            vm.getList();
-          }
-        });
-      });
+            if (index == items.length - 1) {
+              vm.getList();
+            }
+          });
+        }
+      }
     },
 
     /* 取消排班 */
@@ -695,7 +754,7 @@ export default {
         id,
         cancelRemark: "SYS_ORDERCANCEL_REMARK_ADMIN",
       };
-      orderBusUser.cancel(params).then((res) => {
+      orderCaseUser.cancel(params).then((res) => {
         vm.$alertT.fire({
           icon: "success",
           title: res.message,
@@ -710,7 +769,7 @@ export default {
       let date = moment(vm.temp.date).format("yyyy-MM-DD");
       vm.temp.reserveDate = `${date} ${vm.temp.time}`;
 
-      orderBusUser.update(vm.temp).then((res) => {
+      orderCaseUser.update(vm.temp).then((res) => {
         vm.editDialog = false;
         vm.getList();
         vm.$alertT.fire({
@@ -720,43 +779,35 @@ export default {
       });
     },
 
-    /* 檢查是否可排班 */
-    handleCanRoster() {
-      const vm = this;
-      if (vm.multipleSelection.length < 1) {
-        vm.$alertM.fire({
-          icon: "error",
-          title: `請勾選欲排班之訂單`,
-        });
-      } else {
-        let flag = vm.multipleSelection.filter((o) => {
-          return o.status !== 1;
-        });
-        if (flag.length > 0) {
-          vm.$alertM.fire({
-            icon: "error",
-            title: `請確認已勾選訂單狀態皆為新訂單`,
-          });
-        } else {
-          vm.rosterCar = "";
-          vm.rosterDriver = "";
-          vm.rosterDialog = true;
-        }
-      }
-    },
-
     /* 獲取單筆訂單資料 */
     getOrder(id) {
       this.$cl(id);
     },
 
-    //變更司機車輛
+    /* 預約訂車 */
+    handleDispatch() {
+      const vm = this;
+      if (vm.dispatchCaseUser == "") {
+        vm.$alertT.fire({
+          icon: "error",
+          title: "請選擇預約乘車個案",
+        });
+      } else {
+        let routeParams = vm.caseUserList.filter((u) => {
+          return u.userId === vm.dispatchCaseUser;
+        })[0];
+        vm.$cl(routeParams);
+        vm.$router.push(`/alluser/addCaseUser/${this.multipleSelection[0].id}?fast=${this.multipleSelection[0].fast}`)
+      }
+    },
+
+    /* 變更司機車輛 */
     handleChange(order) {
       const vm = this;
       vm.orderTemp = Object.assign({}, order); // copy obj
     },
 
-    //確認變更司機車輛
+    /* 確認變更司機車輛 */
     handleConfirmChange() {
       const vm = this;
 
@@ -795,62 +846,13 @@ export default {
   async mounted() {
     this.getDriverList();
     this.getCarList();
+    this.getCaseUserList();
     this.getList();
   },
 };
 </script>
 
 <style lang='scss' scoped>
-.newOrderContainer {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-}
-.orderCard {
-  width: 320px;
-  margin-right: 0.5rem;
-  height: auto;
-  background: #fff;
-  border: 2px solid #fa8c16;
-  border-top: 5px solid #fa8c16;
-  border-radius: 0px 0px 8px 8px;
-  margin-bottom: 1rem;
-}
-.orderCardTitle {
-  height: 38px;
-  color: #fff;
-  background: #fa8c16;
-  padding: 0.5rem;
-  display: flex;
-  font-size: 14px;
-  font-weight: 700;
-  p {
-    margin-right: 1rem;
-  }
-}
-.orderCardMain {
-  padding: 0.5rem;
-  font-size: 14px;
-  font-weight: 700;
-}
-.orderInfo {
-  color: #fa8c16;
-  display: flex;
-  margin-bottom: 0.5rem;
-
-  p {
-    margin-right: 1rem;
-  }
-}
-.orderInfoName {
-  color: #000;
-  font-size: 1rem;
-}
-.orderTime {
-  margin-bottom: 0.5rem;
-}
 .orderAddr {
   padding-left: 0.5rem;
   display: flex;
@@ -858,7 +860,6 @@ export default {
   justify-content: space-between;
   align-items: flex-start;
   height: 45px;
-  border-left: 3px dotted #fa8c16;
   position: relative;
 
   .icon-circle {
@@ -867,7 +868,6 @@ export default {
     position: absolute;
     left: -9px;
     top: -1px;
-    background: #fff;
   }
 
   .icon-Vector10 {
@@ -876,7 +876,6 @@ export default {
     position: absolute;
     left: -9px;
     bottom: -1px;
-    background: #fff;
   }
 }
 

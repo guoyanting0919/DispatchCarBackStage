@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-column allUserDispatch">
+  <div class="flex-column">
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 權限按鈕 -->

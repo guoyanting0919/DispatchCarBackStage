@@ -8,6 +8,19 @@
   text-align: center;
 }
 
+/* filter container 篩選列 */
+.filter-container {
+  .el-select {
+    margin-right: 0.5rem;
+  }
+}
+
+/* disabled input background */
+.el-input.is-disabled .el-input__inner {
+  background-color: $--color-primary-light-9;
+  color: #8a8a8a;
+}
+
 /* NProgress */
 #nprogress .bar {
   background: transparent !important; //自定义颜色

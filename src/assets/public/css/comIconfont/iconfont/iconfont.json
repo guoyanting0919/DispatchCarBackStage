@@ -6,6 +6,97 @@
   "description": "新北營運端",
   "glyphs": [
     {
+      "icon_id": "1226477",
+      "name": "success",
+      "font_class": "success",
+      "unicode": "e6b3",
+      "unicode_decimal": 59059
+    },
+    {
+      "icon_id": "19324471",
+      "name": "missionFail",
+      "font_class": "Frame1304",
+      "unicode": "e645",
+      "unicode_decimal": 58949
+    },
+    {
+      "icon_id": "19324473",
+      "name": "compeleteRatio",
+      "font_class": "Star",
+      "unicode": "e646",
+      "unicode_decimal": 58950
+    },
+    {
+      "icon_id": "19324474",
+      "name": "InfoCircle",
+      "font_class": "InfoCircle",
+      "unicode": "e647",
+      "unicode_decimal": 58951
+    },
+    {
+      "icon_id": "7821146",
+      "name": "chart",
+      "font_class": "chart",
+      "unicode": "e643",
+      "unicode_decimal": 58947
+    },
+    {
+      "icon_id": "448675",
+      "name": "data",
+      "font_class": "data",
+      "unicode": "e640",
+      "unicode_decimal": 58944
+    },
+    {
+      "icon_id": "698160",
+      "name": "category- Selected",
+      "font_class": "categoryselected",
+      "unicode": "e641",
+      "unicode_decimal": 58945
+    },
+    {
+      "icon_id": "1084703",
+      "name": "setting",
+      "font_class": "setting",
+      "unicode": "e666",
+      "unicode_decimal": 58982
+    },
+    {
+      "icon_id": "5634072",
+      "name": "folder",
+      "font_class": "folder",
+      "unicode": "efdb",
+      "unicode_decimal": 61403
+    },
+    {
+      "icon_id": "11981404",
+      "name": "category",
+      "font_class": "category",
+      "unicode": "e93d",
+      "unicode_decimal": 59709
+    },
+    {
+      "icon_id": "11982742",
+      "name": "Home, homepage, menu",
+      "font_class": "Homehomepagemenu",
+      "unicode": "e9db",
+      "unicode_decimal": 59867
+    },
+    {
+      "icon_id": "18427883",
+      "name": "Data base filled icon",
+      "font_class": "Databasefilledicon",
+      "unicode": "e64c",
+      "unicode_decimal": 58956
+    },
+    {
+      "icon_id": "18427884",
+      "name": "Data filled icon",
+      "font_class": "Datafilledicon",
+      "unicode": "e64d",
+      "unicode_decimal": 58957
+    },
+    {
       "icon_id": "1420914",
       "name": "down",
       "font_class": "down",
