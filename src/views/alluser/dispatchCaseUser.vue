@@ -5,8 +5,9 @@
         <!-- 權限按鈕 -->
         <!-- <el-button size="mini" type="primary">立即預約</el-button>
         <el-button size="mini" type="info">新增下個地點</el-button>-->
-        <el-button size="mini" type="info">可用補助額查詢</el-button>
-        <el-button size="mini" type="success">回列表</el-button>
+        <el-button size="mini" type="info" @click="handleCheckAmt"
+          >可用補助額查詢</el-button
+        >
       </div>
     </sticky>
 
@@ -408,6 +409,18 @@
         </div>
       </div>
     </div>
+
+    <!-- amt dialog -->
+    <el-dialog title="補助餘額" :visible.sync="amtDialog" width="400px">
+      <div class="amtDialogBody">
+        <p>總額度：$0</p>
+        <p>使用額度：$0</p>
+        <p>剩餘額度：$0</p>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="amtDialog = false">確 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template> 
 <script
@@ -485,6 +498,9 @@ export default {
         noticePhone: "",
       },
       rules: {},
+
+      /* 補助餘額 */
+      amtDialog: false,
     };
   },
   computed: {
@@ -597,9 +613,7 @@ export default {
         lon: place.geometry.location.toJSON().lng,
         lat: place.geometry.location.toJSON().lat,
       };
-
       vm.$cl(params);
-
       map.placeDetail(params).then((res) => {
         vm.$cl(res);
         vm.setMarker(res.result, status);
@@ -767,6 +781,8 @@ export default {
     /* 立即預約 */
     handleSubmit() {
       const vm = this;
+      let route = vm.$route.path.split("/")[1];
+      vm.$cl(route);
       vm.temp.reserveDate = `${vm.temp.date} ${vm.temp.time}`;
       vm.temp.carCategoryName = vm.carCategorysList.filter((i) => {
         return i.dtValue === vm.temp.carCategoryId;
@@ -793,9 +809,18 @@ export default {
           vm.$cl(backTemp);
           orderCaseUser.add(backTemp).then((res) => {
             vm.$cl(res);
+            vm.$router.push(`/${route}/index`);
           });
+        } else {
+          vm.$router.push(`/${route}/index`);
         }
       });
+    },
+
+    /* 補助餘額查詢 */
+    handleCheckAmt() {
+      const vm = this;
+      vm.amtDialog = true;
     },
   },
   mounted() {
@@ -832,7 +857,7 @@ export default {
   background: #fff;
   border-radius: 1rem;
   box-shadow: 0px 0px 1rem #a1a0a0;
-  z-index: 99999;
+  z-index: 9;
   opacity: 0.9;
   transition: 0.5s;
 

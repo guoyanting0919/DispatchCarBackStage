@@ -1,5 +1,6 @@
 <template>
   <div class="flex-column dispatch" style="height: calc(100% - 20px)">
+    <div id="map" ref="map" style="width: 0%; height: 0%"></div>
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 非權限按鈕 -->
@@ -222,7 +223,7 @@
                   v-if="scope.row.status == 1"
                   @click="
                     editDialog = true;
-                    getOrder(scope.row.id);
+                    getOrder(scope.row);
                   "
                   >編輯訂單</el-button
                 >
@@ -232,7 +233,7 @@
                   v-if="scope.row.status !== 1 && scope.row.status !== 9"
                   @click="
                     changeDialog = true;
-                    handleChange(scope.row);
+                    handleChangeDC(scope.row);
                   "
                   >變更司機車輛</el-button
                 >
@@ -267,12 +268,7 @@
     <!-- 燈箱 -->
 
     <!-- eidt dialog -->
-    <el-dialog
-      title="編輯訂單"
-      @closed="temp.passengerNum = 0"
-      :visible.sync="editDialog"
-      width="800px"
-    >
+    <el-dialog title="編輯訂單" :visible.sync="editDialog" width="800px">
       <div class="editDialogBody">
         <el-form
           :label-position="labelPosition"
@@ -282,57 +278,187 @@
         >
           <el-row :gutter="16">
             <el-col :sm="12" :md="8">
-              <el-form-item label="預約日期">
-                <el-date-picker
+              <el-form-item label="訂單編號">
+                <el-input
+                  disabled
                   style="width: 100%"
-                  v-model="temp.date"
-                  type="date"
-                  placeholder="選擇日期"
-                  value-format="yyyy-MM-dd"
+                  v-model="temp.despatchNo"
                 >
-                </el-date-picker>
+                </el-input>
               </el-form-item>
             </el-col>
+
             <el-col :sm="12" :md="8">
-              <el-form-item label="預約時間">
-                <el-time-select
-                  style="width: 100%"
-                  v-model="temp.time"
-                  :picker-options="{
-                    start: '08:30',
-                    step: '00:15',
-                    end: '18:30',
-                  }"
-                  placeholder="選擇時間"
-                >
-                </el-time-select>
+              <el-form-item label="訂車個案">
+                <el-input disabled style="width: 100%" v-model="temp.userName">
+                </el-input>
               </el-form-item>
             </el-col>
+
             <el-col :sm="12" :md="8">
-              <el-form-item label="搭乘人數">
+              <el-form-item label="身分證字號">
+                <el-input disabled style="width: 100%" v-model="temp.uid">
+                </el-input>
+              </el-form-item>
+            </el-col>
+
+            <el-col :sm="12" :md="8">
+              <el-form-item label="聯絡電話">
+                <el-input style="width: 100%" v-model="temp.noticePhone">
+                </el-input>
+              </el-form-item>
+            </el-col>
+
+            <el-col :sm="12" :md="8">
+              <el-form-item label="車種">
                 <el-select
                   style="width: 100%"
-                  v-model="temp.passengerNum"
-                  placeholder="選擇搭乘人數"
+                  v-model="temp.carCategoryId"
+                  placeholder="選擇車種"
                 >
                   <el-option
-                    v-for="num in 8"
-                    :key="num"
-                    :label="num"
-                    :value="num"
+                    v-for="type in carCategorysList"
+                    :key="type.id"
+                    :label="type.name"
+                    :value="type.dtValue"
                   >
                   </el-option>
                 </el-select>
               </el-form-item>
             </el-col>
+
             <el-col :sm="12" :md="8">
-              <el-form-item label="選擇路線"> </el-form-item>
+              <el-form-item label="輪椅">
+                <el-select
+                  style="width: 100%"
+                  v-model="temp.wheelchairType"
+                  placeholder="選擇輪椅"
+                >
+                  <el-option value="無" label="無">無</el-option>
+                  <el-option value="普通輪椅(可收折)" label="普通輪椅(可收折)"
+                    >普通輪椅(可收折)</el-option
+                  >
+                  <el-option value="高背輪椅" label="高背輪椅"
+                    >高背輪椅</el-option
+                  >
+                  <el-option value="電動輪椅" label="電動輪椅"
+                    >電動輪椅</el-option
+                  >
+                  <el-option value="電動高背輪椅" label="電動高背輪椅"
+                    >電動高背輪椅</el-option
+                  >
+                </el-select>
+              </el-form-item>
             </el-col>
+
             <el-col :sm="12" :md="8">
-              <el-form-item label="選擇起點站牌"> </el-form-item>
+              <el-form-item label="願意共乘">
+                <el-radio-group v-model="temp.canShared">
+                  <el-radio :label="true">是</el-radio>
+                  <el-radio :label="false">否</el-radio>
+                </el-radio-group>
+              </el-form-item>
             </el-col>
+
             <el-col :sm="12" :md="8">
-              <el-form-item label="選擇終點站牌"> </el-form-item>
+              <el-form-item label="乘車日期">
+                <el-date-picker
+                  v-model="temp.date"
+                  type="date"
+                  placeholder="請選擇乘車日期"
+                  value-format="yyyy-MM-dd"
+                  style="width: 100%"
+                  :picker-options="{
+                    disabledDate(time) {
+                      return time.getTime() < Date.now() - 8.64e7;
+                    },
+                  }"
+                ></el-date-picker>
+              </el-form-item>
+            </el-col>
+
+            <el-col :sm="12" :md="8">
+              <el-form-item label="乘車日期">
+                <el-time-select
+                  v-model="temp.time"
+                  :picker-options="{
+                    start: '06:00', //timeStartTime
+                    step: '00:10',
+                    end: '20:00',
+                  }"
+                  placeholder="請選擇乘車時間"
+                  style="width: 100%"
+                >
+                </el-time-select>
+              </el-form-item>
+            </el-col>
+
+            <el-col :sm="12" :md="8">
+              <el-form-item label="陪同人數">
+                <el-select
+                  style="width: 100%"
+                  v-model="temp.familyWith"
+                  placeholder="選擇陪同人數"
+                >
+                  <el-option
+                    v-for="num in 8"
+                    :key="num"
+                    :label="num - 1"
+                    :value="num - 1"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+
+            <el-col :sm="12" :md="24">
+              <el-form-item label="起點">
+                <el-select
+                  filterable
+                  :default-first-option="false"
+                  remote
+                  :remote-method="remoteMethod"
+                  @change="handleChange('from')"
+                  @visible-change="handleVisibleChange"
+                  ref="atc"
+                  :trigger-on-focus="false"
+                  v-model="temp.fromAddr"
+                  placeholder="請輸入起點"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in searchResults"
+                    :key="item.place_id"
+                    :value="item.place_id"
+                    :label="item.description"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+
+            <el-col :sm="12" :md="24">
+              <el-form-item label="迄點">
+                <el-select
+                  filterable
+                  :default-first-option="false"
+                  remote
+                  :remote-method="remoteMethod"
+                  @change="handleChange('to')"
+                  @visible-change="handleVisibleChange"
+                  ref="atc"
+                  :trigger-on-focus="false"
+                  v-model="temp.toAddr"
+                  placeholder="請輸入迄點"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in searchResults"
+                    :key="item.place_id"
+                    :value="item.place_id"
+                    :label="item.description"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
             </el-col>
           </el-row>
         </el-form>
@@ -405,10 +531,10 @@
     <!-- dispatch dialog -->
     <el-dialog
       title="請選擇預約乘車個案"
-      :visible.sync="dispatchDialog"
+      :visible.sync="coDialog"
       width="400px"
     >
-      <div class="dispatchDialogBody">
+      <div class="coDialogBody">
         <el-select
           style="width: 300px"
           v-model="dispatchCaseUser"
@@ -426,13 +552,17 @@
         </el-select>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dispatchDialog = false">取 消</el-button>
+        <el-button @click="coDialog = false">取 消</el-button>
         <el-button type="primary" @click="handleDispatch">確 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template> 
-
+<script
+  async
+  defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkLxJzOtyQ6Oyv4e1rTlMxGSixHr0to3Q"
+></script>
 <script>
 import moment from "moment";
 import { mapGetters } from "vuex";
@@ -446,6 +576,8 @@ import * as drivers from "@/api/drivers";
 import * as cars from "@/api/cars";
 import * as dispatchs from "@/api/dispatchs";
 import * as caseUsers from "@/api/caseUsers";
+import * as map from "@/api/map";
+import * as category from "@/api/categorys";
 export default {
   name: "dispatch",
   components: {
@@ -486,6 +618,14 @@ export default {
       newOrderList: [],
       /* 車輛類別 */
       carCategorysList: [],
+      /* map */
+      map: null,
+      service: null, //auto complete service
+      searchResults: [], //auto complete options
+      sessionToken: null, //令牌
+      fromAddr: "", //起點詳細地址
+      toAddr: "", //迄點詳細地址
+      tableToggle: true,
 
       /* table */
       list: [],
@@ -548,7 +688,7 @@ export default {
       /* dialog */
       editDialog: false,
       changeDialog: false,
-      dispatchDialog: false,
+      coDialog: false,
 
       value: "",
     };
@@ -572,7 +712,7 @@ export default {
           this.handleBatch(this.multipleSelection);
           break;
         case "dispatch":
-          this.dispatchDialog = true;
+          this.coDialog = true;
           break;
         default:
           break;
@@ -590,7 +730,6 @@ export default {
         });
         vm.total = res.count;
         vm.listLoading = false;
-        vm.$cl(vm.list);
       });
     },
 
@@ -609,6 +748,19 @@ export default {
       vm.listLoading = true;
       cars.load({ limit: 9999, page: 1 }).then((res) => {
         vm.carList = res.data;
+      });
+    },
+
+    /* 獲取車種 */
+    getCarCategorys() {
+      const vm = this;
+      let query = {
+        page: 1,
+        limit: 20,
+        TypeId: "SYS_CAR",
+      };
+      category.getList(query).then((res) => {
+        vm.carCategorysList = res.data;
       });
     },
 
@@ -766,22 +918,104 @@ export default {
     /* 編輯訂單 */
     handleEdit() {
       const vm = this;
-      let date = moment(vm.temp.date).format("yyyy-MM-DD");
-      vm.temp.reserveDate = `${date} ${vm.temp.time}`;
-
+      vm.temp.reserveDate = `${vm.temp.date} ${vm.temp.time}`;
+      vm.temp.carCategoryName = vm.carCategorysList.filter((i) => {
+        return i.dtValue === vm.temp.carCategoryId;
+      })[0].name;
+      vm.temp.fromAddr = vm.fromAddr;
+      vm.temp.toAddr = vm.toAddr;
       orderCaseUser.update(vm.temp).then((res) => {
         vm.editDialog = false;
-        vm.getList();
         vm.$alertT.fire({
           icon: "success",
-          title: res.message,
+          title: `訂單${vm.temp.orderNo}編輯成功`,
         });
+        vm.getList();
       });
     },
 
     /* 獲取單筆訂單資料 */
-    getOrder(id) {
-      this.$cl(id);
+    getOrder(order) {
+      const vm = this;
+      vm.temp = Object.assign({}, order);
+      vm.fromAddr = vm.temp.fromAddr;
+      vm.toAddr = vm.temp.toAddr;
+      this.$set(vm.temp, "date", order.reserveDate.split(" ")[0]);
+      this.$set(vm.temp, "time", order.reserveDate.split(" ")[1].slice(0, 5));
+    },
+
+    /* init google map api */
+    initMapApi() {
+      const vm = this;
+      vm.map = new google.maps.Map(document.getElementById("map"), {
+        center: {
+          //原始中心點
+          lat: 25.0374865,
+          lng: 121.5647688,
+        },
+        zoom: 15,
+      });
+      vm.sessionToken = new google.maps.places.AutocompleteSessionToken();
+      vm.service = new window.google.maps.places.AutocompleteService();
+    },
+
+    /* remoteMethod  */
+    remoteMethod(query) {
+      const vm = this;
+      if (!query) return;
+      this.service.getPlacePredictions(
+        {
+          input: query,
+          sessionToken: vm.sessionToken,
+        },
+        vm.displaySuggestions
+      );
+    },
+
+    /* 用戶選擇autocomplete選項後 */
+    handleChange(direction) {
+      const vm = this;
+      if (vm.temp[`${direction}Addr`] == "") return;
+      const request = {
+        placeId: vm.temp[`${direction}Addr`],
+        fields: ["name", "formatted_address", "place_id", "geometry"],
+        sessionToken: vm.sessionToken,
+      };
+
+      const service = new google.maps.places.PlacesService(vm.map);
+      service.getDetails(request, (place, status) => {
+        vm.getPlaceDetail(place, direction);
+        vm.sessionToken = new google.maps.places.AutocompleteSessionToken();
+      });
+    },
+
+    /* 獲取地點詳情 */
+    getPlaceDetail(place, direction) {
+      const vm = this;
+      let params = {
+        placeId: place.place_id,
+        addrFormat: place.formatted_address,
+        addrName: place.name,
+        lon: place.geometry.location.toJSON().lng,
+        lat: place.geometry.location.toJSON().lat,
+      };
+      map.placeDetail(params).then((res) => {
+        vm[`${direction}Addr`] = res.result.addrFormat;
+      });
+    },
+
+    /* 清空選項避免enter選到 */
+    handleVisibleChange() {
+      this.searchResults = [];
+    },
+
+    /* 獲取autocomplete資料 */
+    displaySuggestions(predictions, status) {
+      if (status !== window.google.maps.places.PlacesServiceStatus.OK) {
+        this.searchResults = [];
+        return;
+      }
+      this.searchResults = predictions;
     },
 
     /* 預約訂車 */
@@ -796,13 +1030,14 @@ export default {
         let routeParams = vm.caseUserList.filter((u) => {
           return u.userId === vm.dispatchCaseUser;
         })[0];
-        vm.$cl(routeParams);
-        vm.$router.push(`/alluser/addCaseUser/${this.multipleSelection[0].id}?fast=${this.multipleSelection[0].fast}`)
+        vm.$router.push(
+          `/tabledispatchcaseuser/dispatch/${routeParams.userId}-${routeParams.caseUserId}`
+        );
       }
     },
 
     /* 變更司機車輛 */
-    handleChange(order) {
+    handleChangeDC(order) {
       const vm = this;
       vm.orderTemp = Object.assign({}, order); // copy obj
     },
@@ -844,8 +1079,10 @@ export default {
     },
   },
   async mounted() {
+    this.initMapApi();
     this.getDriverList();
     this.getCarList();
+    this.getCarCategorys();
     this.getCaseUserList();
     this.getList();
   },
