@@ -509,7 +509,8 @@ export default {
       if (this.temp.date !== this.today) {
         time = "06:00";
       } else {
-        let nowHr = moment().format("hh");
+        let nowHr = moment().format("HH");
+        this.$cl(nowHr);
         let nowMin =
           (Math.floor(moment().format("hh:mm").split(":")[1] / 10) + 1) * 10;
 

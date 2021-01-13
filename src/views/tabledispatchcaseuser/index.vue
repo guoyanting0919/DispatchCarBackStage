@@ -34,6 +34,7 @@
           v-loading="listLoading"
           highlight-current-row
           @selection-change="handleSelectionChange"
+          :span-method="objectSpanMethod"
           style="width: 100%"
         >
           <el-table-column
@@ -556,6 +557,60 @@
         <el-button type="primary" @click="handleDispatch">確 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- carPool dialog -->
+    <el-dialog title="共乘設定" :visible.sync="carPoolDialog" width="650px">
+      <div class="carPoolDialogBody">
+        <el-form
+          :label-position="labelPosition"
+          label-width="200px"
+          :model="temp"
+          ref="form"
+        >
+          <el-row :gutter="16">
+            <el-col :sm="12" :md="24">
+              <el-form-item label="選擇司機">
+                <el-select
+                  style="width: 100%"
+                  v-model="carPoolTemp.driverInfoId"
+                  placeholder="請選擇司機"
+                >
+                  <el-option
+                    v-for="driver in driverList"
+                    :key="driver.id"
+                    :label="`${driver.userName} / ${driver.phone}`"
+                    :value="driver.id"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+
+            <el-col :sm="12" :md="24">
+              <el-form-item label="選擇車輛">
+                <el-select
+                  style="width: 100%"
+                  v-model="carPoolTemp.carId"
+                  placeholder="請選擇車輛"
+                >
+                  <el-option
+                    v-for="car in isShareCarFilter()"
+                    :key="car.id"
+                    :label="`${car.carNo} / ${car.seatNum}人座 / ${car.carNo}`"
+                    :value="car.id"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="carPoolDialog = false">取 消</el-button>
+        <el-button type="primary" @click="handleSetCarPool()">確 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template> 
 <script
@@ -637,6 +692,8 @@ export default {
         key: undefined,
       },
       multipleSelection: [],
+      spanArr: [],
+      pos: "",
 
       /*  order temp */
       /* 表單相關 */
@@ -689,6 +746,7 @@ export default {
       editDialog: false,
       changeDialog: false,
       coDialog: false,
+      carPoolDialog: false,
 
       value: "",
     };
@@ -700,6 +758,9 @@ export default {
       switch (domId) {
         case "delete":
           this.handleDeleteOrders(this.multipleSelection);
+          break;
+        case "carPool":
+          this.isShare();
           break;
         case "batch":
           if (this.multipleSelection.length == 0) {
@@ -725,12 +786,55 @@ export default {
       vm.listLoading = true;
       orderCaseUser.loadDespatch(vm.listQuery).then((res) => {
         vm.list = res.data.map((d) => {
+          vm.spanArr = [];
           d.despatchNo = d.despatchNo ? d.despatchNo : d.orderNo;
           return d;
         });
+
         vm.total = res.count;
+        vm.getSpanArr(vm.list);
         vm.listLoading = false;
       });
+    },
+
+    /* 合併row array */
+    getSpanArr(data) {
+      const vm = this;
+      for (let i = 0; i < data.length; i++) {
+        if (i === 0) {
+          vm.spanArr.push(1);
+          vm.pos = 0;
+        } else {
+          // 判斷當前元素與上一個元素是否相同
+          if (data[i].despatchNo === data[i - 1].despatchNo) {
+            vm.spanArr[vm.pos] += 1;
+            vm.spanArr.push(0);
+          } else {
+            vm.spanArr.push(1);
+            vm.pos = i;
+          }
+        }
+      }
+    },
+
+    /* 合併共乘欄位 */
+    objectSpanMethod({ rowIndex, columnIndex }) {
+      if (
+        columnIndex === 0 ||
+        columnIndex === 3 ||
+        columnIndex === 4 ||
+        columnIndex === 11 ||
+        columnIndex === 12
+      ) {
+        const _row = this.spanArr[rowIndex];
+        const _col = _row > 0 ? 1 : 0;
+        // alert(_row);
+        // alert(_col);
+        return {
+          rowspan: _row,
+          colspan: _col,
+        };
+      }
     },
 
     /* 獲取所有司機 */
@@ -812,6 +916,138 @@ export default {
       } else {
         return order.carCategoryId !== car.carCategoryId;
       }
+    },
+
+    /* 判斷可否共乘 */
+    isShare() {
+      const vm = this;
+      let canShare = true;
+      vm.multipleSelection.forEach((i) => {
+        if (!i.canShared) canShare = false;
+      });
+      if (canShare && vm.multipleSelection.length >= 2) {
+        vm.carPoolTemp = {
+          carId: null,
+          carNo: "",
+          driverInfoId: null,
+          driverInfoName: "",
+          id: [],
+        };
+        vm.carPoolDialog = true;
+        vm.isShareCarFilter();
+      } else {
+        vm.$alertM.fire({
+          icon: "error",
+          title: `請勾選兩張(含)以上訂單並確認個別訂單是否願意共乘`,
+        });
+      }
+    },
+
+    /* 車輛檢核 */
+    isShareCarFilter() {
+      let data = this.carList;
+      let checkedRowsData = this.multipleSelection;
+      return data.filter((item) => {
+        return [
+          () => {
+            // 若 車輛 為 不可派發 (status === 0) ，則不能選
+            if (item.status === 0) {
+              return false;
+            }
+            // 若 車輛 為 可派發 (status !== 0) ，則可以選
+            else {
+              return true;
+            }
+          },
+          () => {
+            // 若 有某一張定單 車種 不等於 一般車，那只能是 福祉車
+            if (checkedRowsData.some((el) => el.carCategoryName !== "一般車")) {
+              return item.carCategoryName !== "一般車";
+            }
+            // 若 有某一張定單 車種 等於 一般車，那可以是 一般車、福祉車
+            else {
+              return true; // 車種只有 一般車、福祉車 所以都通過
+            }
+          },
+          () => {
+            //#region  輪椅選項
+            // 一般車
+            // [
+            //     { value: '無', label: "無" },
+            //     { value: '普通輪椅(可收折)', label: "普通輪椅(可收折)" },
+            // ]
+            // 福祉車
+            // [
+            //     { value: '普通輪椅', label: "普通輪椅" },
+            //     { value: '高背輪椅', label: "高背輪椅" },
+            //     { value: '電動輪椅', label: "電動輪椅" },
+            //     { value: '電動高背輪椅', label: "電動高背輪椅" },
+            // ]
+            //#endregion
+
+            return (
+              item.wheelchairNum >=
+              checkedRowsData.reduce(
+                (accumulator, currentValue) =>
+                  accumulator +
+                  (currentValue.wheelchairType !== "無" ||
+                  currentValue.wheelchairType !== "普通輪椅(可收折)"
+                    ? 0
+                    : 1),
+                0
+              )
+            );
+          },
+          () => {
+            // 座椅數量 必須大於 所有訂單 (一般車訂單的陪同人數 + 1、福祉車訂單的陪同人數) 陪同人數 加總
+            return (
+              item.seatNum >=
+              checkedRowsData.reduce(
+                (accumulator, currentValue) =>
+                  accumulator +
+                  (currentValue.carCategoryName === "一般車"
+                    ? currentValue.familyWith + 1
+                    : currentValue.familyWith),
+                0
+              )
+            );
+          },
+        ].every((it) => it());
+      });
+    },
+
+    /* 共乘 */
+    handleSetCarPool() {
+      const vm = this;
+      if (vm.carPoolTemp.driverInfoId == null || vm.carPoolTemp.carId == null) {
+        vm.$alertM.fire({
+          icon: "error",
+          title: `請確實選擇司機及車輛`,
+        });
+        return;
+      }
+      let data = {
+        id: vm.multipleSelection.map((i) => {
+          return i.despatchNo;
+        }),
+        driverInfoId: vm.carPoolTemp.driverInfoId,
+        carId: vm.carPoolTemp.carId,
+        driverInfoName: vm.driverList.filter((d) => {
+          return d.id == vm.carPoolTemp.driverInfoId;
+        })[0].userName,
+        carNo: vm.carList.filter((c) => {
+          return c.id == vm.carPoolTemp.carId;
+        })[0].carNo,
+      };
+      this.$cl(data);
+      dispatchs.addOrUpdate(data).then((res) => {
+        vm.$alertT.fire({
+          icon: "success",
+          title: res.message,
+        });
+        vm.carPoolDialog = false;
+        vm.getList();
+      });
     },
 
     /* 排班 */
@@ -1030,6 +1266,7 @@ export default {
         let routeParams = vm.caseUserList.filter((u) => {
           return u.userId === vm.dispatchCaseUser;
         })[0];
+        vm.coDialog = false;
         vm.$router.push(
           `/tabledispatchcaseuser/dispatch/${routeParams.userId}-${routeParams.caseUserId}`
         );
