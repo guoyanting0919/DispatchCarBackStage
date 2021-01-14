@@ -262,7 +262,8 @@ export default {
     /* 回列表 */
     handleBack() {
       //TODO:白牌用戶頁面跳轉記得換路徑
-      this.$router.push("/alluser/index");
+      // this.$router.push("/alluser/index");
+      this.$router.go(-1);
       // this.$router.push("/bususer/index");
     },
 
@@ -335,7 +336,8 @@ export default {
               title: res.message,
             });
             //TODO:更換島夜路由
-            vm.$router.push("/alluser/index");
+            // vm.$router.push("/alluser/index");
+            this.$router.go(-1);
             // vm.$router.push("/bususer/index");
           });
         }

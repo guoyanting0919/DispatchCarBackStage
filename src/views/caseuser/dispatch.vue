@@ -1,10 +1,20 @@
 <template>
-  <h1>dispatch</h1>
-</template>
+  <!-- TODO:這邊用 views/alluser/dispatchCaseUser 頁面當作component使用 -->
+  <DispatchCaseUser />
+</template> 
 
 <script>
-export default {};
+import DispatchCaseUser from "@/views/alluser/dispatchCaseUser";
+export default {
+  name: "dispatchCaseUser",
+  components: {
+    DispatchCaseUser,
+  },
+  data() {
+    return {};
+  },
+  computed: {},
+  filters: {},
+};
 </script>
 
-<style>
-</style>

@@ -509,6 +509,7 @@ export default {
     /* 預約訂單 */
     handleReservation() {
       // console.log(this.passengerArr);
+
       this.$refs.form.validate((valid) => {
         if (valid) {
           const vm = this;
@@ -530,8 +531,10 @@ export default {
               icon: "success",
               title: res.message,
             });
+            this.handleBack();
             //TODO:白牌用戶頁面跳轉記得換路徑
-            vm.$router.push("/alluser/index");
+
+            // vm.$router.push("/alluser/index");
             // vm.$router.push("/selfpayuser/index");
           });
         }
@@ -554,7 +557,8 @@ export default {
     /* 回列表 */
     handleBack() {
       //TODO:白牌用戶頁面跳轉記得換路徑
-      this.$router.push("/alluser/index");
+      // this.$router.push("/alluser/index");
+      this.$router.go(-1);
       // this.$router.push("/selfpayuser/index");
     },
 

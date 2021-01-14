@@ -155,7 +155,7 @@
                     <span class="unitBTitle"
                       >優先搭乘車行排序 (請依序點擊完成排序)</span
                     >
-                    <div class="unitBContainer">
+                    <div class="unitBContainer" v-if="roleOrgB">
                       <div
                         @click="handleOrgBSelect(item.id)"
                         v-for="item in roleOrgB"
@@ -707,8 +707,8 @@ export default {
     },
 
     /* 獲取所有B單位 */
-    getOrgB() {
-      org.getOrgB().then((res) => {
+    async getOrgB() {
+      await org.getOrgB().then((res) => {
         this.orgBList = res.result;
       });
     },
@@ -750,13 +750,7 @@ export default {
         FamilyWith: vm.temp.familyWith, //2
         ReservationDate: `${vm.temp.date} ${vm.temp.time}`, //2020-12-22 00:05
       };
-      if (
-        vm.temp.date &&
-        vm.temp.time &&
-        vm.toAddr &&
-        vm.fromAddr &&
-        vm.temp.familyWith
-      ) {
+      if (vm.temp.date && vm.temp.time && vm.toAddr && vm.fromAddr) {
         vm.$cl("計算金額");
         vm.$cl(params);
         orderCaseUser.getDiscount(params).then((res) => {
@@ -782,8 +776,8 @@ export default {
     /* 立即預約 */
     handleSubmit() {
       const vm = this;
-      let route = vm.$route.path.split("/")[1];
-      vm.$cl(route);
+      // let route = vm.$route.path.split("/")[1];
+      // vm.$cl(route);
       vm.temp.reserveDate = `${vm.temp.date} ${vm.temp.time}`;
       vm.temp.carCategoryName = vm.carCategorysList.filter((i) => {
         return i.dtValue === vm.temp.carCategoryId;
@@ -809,11 +803,12 @@ export default {
 
           vm.$cl(backTemp);
           orderCaseUser.add(backTemp).then((res) => {
-            vm.$cl(res);
-            vm.$router.push(`/${route}/index`);
+            this.$router.go(-1);
+            // vm.$router.push(`/${route}/index`);
           });
         } else {
-          vm.$router.push(`/${route}/index`);
+          // vm.$router.push(`/${route}/index`);
+          this.$router.go(-1);
         }
       });
     },
@@ -824,13 +819,13 @@ export default {
       vm.amtDialog = true;
     },
   },
-  mounted() {
+  async mounted() {
     this.today = moment().format("yyyy-MM-DD");
     this.initMap();
     this.getUser();
-    this.getRole();
-    this.getOrgB();
     this.getCarCategorys();
+    await this.getOrgB();
+    this.getRole();
   },
 };
 </script>

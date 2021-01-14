@@ -3,11 +3,7 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 權限按鈕 -->
-        <el-button
-          size="mini"
-          @click="$router.push('/alluser/index')"
-          type="success"
-          plain
+        <el-button size="mini" @click="$router.go(-1)" type="success" plain
           >回列表</el-button
         >
       </div>

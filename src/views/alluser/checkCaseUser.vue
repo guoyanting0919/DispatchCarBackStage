@@ -3,8 +3,8 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 權限按鈕 -->
-        <el-button size="mini" @click="handleSave" type="success" plain
-          >儲存</el-button
+        <el-button size="mini" @click="$router.go(-1)" type="success" plain
+          >回列表</el-button
         >
       </div>
     </sticky>

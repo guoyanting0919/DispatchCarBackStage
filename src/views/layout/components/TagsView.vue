@@ -72,7 +72,10 @@ export default {
       return false;
     },
     isActive(route) {
-      return route.path === this.$route.path;
+      let flag =
+        route.path === this.$route.path ||
+        this.$route.path?.split("/")[1] === route.path?.split("/")[1];
+      return flag;
     },
     addViewTags() {
       const route = this.generateRoute();

@@ -167,7 +167,8 @@ export default {
               icon: "success",
               title: `用戶${vm.basicTemp.name} 白牌身份編輯成功`,
             });
-            vm.$router.push("/alluser/index");
+            // vm.$router.push("/alluser/index");
+            this.$router.go(-1);
             // vm.getSelfPayUser();
           });
         } else {

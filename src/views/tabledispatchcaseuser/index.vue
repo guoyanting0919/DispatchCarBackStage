@@ -105,8 +105,7 @@
                 :disabled="scope.row.status != 1"
               >
                 <el-option
-                  v-for="car in carList"
-                  :disabled="checkCarType(scope.row, car)"
+                  v-for="car in dispatchCarFilter(carList, scope.row)"
                   :key="car.id"
                   :label="car.carNo"
                   :value="car.id"
@@ -596,7 +595,7 @@
                   <el-option
                     v-for="car in isShareCarFilter()"
                     :key="car.id"
-                    :label="`${car.carNo} / ${car.seatNum}人座 / ${car.carNo}`"
+                    :label="`${car.carCategoryName} / ${car.seatNum}人座 / ${car.carNo}`"
                     :value="car.id"
                   >
                   </el-option>
@@ -934,7 +933,6 @@ export default {
           id: [],
         };
         vm.carPoolDialog = true;
-        vm.isShareCarFilter();
       } else {
         vm.$alertM.fire({
           icon: "error",
@@ -943,7 +941,73 @@ export default {
       }
     },
 
-    /* 車輛檢核 */
+    /* 排班車輛檢核 */
+    dispatchCarFilter(data = [], rowData) {
+      return data.filter((item) => {
+        return [
+          () => {
+            // 若 車輛 為 不可派發 (status === 0) ，則不能選
+            if (item.status === 0) {
+              return false;
+            }
+            // 若 車輛 為 可派發 (status !== 0) ，則可以選
+            else {
+              return true;
+            }
+          },
+          () => {
+            // 若 這一張訂單車種 不等於 一般車，那只能是 福祉車
+            if (rowData.carCategoryName !== "一般車") {
+              return item.carCategoryName !== "一般車";
+            }
+            // 若 這一張訂單車種 等於 一般車，那可以是 一般車、福祉車
+            else {
+              return true; // 車種只有 一般車、福祉車 所以都通過
+            }
+          },
+          () => {
+            //#region  輪椅選項
+            // 一般車
+            // [
+            //     { value: '無', label: "無" },
+            //     { value: '普通輪椅(可收折)', label: "普通輪椅(可收折)" },
+            // ]
+            // 福祉車
+            // [
+            //     { value: '普通輪椅', label: "普通輪椅" },
+            //     { value: '高背輪椅', label: "高背輪椅" },
+            //     { value: '電動輪椅', label: "電動輪椅" },
+            //     { value: '電動高背輪椅', label: "電動高背輪椅" },
+            // ]
+            //#endregion
+
+            // 若 這一張訂單輪椅類型 不等於 ( "無" 或 "普通輪椅(可收折)" )，那 輪椅數量 要大於等於 1
+            if (
+              rowData.wheelchairType !== "無" ||
+              rowData.wheelchairType !== "普通輪椅(可收折)"
+            ) {
+              return item.wheelchairNum >= 1;
+            }
+            // 若 這一張訂單輪椅類型 等於 ( "無" 或 "普通輪椅(可收折)" )，那 輪椅數量 要大於等於 0
+            else {
+              return item.wheelchairNum >= 0;
+            }
+          },
+          () => {
+            // 若 這一張訂單車種 等於 一般車，則 座位數量 必須 大於等於 訂單的陪同人數 + 1
+            if (rowData.carCategoryName === "一般車") {
+              return item.seatNum >= rowData.familyWith + 1;
+            }
+            // 若 這一張訂單車種 不等於 一般車，則 座位數量 必須 大於等於 訂單的陪同人數
+            else {
+              return item.seatNum >= rowData.familyWith;
+            }
+          },
+        ].every((it) => it());
+      });
+    },
+
+    /* 共乘車輛檢核 */
     isShareCarFilter() {
       let data = this.carList;
       let checkedRowsData = this.multipleSelection;

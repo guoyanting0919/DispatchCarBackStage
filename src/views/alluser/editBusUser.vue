@@ -104,7 +104,8 @@ export default {
               icon: "success",
               title: `用戶${vm.basicTemp.name} 成功編輯巴士身份`,
             });
-            vm.$router.push("/alluser/index");
+            this.$router.go(-1);
+            // vm.$router.push("/alluser/index");
           });
         } else {
           console.log("submit error");

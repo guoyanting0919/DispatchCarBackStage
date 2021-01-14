@@ -41,7 +41,10 @@
             :key="child.path"
           ></sidebar-item>
           <el-menu-item
-            :class="{ dark: !themeStatus }"
+            :class="{
+              dark: !themeStatus,
+              'is-active': customActiveRoute(child),
+            }"
             v-else
             :key="child.name"
             :index="child.path"
@@ -103,6 +106,11 @@ export default {
     this.groupRouters();
   },
   methods: {
+    /* custom active route */
+    customActiveRoute(child) {
+      const vm = this;
+      return vm.$route.path?.split("/")[1] === child.path?.split("/")[1];
+    },
     groupRouters() {
       this.routes =
         this.item.children &&

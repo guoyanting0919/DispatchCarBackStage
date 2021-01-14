@@ -3,7 +3,7 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 權限按鈕 -->
-        <el-button size="mini" @click="handleSave" type="success" plain
+        <el-button size="mini" @click="$router.go(-1)" type="success" plain
           >回列表</el-button
         >
       </div>
@@ -170,7 +170,8 @@ export default {
               icon: "success",
               title: `用戶${vm.basicTemp.name} 白牌身份編輯成功`,
             });
-            vm.$router.push("/alluser/index");
+            // vm.$router.push("/alluser/index");
+            this.$router.go(-1);
             // vm.getSelfPayUser();
           });
         } else {
