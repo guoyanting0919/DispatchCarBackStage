@@ -8,6 +8,9 @@
         <el-button size="mini" type="info" @click="handleCheckAmt"
           >可用補助額查詢</el-button
         >
+        <el-button size="mini" type="info" @click="handleChangeAddr"
+          >起迄點互換</el-button
+        >
       </div>
     </sticky>
 
@@ -191,9 +194,9 @@
                       filterable
                       :default-first-option="false"
                       remote
-                      :remote-method="remoteMethod"
+                      :remote-method="remoteMethodFrom"
                       @change="handleChange('from')"
-                      @visible-change="handleVisibleChange"
+                      @visible-change="handleVisibleChangeFrom"
                       ref="atc"
                       :trigger-on-focus="false"
                       v-model="temp.fromAddr"
@@ -201,7 +204,7 @@
                       style="width: 100%"
                     >
                       <el-option
-                        v-for="item in searchResults"
+                        v-for="item in searchResultsFrom"
                         :key="item.place_id"
                         :value="item.place_id"
                         :label="item.description"
@@ -245,9 +248,9 @@
                       filterable
                       :default-first-option="false"
                       remote
-                      :remote-method="remoteMethod"
+                      :remote-method="remoteMethodTo"
                       @change="handleChange('to')"
-                      @visible-change="handleVisibleChange"
+                      @visible-change="handleVisibleChangeTo"
                       ref="atc"
                       :trigger-on-focus="false"
                       v-model="temp.toAddr"
@@ -255,7 +258,7 @@
                       style="width: 100%"
                     >
                       <el-option
-                        v-for="item in searchResults"
+                        v-for="item in searchResultsTo"
                         :key="item.place_id"
                         :value="item.place_id"
                         :label="item.description"
@@ -335,6 +338,7 @@
                       v-model="temp.carCategoryId"
                       placeholder="請選擇車種"
                       style="width: 100%"
+                      @change="temp.wheelchairType = ''"
                     >
                       <el-option
                         v-for="item in carCategorysList"
@@ -353,19 +357,40 @@
                       placeholder="請選擇輪椅"
                       style="width: 100%"
                     >
-                      <el-option value="無" label="無">無</el-option>
                       <el-option
+                        v-if="temp.carCategoryId === 'SYS_CAR_GENERAL'"
+                        value="無"
+                        label="無"
+                        >無</el-option
+                      >
+                      <el-option
+                        v-if="temp.carCategoryId === 'SYS_CAR_GENERAL'"
                         value="普通輪椅(可收折)"
                         label="普通輪椅(可收折)"
                         >普通輪椅(可收折)</el-option
                       >
-                      <el-option value="高背輪椅" label="高背輪椅"
+                      <el-option
+                        v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
+                        value="普通輪椅"
+                        label="普通輪椅"
+                        >普通輪椅</el-option
+                      >
+                      <el-option
+                        value="高背輪椅"
+                        label="高背輪椅"
+                        v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
                         >高背輪椅</el-option
                       >
-                      <el-option value="電動輪椅" label="電動輪椅"
+                      <el-option
+                        value="電動輪椅"
+                        label="電動輪椅"
+                        v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
                         >電動輪椅</el-option
                       >
-                      <el-option value="電動高背輪椅" label="電動高背輪椅"
+                      <el-option
+                        value="電動高背輪椅"
+                        label="電動高背輪椅"
+                        v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
                         >電動高背輪椅</el-option
                       >
                     </el-select>
@@ -454,6 +479,8 @@ export default {
       },
       service: null, //auto complete service
       searchResults: [], //auto complete options
+      searchResultsFrom: [], //auto complete options
+      searchResultsTo: [], //auto complete options
       sessionToken: null, //令牌
       fromAddr: "", //起點詳細地址
       toAddr: "", //迄點詳細地址
@@ -494,7 +521,7 @@ export default {
         carCategoryId: "",
         carCategoryName: "",
         wheelchairType: "",
-        familyWith: 0,
+        familyWith: "",
         noticePhone: "",
       },
       rules: {},
@@ -565,7 +592,7 @@ export default {
     },
 
     /* remoteMethod  */
-    remoteMethod(query) {
+    remoteMethodFrom(query) {
       const vm = this;
       if (!query) return;
       this.service.getPlacePredictions(
@@ -573,17 +600,35 @@ export default {
           input: query,
           sessionToken: vm.sessionToken,
         },
-        vm.displaySuggestions
+        vm.displaySuggestionsFrom
+      );
+    },
+    remoteMethodTo(query) {
+      const vm = this;
+      if (!query) return;
+      this.service.getPlacePredictions(
+        {
+          input: query,
+          sessionToken: vm.sessionToken,
+        },
+        vm.displaySuggestionsTo
       );
     },
 
     /* 獲取autocomplete資料 */
-    displaySuggestions(predictions, status) {
+    displaySuggestionsFrom(predictions, status) {
       if (status !== window.google.maps.places.PlacesServiceStatus.OK) {
-        this.searchResults = [];
+        this.searchResultsFrom = [];
         return;
       }
-      this.searchResults = predictions;
+      this.searchResultsFrom = predictions;
+    },
+    displaySuggestionsTo(predictions, status) {
+      if (status !== window.google.maps.places.PlacesServiceStatus.OK) {
+        this.searchResultsTo = [];
+        return;
+      }
+      this.searchResultsTo = predictions;
     },
 
     /* 用戶選擇autocomplete選項後 */
@@ -678,8 +723,15 @@ export default {
     },
 
     /* 清空選項避免enter選到 */
-    handleVisibleChange() {
-      this.searchResults = [];
+    handleVisibleChangeFrom(val) {
+      if (val) {
+        this.searchResultsFrom = [];
+      }
+    },
+    handleVisibleChangeTo(val) {
+      if (val) {
+        this.searchResultsTo = [];
+      }
     },
 
     /* 獲取用戶資料 */
@@ -736,7 +788,11 @@ export default {
         TypeId: "SYS_CAR",
       };
       category.getList(query).then((res) => {
-        vm.carCategorysList = res.data;
+        vm.carCategorysList = res.data.filter((car) => {
+          return (
+            car.dtValue === "SYS_CAR_GENERAL" || car.dtValue === "SYS_CAR_WEAL"
+          );
+        });
       });
     },
 
@@ -750,9 +806,13 @@ export default {
         FamilyWith: vm.temp.familyWith, //2
         ReservationDate: `${vm.temp.date} ${vm.temp.time}`, //2020-12-22 00:05
       };
-      if (vm.temp.date && vm.temp.time && vm.toAddr && vm.fromAddr) {
-        vm.$cl("計算金額");
-        vm.$cl(params);
+      if (
+        vm.temp.date &&
+        vm.temp.time &&
+        vm.toAddr &&
+        vm.fromAddr &&
+        vm.temp.familyWith !== ""
+      ) {
         orderCaseUser.getDiscount(params).then((res) => {
           vm.$cl(res);
           // vm.discountData = [res.result];
@@ -769,8 +829,20 @@ export default {
         });
       } else {
         vm.$cl("資料不全 無法計算金額");
-        vm.$cl(params);
       }
+    },
+
+    /* 起迄點互換 */
+    handleChangeAddr() {
+      const vm = this;
+      [vm.toAddr, vm.fromAddr] = [vm.fromAddr, vm.toAddr];
+      [vm.searchResultsFrom, vm.searchResultsTo] = [
+        vm.searchResultsTo,
+        vm.searchResultsFrom,
+      ];
+      [vm.temp.fromAddr, vm.temp.toAddr] = [vm.temp.toAddr, vm.temp.fromAddr];
+
+      this.$cl(vm.temp);
     },
 
     /* 立即預約 */

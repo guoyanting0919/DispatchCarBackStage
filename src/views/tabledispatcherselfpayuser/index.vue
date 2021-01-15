@@ -162,7 +162,7 @@
                   :disabled="scope.row.status != 1"
                 >
                   <el-option
-                    v-for="car in carList"
+                    v-for="car in dispatchCarFilter(carList, scope.row)"
                     :key="car.id"
                     :label="car.carNo"
                     :value="car.id"
@@ -545,9 +545,9 @@
                   placeholder="請選擇車輛"
                 >
                   <el-option
-                    v-for="car in carList"
+                    v-for="car in isShareCarFilter()"
                     :key="car.id"
-                    :label="`${car.carNo} / ${car.seatNum}人座 / ${car.carNo}`"
+                    :label="`${car.carCategoryName} / ${car.seatNum}人座 / ${car.carNo}`"
                     :value="car.id"
                   >
                   </el-option>
@@ -600,11 +600,9 @@
                   style="width: 100%"
                 >
                   <el-option
-                    v-for="car in carList"
+                    v-for="car in dispatchCarFilter(carList, orderTemp)"
                     :key="car.id"
-                    :label="`${car.carCategoryName || '一般車'} / ${
-                      car.seatNum
-                    }人座 / ${car.carNo}`"
+                    :label="`${car.carCategoryName} / ${car.seatNum}人座 / ${car.carNo}`"
                     :value="car.id"
                   ></el-option>
                 </el-select>
@@ -898,7 +896,12 @@ export default {
     getCarList() {
       const vm = this;
       cars.load({ limit: 9999, page: 1 }).then((res) => {
-        vm.carList = res.data;
+        vm.carList = res.data.filter((car) => {
+          return (
+            car.carCategoryId === "SYS_CAR_GENERAL" ||
+            car.carCategoryId === "SYS_CAR_WEAL"
+          );
+        });
       });
     },
 
@@ -911,7 +914,11 @@ export default {
         TypeId: "SYS_CAR",
       };
       categorys.getList(query).then((res) => {
-        vm.carCategorysList = res.data;
+        vm.carCategorysList = res.data.filter((car) => {
+          return (
+            car.dtValue === "SYS_CAR_GENERAL" || car.dtValue === "SYS_CAR_WEAL"
+          );
+        });
       });
     },
 
@@ -1017,6 +1024,78 @@ export default {
         .then((res) => {
           this.$cl(res);
         });
+    },
+
+    /* 排班車輛檢核 */
+    dispatchCarFilter(data = [], rowData) {
+      return data.filter((item) => {
+        return [
+          () => {
+            if (item.status === 0) {
+              return false;
+            } else {
+              return true;
+            }
+          },
+          () => {
+            // 若 這一張訂單車種 不等於 一般車，那只能是 福祉車
+            if (rowData.carCategoryName !== "一般車") {
+              return item.carCategoryName !== "一般車";
+            } else {
+              return true;
+            }
+          },
+
+          () => {
+            // 若 這一張訂單車種 等於 一般車，則 座位數量 必須 大於等於 訂單的陪同人數 + 1
+            if (rowData.carCategoryName === "一般車") {
+              return item.seatNum >= rowData.passengerNum;
+            }
+            // 若 這一張訂單車種 不等於 一般車，則 座位數量 必須 大於等於 訂單的陪同人數
+            else {
+              return item.seatNum >= rowData.passengerNum;
+            }
+          },
+        ].every((it) => it());
+      });
+    },
+
+    /* 共乘車輛檢核 */
+    isShareCarFilter() {
+      let data = this.carList;
+      let checkedRowsData = this.multipleSelection;
+      return data.filter((item) => {
+        return [
+          () => {
+            // 若 車輛 為 不可派發 (status === 0) ，則不能選
+            if (item.status === 0) {
+              return false;
+            }
+            // 若 車輛 為 可派發 (status !== 0) ，則可以選
+            else {
+              return true;
+            }
+          },
+          () => {
+            // 若 有某一張定單 車種 不等於 一般車，那只能是 福祉車
+            if (checkedRowsData.some((el) => el.carCategoryName !== "一般車")) {
+              return item.carCategoryName !== "一般車";
+            } else {
+              return true; // 車種只有 一般車、福祉車 所以都通過
+            }
+          },
+          () => {
+            return (
+              item.seatNum >=
+              checkedRowsData.reduce(
+                (accumulator, currentValue) =>
+                  accumulator + currentValue.passengerNum,
+                0
+              )
+            );
+          },
+        ].every((it) => it());
+      });
     },
 
     /* 排班 */
@@ -1157,8 +1236,10 @@ export default {
     /* 變更司機車輛 */
     handleChange(order) {
       const vm = this;
-      vm.changeDialog = true;
       vm.orderTemp = Object.assign({}, order); // copy obj
+      vm.$nextTick(() => {
+        vm.changeDialog = true;
+      });
     },
 
     /* 確認變更司機車輛 */

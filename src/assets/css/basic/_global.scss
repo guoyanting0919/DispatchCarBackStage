@@ -8,6 +8,19 @@
   text-align: center;
 }
 
+/* flex utility */
+.flex {
+  display: flex;
+}
+
+.justifyCenter {
+  justify-content: center;
+}
+
+.alignCenter {
+  align-items: center;
+}
+
 /* filter container 篩選列 */
 .filter-container {
   .el-select {

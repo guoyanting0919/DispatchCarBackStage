@@ -72,7 +72,11 @@
             label="身分證字號"
             width="200"
             align="center"
-          ></el-table-column>
+          >
+            <template slot-scope="scope">
+              {{ scope.row.uid | hideFilter }}
+            </template>
+          </el-table-column>
           <el-table-column
             property="phone"
             label="手機"

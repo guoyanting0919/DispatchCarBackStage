@@ -120,7 +120,7 @@
                 >
                 <el-button
                   size="mini"
-                  @click="dispatchCaseUser(scope.row)"
+                  @click="handleQuota(scope.row)"
                   type="primary"
                   v-if="hasButton('quota')"
                   >額度</el-button
@@ -160,6 +160,58 @@
         <el-button type="primary" @click="confirmUnitB">確 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- quotaDialog -->
+    <el-dialog title="可用額度" :visible.sync="quotaDialog" width="600px">
+      <div class="quotaBody">
+        <div class="quotaData">
+          <div class="quotaDataItem">
+            <p>使用額度</p>
+            <h1>${{ discountTemp.useDiscount }}</h1>
+          </div>
+          <div class="quotaDataItem">
+            <p>剩餘額度</p>
+            <h1>${{ discountTemp.lastDiscount }}</h1>
+          </div>
+          <div class="quotaDataItem">
+            <p>本月可用額度</p>
+            <h1>${{ discountTemp.totalDiscount }}</h1>
+          </div>
+        </div>
+        <div class="addQuota">
+          <p>新增額度</p>
+          <div class="flex alignCeter">
+            <el-input
+              style="width: 200px; margin-right: 1rem"
+              :disabled="!hasSpecialButton('editQuota')"
+              v-model="amt"
+            ></el-input>
+            <el-button type="primary" plain size="mini" @click="amt = 0"
+              >清空</el-button
+            >
+            <el-button type="primary" size="mini" @click="confirmQuota"
+              >確定</el-button
+            >
+          </div>
+        </div>
+        <div class="quotaHistory">
+          <p class="quotaHistoryTitle">修改記錄</p>
+          <p class="noQuotaHistory" v-if="discountList.length == 0">
+            無修改記錄
+          </p>
+          <template v-else>
+            <p
+              class="quotaHistoryData"
+              v-for="item in discountList"
+              :key="item.id"
+            >
+              {{ item.typeName }} ${{ item.amt }}
+              {{ item.createDate | globalDateFilter("yyyy-MM-DD") }}
+            </p>
+          </template>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -171,6 +223,7 @@ import elDragDialog from "@/directive/el-dragDialog";
 import Pagination from "@/components/Pagination";
 import * as caseUsers from "@/api/caseUsers";
 import * as orgs from "@/api/orgs";
+import * as caseUserDiscounts from "@/api/caseUserDiscounts";
 export default {
   name: "publicExpense",
   components: {
@@ -185,6 +238,7 @@ export default {
   data() {
     return {
       value: "",
+      specialButtons: [],
       buttons: [],
       // 表格相關
       list: [],
@@ -223,8 +277,19 @@ export default {
         isEffectNow: true, //是否生效
       },
 
+      /* 額度相關 */
+      discountList: [],
+      discountTemp: {
+        caseUserId: "",
+        lastDiscount: "",
+        totalDiscount: "",
+        useDiscount: "",
+      },
+      amt: 0,
+
       /* dialog */
       unitBDialog: false,
+      quotaDialog: false,
       unitBs: "",
       checkedUnitBs: [],
 
@@ -242,6 +307,25 @@ export default {
     },
   },
   methods: {
+    /* 獲取特殊修改權限 */
+    getSpecialButtons() {
+      let router2 = this.$store.getters.modules;
+      let a = router2.filter((r) => {
+        return r.item.name == "用戶資料";
+      });
+      let b = a[0].children.filter((r2) => {
+        return r2.item.name == "全部用戶";
+      });
+      this.specialButtons = b[0].item.elements.map((btn) => {
+        return btn.domId;
+      });
+    },
+
+    /* 是否擁有特殊按鈕功能權限 */
+    hasSpecialButton(domId) {
+      return this.specialButtons.includes(domId);
+    },
+
     /* 獲取本路由下所有功能按鈕 */
     getButtons() {
       this.$route.meta.elements.forEach((el) => {
@@ -310,6 +394,41 @@ export default {
       });
     },
 
+    /* 獲取額度資料 */
+    handleQuota(user) {
+      const vm = this;
+      this.$cl(user);
+      vm.amt = 0;
+      vm.rowClick(user);
+      let caseUserId = user.caseUserId;
+      caseUserDiscounts.get({ caseUserId }).then((res) => {
+        vm.discountTemp = Object.assign({}, res.result); // copy obj
+        this.quotaDialog = true;
+      });
+      caseUserDiscounts
+        .load({ caseUserId, page: 1, limit: 9999 })
+        .then((res) => {
+          vm.discountList = res.data;
+          this.$cl(vm.discountList);
+        });
+    },
+
+    /* 確認新增額度 */
+    confirmQuota() {
+      const vm = this;
+      let temp = {
+        caseUserId: vm.discountTemp.caseUserId,
+        amt: vm.amt,
+      };
+      caseUserDiscounts.add(temp).then((res) => {
+        vm.$alertT.fire({
+          icon: "success",
+          title: res.message,
+        });
+        this.quotaDialog = false;
+      });
+    },
+
     /* 預約 */
     handleDispatch(user) {
       let id = `${user.userId}-${user.caseUserId}`;
@@ -359,8 +478,56 @@ export default {
     this.getButtons();
     this.getList();
     this.getUnitBs();
+    this.getSpecialButtons();
   },
 };
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+.quotaBody {
+  width: 100%;
+}
+.quotaData {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+.quotaDataItem {
+  width: 33%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  p {
+    font-size: 16px;
+    margin-bottom: 0.75rem;
+  }
+}
+.addQuota {
+  margin-bottom: 1.25rem;
+  p {
+    font-size: 16px;
+    margin-bottom: 0.5rem;
+  }
+}
+.quotaHistoryTitle {
+  font-size: 1rem;
+  background: $--color-primary-light-8;
+  padding: 0.5rem 0;
+}
+
+.quotaHistoryData {
+  padding: 0.25rem 0;
+  border-bottom: 1px solid $--color-primary-light-8;
+
+  &:nth-child(2n + 1) {
+    background: $--color-primary-light-9;
+  }
+}
+
+.noQuotaHistory {
+  text-align: center;
+  color: red;
+}
+</style>

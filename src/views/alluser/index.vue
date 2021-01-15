@@ -141,7 +141,11 @@
             label="身分證字號"
             min-width="160"
             align="center"
-          ></el-table-column>
+          >
+            <template slot-scope="scope">
+              {{ scope.row.uid | hideFilter }}
+            </template>
+          </el-table-column>
           <!-- <el-table-column
             property="birthday"
             label="生日"
@@ -568,24 +572,37 @@
         </div>
         <div class="addQuota">
           <p>新增額度</p>
-          <el-input
-            :disabled="!hasButton('editQuota')"
-            v-model="amt"
-          ></el-input>
+          <div class="flex alignCeter">
+            <el-input
+              style="width: 200px; margin-right: 1rem"
+              :disabled="!hasButton('editQuota')"
+              v-model="amt"
+            ></el-input>
+            <el-button type="primary" plain size="mini" @click="amt = 0"
+              >清空</el-button
+            >
+            <el-button type="primary" size="mini" @click="confirmQuota"
+              >確定</el-button
+            >
+          </div>
         </div>
         <div class="quotaHistory">
-          <p>修改記錄</p>
+          <p class="quotaHistoryTitle">修改記錄</p>
+          <p class="noQuotaHistory" v-if="discountList.length == 0">
+            無修改記錄
+          </p>
+          <template v-else>
+            <p
+              class="quotaHistoryData"
+              v-for="item in discountList"
+              :key="item.id"
+            >
+              {{ item.typeName }} ${{ item.amt }}
+              {{ item.createDate | globalDateFilter("yyyy-MM-DD") }}
+            </p>
+          </template>
         </div>
       </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="quotaDialog = false">取 消</el-button>
-        <el-button
-          :disabled="!hasButton('editQuota')"
-          type="primary"
-          @click="confirmQuota"
-          >確 定</el-button
-        >
-      </span>
     </el-dialog>
 
     <!-- unitBDialog -->
@@ -611,13 +628,15 @@
 </template>
 
 <script>
+import moment from "moment";
+import { mapGetters } from "vuex";
+
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import permissionBtn from "@/components/PermissionBtn";
-import { mapGetters } from "vuex";
 import elDragDialog from "@/directive/el-dragDialog";
 import Pagination from "@/components/Pagination";
-import moment from "moment";
+
 import * as users from "@/api/users";
 import * as orgs from "@/api/orgs";
 import * as caseUsers from "@/api/caseUsers";
@@ -787,6 +806,9 @@ export default {
         wealTypeName: "", //社會福利身份
         isEffectNow: true, //是否生效
       },
+
+      /* 額度相關 */
+      discountList: [],
       discountTemp: {
         caseUserId: "",
         lastDiscount: "",
@@ -794,6 +816,8 @@ export default {
         useDiscount: "",
       },
       amt: 0,
+
+      /* 表單驗證 */
       userRules: {
         name: [
           { required: true, message: "請輸入姓名", trigger: "blur" },
@@ -835,6 +859,18 @@ export default {
         bususer: "幸福巴士",
       },
     };
+  },
+  computed: {
+    ...mapGetters(["defaultorgid"]),
+    unitBDialogTitle() {
+      return `編輯長照個案 ${this.multipleSelection[0]?.name} B單位 ( ${this.checkedUnitBs.length}/3 )`;
+    },
+  },
+  filters: {
+    dateFilter(date, format) {
+      let res = moment(date).format(format);
+      return res;
+    },
   },
   methods: {
     // 是否為移動端
@@ -1102,25 +1138,32 @@ export default {
         vm.unitBDialog = false;
       });
     },
-    // 獲取額度資料
+
+    /* 獲取額度資料 */
     handleQuota(user) {
       const vm = this;
       vm.amt = 0;
       vm.rowClick(user);
-      let caseid = vm.roles[user.id].split("-")[1];
-      caseUserDiscounts.get({ caseid }).then((res) => {
+      let caseUserId = vm.roles[user.id].split("-")[1];
+      caseUserDiscounts.get({ caseUserId }).then((res) => {
         vm.discountTemp = Object.assign({}, res.result); // copy obj
         this.quotaDialog = true;
       });
+      caseUserDiscounts
+        .load({ caseUserId, page: 1, limit: 9999 })
+        .then((res) => {
+          vm.discountList = res.data;
+          this.$cl(vm.discountList);
+        });
     },
-    // 確認新增額度
+
+    /* 確認新增額度 */
     confirmQuota() {
       const vm = this;
       let temp = {
         caseUserId: vm.discountTemp.caseUserId,
         amt: vm.amt,
       };
-      // console.log(temp);
       caseUserDiscounts.add(temp).then((res) => {
         vm.$alertT.fire({
           icon: "success",
@@ -1319,18 +1362,6 @@ export default {
       }
     },
   },
-  computed: {
-    ...mapGetters(["defaultorgid"]),
-    unitBDialogTitle() {
-      return `編輯長照個案 ${this.multipleSelection[0]?.name} B單位 ( ${this.checkedUnitBs.length}/3 )`;
-    },
-  },
-  filters: {
-    dateFilter(date) {
-      let res = moment(date).format("YYYY-MM-DD");
-      return res;
-    },
-  },
   async mounted() {
     const vm = this;
     // console.log(vm.$route)
@@ -1383,6 +1414,25 @@ export default {
       margin-bottom: 0.5rem;
     }
   }
+  .quotaHistoryTitle {
+    font-size: 1rem;
+    background: $--color-primary-light-8;
+    padding: 0.5rem 0;
+  }
+
+  .quotaHistoryData {
+    padding: 0.25rem 0;
+    border-bottom: 1px solid $--color-primary-light-8;
+
+    &:nth-child(2n + 1) {
+      background: $--color-primary-light-9;
+    }
+  }
+
+  .noQuotaHistory {
+    text-align: center;
+    color: red;
+  }
 
   .buttomColum {
     display: flex;
@@ -1400,6 +1450,7 @@ export default {
   .xsBtn {
     padding: 0.25rem;
   }
+
   // .quotaHistory {
   //   p
   // }

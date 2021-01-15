@@ -315,6 +315,7 @@
                   style="width: 100%"
                   v-model="temp.carCategoryId"
                   placeholder="選擇車種"
+                  @change="temp.wheelchairType = ''"
                 >
                   <el-option
                     v-for="type in carCategorysList"
@@ -330,21 +331,45 @@
             <el-col :sm="12" :md="8">
               <el-form-item label="輪椅">
                 <el-select
-                  style="width: 100%"
+                  clearable
                   v-model="temp.wheelchairType"
-                  placeholder="選擇輪椅"
+                  placeholder="請選擇輪椅"
+                  style="width: 100%"
                 >
-                  <el-option value="無" label="無">無</el-option>
-                  <el-option value="普通輪椅(可收折)" label="普通輪椅(可收折)"
+                  <el-option
+                    v-if="temp.carCategoryId === 'SYS_CAR_GENERAL'"
+                    value="無"
+                    label="無"
+                    >無</el-option
+                  >
+                  <el-option
+                    v-if="temp.carCategoryId === 'SYS_CAR_GENERAL'"
+                    value="普通輪椅(可收折)"
+                    label="普通輪椅(可收折)"
                     >普通輪椅(可收折)</el-option
                   >
-                  <el-option value="高背輪椅" label="高背輪椅"
+                  <el-option
+                    v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
+                    value="普通輪椅"
+                    label="普通輪椅"
+                    >普通輪椅</el-option
+                  >
+                  <el-option
+                    value="高背輪椅"
+                    label="高背輪椅"
+                    v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
                     >高背輪椅</el-option
                   >
-                  <el-option value="電動輪椅" label="電動輪椅"
+                  <el-option
+                    value="電動輪椅"
+                    label="電動輪椅"
+                    v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
                     >電動輪椅</el-option
                   >
-                  <el-option value="電動高背輪椅" label="電動高背輪椅"
+                  <el-option
+                    value="電動高背輪椅"
+                    label="電動高背輪椅"
+                    v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
                     >電動高背輪椅</el-option
                   >
                 </el-select>
@@ -850,7 +875,12 @@ export default {
       const vm = this;
       vm.listLoading = true;
       cars.load({ limit: 9999, page: 1 }).then((res) => {
-        vm.carList = res.data;
+        vm.carList = res.data.filter((car) => {
+          return (
+            car.carCategoryId === "SYS_CAR_GENERAL" ||
+            car.carCategoryId === "SYS_CAR_WEAL"
+          );
+        });
       });
     },
 
@@ -863,7 +893,11 @@ export default {
         TypeId: "SYS_CAR",
       };
       category.getList(query).then((res) => {
-        vm.carCategorysList = res.data;
+        vm.carCategorysList = res.data.filter((car) => {
+          return (
+            car.dtValue === "SYS_CAR_GENERAL" || car.dtValue === "SYS_CAR_WEAL"
+          );
+        });
       });
     },
 
@@ -943,6 +977,7 @@ export default {
 
     /* 排班車輛檢核 */
     dispatchCarFilter(data = [], rowData) {
+      console.log(data, rowData);
       return data.filter((item) => {
         return [
           () => {
@@ -966,26 +1001,9 @@ export default {
             }
           },
           () => {
-            //#region  輪椅選項
-            // 一般車
-            // [
-            //     { value: '無', label: "無" },
-            //     { value: '普通輪椅(可收折)', label: "普通輪椅(可收折)" },
-            // ]
-            // 福祉車
-            // [
-            //     { value: '普通輪椅', label: "普通輪椅" },
-            //     { value: '高背輪椅', label: "高背輪椅" },
-            //     { value: '電動輪椅', label: "電動輪椅" },
-            //     { value: '電動高背輪椅', label: "電動高背輪椅" },
-            // ]
-            //#endregion
-
+            console.log(rowData.wheelchairType);
             // 若 這一張訂單輪椅類型 不等於 ( "無" 或 "普通輪椅(可收折)" )，那 輪椅數量 要大於等於 1
-            if (
-              rowData.wheelchairType !== "無" ||
-              rowData.wheelchairType !== "普通輪椅(可收折)"
-            ) {
+            if (!["無", "普通輪椅(可收折)"].includes(rowData.wheelchairType)) {
               return item.wheelchairNum >= 1;
             }
             // 若 這一張訂單輪椅類型 等於 ( "無" 或 "普通輪椅(可收折)" )，那 輪椅數量 要大於等於 0
@@ -1034,28 +1052,14 @@ export default {
             }
           },
           () => {
-            //#region  輪椅選項
-            // 一般車
-            // [
-            //     { value: '無', label: "無" },
-            //     { value: '普通輪椅(可收折)', label: "普通輪椅(可收折)" },
-            // ]
-            // 福祉車
-            // [
-            //     { value: '普通輪椅', label: "普通輪椅" },
-            //     { value: '高背輪椅', label: "高背輪椅" },
-            //     { value: '電動輪椅', label: "電動輪椅" },
-            //     { value: '電動高背輪椅', label: "電動高背輪椅" },
-            // ]
-            //#endregion
-
             return (
               item.wheelchairNum >=
               checkedRowsData.reduce(
                 (accumulator, currentValue) =>
                   accumulator +
-                  (currentValue.wheelchairType !== "無" ||
-                  currentValue.wheelchairType !== "普通輪椅(可收折)"
+                  (["無", "普通輪椅(可收折)"].includes(
+                    currentValue.wheelchairType
+                  )
                     ? 0
                     : 1),
                 0

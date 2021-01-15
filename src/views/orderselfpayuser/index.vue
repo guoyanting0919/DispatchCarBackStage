@@ -493,7 +493,11 @@ export default {
         TypeId: "SYS_CAR",
       };
       categorys.getList(query).then((res) => {
-        vm.carCategorysList = res.data;
+        vm.carCategorysList = res.data.filter((car) => {
+          return (
+            car.dtValue === "SYS_CAR_GENERAL" || car.dtValue === "SYS_CAR_WEAL"
+          );
+        });
       });
     },
 

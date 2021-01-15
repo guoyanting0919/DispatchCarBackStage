@@ -44,6 +44,12 @@ import FrmLeaveReqDetail from "@/views/forms/userDefine/frmLeaveReq/detail";
 import vueEsign from "vue-esign";
 Vue.use(vueEsign);
 
+/* Filters */
+import dateFilter from "./filters/dateFilter";
+import hideFilter from "./filters/hideFilter";
+Vue.filter("globalDateFilter", dateFilter); // 全域啟用
+Vue.filter("hideFilter", hideFilter); // 全域啟用
+
 Vue.use(ElementUI, { locale });
 Vue.use(VueSweetalert2);
 Vue.use(VueContextMenu);

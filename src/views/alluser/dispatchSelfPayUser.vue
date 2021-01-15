@@ -124,7 +124,7 @@
               >
                 <el-row :gutter="16">
                   <el-col :sm="4" :md="6" :offset="3">
-                    <el-form-item label="姓名">
+                    <el-form-item label="姓名" required>
                       <el-input
                         style="width: 100%"
                         v-model="item.name"
@@ -135,7 +135,7 @@
                   </el-col>
 
                   <el-col :sm="4" :md="6">
-                    <el-form-item label="生日">
+                    <el-form-item label="生日" required>
                       <el-date-picker
                         style="width: 100%"
                         v-model="item.birth"
@@ -397,6 +397,8 @@ export default {
         noticePhone: [
           { required: true, message: "必填欄位", tigger: "change" },
         ],
+        // name: [{ required: true, message: "必填欄位", tigger: "change" }],
+        // birth: [{ required: true, message: "必填欄位", tigger: "change" }],
         fromAddr: [{ required: true, message: "必填欄位", tigger: "change" }],
         toAddr: [{ required: true, message: "必填欄位", tigger: "change" }],
         required: [{ required: true, message: "必填欄位", tigger: "change" }],
@@ -493,7 +495,11 @@ export default {
         TypeId: "SYS_CAR",
       };
       categorys.getList(query).then((res) => {
-        vm.carCategorysList = res.data;
+        vm.carCategorysList = res.data.filter((car) => {
+          return (
+            car.dtValue === "SYS_CAR_GENERAL" || car.dtValue === "SYS_CAR_WEAL"
+          );
+        });
       });
     },
 
@@ -506,37 +512,54 @@ export default {
         });
     },
 
+    /* 驗證搭乘人員資料 */
+    validatePassenger(data) {
+      return data
+        .map((passenger) => {
+          return [
+            () => {
+              return passenger.name != "";
+            },
+            () => {
+              return passenger.birth != "" && passenger.birth != null;
+            },
+          ].every((fun) => fun());
+        })
+        .every((bol) => bol);
+    },
+
     /* 預約訂單 */
     handleReservation() {
-      // console.log(this.passengerArr);
-
-      this.$refs.form.validate((valid) => {
+      const vm = this;
+      vm.$refs.form.validate((valid) => {
         if (valid) {
-          const vm = this;
-          vm.temp.id = "";
-          vm.temp.orgId = "";
-          vm.temp.orgName = "";
-          let date = moment(vm.temp.date).format("yyyy-MM-DD");
-          vm.temp.selfPayUserId = vm.$route.params.id.split("-")[1];
-          vm.temp.userId = vm.$route.params.id.split("-")[0];
-          vm.temp.reserveDate = `${date} ${vm.temp.time}`;
-          vm.temp.CarCategoryName = vm.carCategorysList.filter((car) => {
-            return car.dtValue === vm.temp.carCategoryId;
-          })[0].name;
-          vm.temp.remark = JSON.stringify(vm.passengerArr);
-          console.log(vm.temp, JSON.parse(vm.temp.remark));
+          if (vm.validatePassenger(vm.passengerArr)) {
+            vm.temp.id = "";
+            vm.temp.orgId = "";
+            vm.temp.orgName = "";
+            let date = moment(vm.temp.date).format("yyyy-MM-DD");
+            vm.temp.selfPayUserId = vm.$route.params.id.split("-")[1];
+            vm.temp.userId = vm.$route.params.id.split("-")[0];
+            vm.temp.reserveDate = `${date} ${vm.temp.time}`;
+            vm.temp.CarCategoryName = vm.carCategorysList.filter((car) => {
+              return car.dtValue === vm.temp.carCategoryId;
+            })[0].name;
+            vm.temp.remark = JSON.stringify(vm.passengerArr);
+            console.log(vm.temp, JSON.parse(vm.temp.remark));
 
-          orderSelfPayUser.add(vm.temp).then((res) => {
-            vm.$alertT.fire({
-              icon: "success",
-              title: res.message,
+            orderSelfPayUser.add(vm.temp).then((res) => {
+              vm.$alertT.fire({
+                icon: "success",
+                title: res.message,
+              });
+              this.handleBack();
             });
-            this.handleBack();
-            //TODO:白牌用戶頁面跳轉記得換路徑
-
-            // vm.$router.push("/alluser/index");
-            // vm.$router.push("/selfpayuser/index");
-          });
+          } else {
+            vm.$alertM.fire({
+              icon: "error",
+              title: "請檢查搭乘資料是否確實填寫",
+            });
+          }
         }
       });
     },
