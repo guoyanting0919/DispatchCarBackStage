@@ -100,7 +100,7 @@
                 :disabled="scope.row.status != 1"
               >
                 <el-option
-                  v-for="car in carList"
+                  v-for="car in dispatchCarFilter(carList, scope.row)"
                   :key="car.id"
                   :label="car.carNo"
                   :value="car.id"
@@ -382,11 +382,9 @@
                   style="width: 100%"
                 >
                   <el-option
-                    v-for="car in carList"
+                    v-for="car in isShareCarFilter()"
                     :key="car.id"
-                    :label="`${car.carCategoryName || '一般車'} / ${
-                      car.seatNum
-                    }人座 / ${car.carNo}`"
+                    :label="`${car.carCategoryName} / ${car.seatNum}人座 / ${car.carNo}`"
                     :value="car.id"
                   >
                   </el-option>
@@ -637,7 +635,12 @@ export default {
       const vm = this;
       vm.listLoading = true;
       cars.load({ limit: 9999, page: 1 }).then((res) => {
-        vm.carList = res.data;
+        vm.carList = res.data.filter((car) => {
+          return (
+            car.carCategoryId !== "SYS_CAR_GENERAL" &&
+            car.carCategoryId !== "SYS_CAR_WEAL"
+          );
+        });
       });
     },
 
@@ -729,6 +732,58 @@ export default {
           title: res.message,
         });
         vm.getList();
+      });
+    },
+
+    /* 排班車輛檢核 */
+    dispatchCarFilter(data = [], rowData) {
+      return data.filter((item) => {
+        return [
+          () => {
+            // 若 車輛 為 不可派發 (status === 0) ，則不能選
+            if (item.status === 0) {
+              return false;
+            }
+            // 若 車輛 為 可派發 (status !== 0) ，則可以選
+            else {
+              return true;
+            }
+          },
+          () => {
+            return item.seatNum >= rowData.passengerNum;
+          },
+        ].every((it) => it());
+      });
+    },
+
+    /* 共乘車輛檢核 */
+    isShareCarFilter() {
+      let data = this.carList;
+      let checkedRowsData = this.multipleSelection;
+      return data.filter((item) => {
+        return [
+          () => {
+            // 若 車輛 為 不可派發 (status === 0) ，則不能選
+            if (item.status === 0) {
+              return false;
+            }
+            // 若 車輛 為 可派發 (status !== 0) ，則可以選
+            else {
+              return true;
+            }
+          },
+          () => {
+            // 座椅數量 必須大於 所有訂單 (一般車訂單的陪同人數 + 1、福祉車訂單的陪同人數) 陪同人數 加總
+            return (
+              item.seatNum >=
+              checkedRowsData.reduce(
+                (accumulator, currentValue) =>
+                  accumulator + currentValue.passengerNum,
+                0
+              )
+            );
+          },
+        ].every((it) => it());
       });
     },
 

@@ -977,7 +977,6 @@ export default {
 
     /* 排班車輛檢核 */
     dispatchCarFilter(data = [], rowData) {
-      console.log(data, rowData);
       return data.filter((item) => {
         return [
           () => {
@@ -1001,7 +1000,6 @@ export default {
             }
           },
           () => {
-            console.log(rowData.wheelchairType);
             // 若 這一張訂單輪椅類型 不等於 ( "無" 或 "普通輪椅(可收折)" )，那 輪椅數量 要大於等於 1
             if (!["無", "普通輪椅(可收折)"].includes(rowData.wheelchairType)) {
               return item.wheelchairNum >= 1;
