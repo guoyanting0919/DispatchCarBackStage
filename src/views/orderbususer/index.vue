@@ -146,128 +146,18 @@
     </div>
 
     <!-- eidt dialog -->
-    <el-dialog
-      title="編輯訂單"
-      @closed="temp.passengerNum = 0"
-      :visible.sync="editDialog"
-      width="800px"
-    >
-      <div class="editDialogBody">
-        <el-form
-          :label-position="labelPosition"
-          label-width="200px"
-          :model="temp"
-          ref="form"
-        >
-          <el-row :gutter="16">
-            <el-col :sm="12" :md="8">
-              <el-form-item label="預約日期">
-                <el-date-picker
-                  style="width: 100%"
-                  v-model="temp.date"
-                  type="date"
-                  placeholder="選擇日期"
-                  value-format="yyyy-MM-dd"
-                >
-                </el-date-picker>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="8">
-              <el-form-item label="預約時間">
-                <el-time-select
-                  style="width: 100%"
-                  v-model="temp.time"
-                  :picker-options="{
-                    start: '08:30',
-                    step: '00:15',
-                    end: '18:30',
-                  }"
-                  placeholder="選擇時間"
-                >
-                </el-time-select>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="8">
-              <el-form-item label="搭乘人數">
-                <el-select
-                  style="width: 100%"
-                  v-model="temp.passengerNum"
-                  placeholder="選擇搭乘人數"
-                >
-                  <el-option
-                    v-for="num in 8"
-                    :key="num"
-                    :label="num"
-                    :value="num"
-                  >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="8">
-              <el-form-item label="選擇路線">
-                <el-select
-                  style="width: 100%"
-                  v-model="temp.stationLineId"
-                  placeholder="選擇路線"
-                  @change="handleLineChange()"
-                >
-                  <el-option
-                    v-for="type in lineList"
-                    :key="type.id"
-                    :label="type.name"
-                    :value="type.id"
-                  >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="8">
-              <el-form-item label="選擇起點站牌">
-                <el-select
-                  :disabled="temp.stationLineId == ''"
-                  style="width: 100%"
-                  v-model="temp.fromStationId"
-                  placeholder="選擇路線"
-                  @change="handleFromChange"
-                >
-                  <el-option
-                    v-for="(type, idx) in lineStop"
-                    :key="type.id"
-                    :label="`${idx + 1}.${type.stationName}`"
-                    :value="type.id"
-                  >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="8">
-              <el-form-item label="選擇終點站牌">
-                <el-select
-                  :disabled="temp.fromStationId == ''"
-                  style="width: 100%"
-                  v-model="temp.toStationId"
-                  placeholder="選擇路線"
-                >
-                  <el-option
-                    :disabled="type.disabled"
-                    v-for="(type, idx) in toLineStop"
-                    :key="type.id"
-                    :label="`${idx + 1}.${type.stationName}`"
-                    :value="type.id"
-                  >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </el-form>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="editDialog = false">取 消</el-button>
-        <el-button type="primary" @click="handleEdit()">確 定</el-button>
-      </span>
-    </el-dialog>
+    <EditDialog
+      :temp="temp"
+      :editDialogProp="editDialog"
+      :lineList="lineList"
+      :stopList="stopList"
+      :toLineStop="toLineStop"
+      :lineStop="lineStop"
+      @handleLineChange="handleLineChange"
+      @handleFromChange="handleFromChange"
+      @handleEdit="handleEdit"
+      @handleClose="handleClose"
+    ></EditDialog>
   </div>
 </template>
 
@@ -279,6 +169,8 @@ import permissionBtn from "@/components/PermissionBtn";
 import elDragDialog from "@/directive/el-dragDialog";
 import Pagination from "@/components/Pagination";
 import OrderStatusTag from "@/components/OrderStatusTag";
+import EditDialog from "@/components/Dialog/editBusUserDespatch";
+
 import * as orderBusUser from "@/api/orderBusUser";
 import * as categorys from "@/api/categorys";
 import * as dispatch from "@/api/dispatchs";
@@ -292,6 +184,7 @@ export default {
     permissionBtn,
     Pagination,
     OrderStatusTag,
+    EditDialog,
   },
   directives: {
     elDragDialog,
@@ -460,11 +353,27 @@ export default {
       });
     },
 
+    /* 選擇路線 */
+    handleLineChange(id) {
+      const vm = this;
+      vm.lineStop = [];
+      vm.temp.fromStationId = "";
+      vm.temp.toStationId = "";
+      busStationLines.get({ id }).then((res) => {
+        vm.stopList.forEach((s) => {
+          if (res.result.assignLineStations.includes(s.id)) {
+            s.disabled = false;
+            vm.lineStop.push(s);
+          }
+        });
+      });
+    },
+
     /* 選擇起點站 */
-    handleFromChange() {
+    handleFromChange(id) {
       const vm = this;
       vm.temp.toStationId = "";
-      let fromId = vm.temp.fromStationId;
+      let fromId = id;
       let idFlag;
       vm.lineStop.forEach((s, idx) => {
         if (s.id == fromId) {
@@ -482,7 +391,7 @@ export default {
       vm.toLineStop = cloneObj;
     },
 
-    /* 確認編輯訂單 */
+    /* 編輯訂單 */
     handleEdit() {
       const vm = this;
       let date = moment(vm.temp.date).format("yyyy-MM-DD");
@@ -505,6 +414,11 @@ export default {
           title: res.message,
         });
       });
+    },
+
+    /* 關閉編輯燈箱 */
+    handleClose(status) {
+      this.editDialog = status;
     },
 
     /* 取消排班 */

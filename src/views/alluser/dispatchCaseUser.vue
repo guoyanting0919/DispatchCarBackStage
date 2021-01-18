@@ -118,10 +118,11 @@
               label-width="200px"
               :model="temp"
               ref="form"
+              :rules="rules"
             >
               <el-row :gutter="8">
                 <el-col :sm="24" :md="15">
-                  <el-form-item label="乘車日期">
+                  <el-form-item label="乘車日期" prop="date">
                     <el-date-picker
                       v-model="temp.date"
                       type="date"
@@ -138,7 +139,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="9" v-if="temp.date">
-                  <el-form-item label="乘車時間">
+                  <el-form-item label="乘車時間" prop="time">
                     <el-time-select
                       @change="getDiscount"
                       v-model="temp.time"
@@ -174,7 +175,7 @@
                   </div>
                 </el-col>
                 <el-col :sm="24" :md="24">
-                  <el-form-item label="訂車人身份">
+                  <el-form-item label="訂車人身份" prop="createdIdentity">
                     <el-select
                       clearable
                       v-model="temp.createdIdentity"
@@ -189,7 +190,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="18">
-                  <el-form-item label="起點">
+                  <el-form-item label="起點" prop="fromAddr">
                     <el-select
                       filterable
                       :default-first-option="false"
@@ -213,7 +214,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="6">
-                  <el-form-item label="起點備註">
+                  <el-form-item label="起點備註" prop="fromAddrRemark">
                     <el-select
                       clearable
                       v-model="temp.fromAddrRemark"
@@ -237,13 +238,13 @@
                 <el-col v-if="temp.fromAddrRemark === '其他'" :sm="24" :md="24">
                   <el-form-item label="起點備註-其他">
                     <el-input
-                      v-model="temp.remark"
+                      v-model="temp.fromRemark"
                       placeholder="請輸入起點備註"
                     ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="18">
-                  <el-form-item label="迄點">
+                  <el-form-item label="迄點" prop="toAddr">
                     <el-select
                       filterable
                       :default-first-option="false"
@@ -267,7 +268,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="6">
-                  <el-form-item label="訖點備註">
+                  <el-form-item label="訖點備註" prop="toAddrRemark">
                     <el-select
                       clearable
                       v-model="temp.toAddrRemark"
@@ -292,7 +293,7 @@
                   <!-- FIXME:remark 欄位缺少 -->
                   <el-form-item label="訖點備註-其他">
                     <el-input
-                      v-model="temp.remark"
+                      v-model="temp.toRemark"
                       placeholder="請輸入訖點備註"
                     ></el-input>
                   </el-form-item>
@@ -332,7 +333,7 @@
 
                 <!-- FIXME:車種/輪椅對應關係確認 -->
                 <el-col :sm="24" :md="6">
-                  <el-form-item label="車種">
+                  <el-form-item label="車種" prop="carCategoryId">
                     <el-select
                       clearable
                       v-model="temp.carCategoryId"
@@ -350,7 +351,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="6">
-                  <el-form-item label="輪椅">
+                  <el-form-item label="輪椅" prop="wheelchairType">
                     <el-select
                       clearable
                       v-model="temp.wheelchairType"
@@ -397,11 +398,11 @@
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="12">
-                  <el-form-item label="陪同人數">
+                  <el-form-item label="陪同人數" prop="familyWith">
                     <el-select
                       clearable
                       @change="getDiscount"
-                      v-model="temp.familyWith"
+                      v-model.number="temp.familyWith"
                       placeholder="請選擇陪同人數"
                       style="width: 100%"
                     >
@@ -415,7 +416,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="12">
-                  <el-form-item label="簡訊號碼">
+                  <el-form-item label="簡訊號碼" prop="noticePhone">
                     <el-input
                       v-model="temp.noticePhone"
                       placeholder="請輸入簡訊號碼"
@@ -501,7 +502,7 @@ export default {
         date: "", //預約日期
         time: "", //預約時間
         haveNextOrderFlag: false, //是否預約回程
-        reTime: "", //預約回程時間
+        reTime: null, //預約回程時間
 
         /* 主要資料 */
         id: "",
@@ -516,6 +517,8 @@ export default {
         toAddr: "",
         toAddrRemark: "",
         remark: "",
+        fromRemark: "",
+        toRemark: "",
         isBack: false,
         canShared: true,
         carCategoryId: "",
@@ -524,7 +527,29 @@ export default {
         familyWith: "",
         noticePhone: "",
       },
-      rules: {},
+      rules: {
+        date: [{ required: true, message: "必填欄位", tigger: "change" }],
+        time: [{ required: true, message: "必填欄位", tigger: "change" }],
+        createdIdentity: [
+          { required: true, message: "必填欄位", tigger: "change" },
+        ],
+        fromAddr: [{ required: true, message: "必填欄位", tigger: "change" }],
+        fromAddrRemark: [
+          { required: true, message: "必填欄位", tigger: "change" },
+        ],
+        toAddr: [{ required: true, message: "必填欄位", tigger: "change" }],
+        toAddrRemark: [
+          { required: true, message: "必填欄位", tigger: "change" },
+        ],
+        carCategoryId: [
+          { required: true, message: "必填欄位", tigger: "change" },
+        ],
+        wheelchairType: [
+          { required: true, message: "必填欄位", tigger: "change" },
+        ],
+        familyWith: [{ required: true, message: "必填欄位" }],
+        noticePhone: [{ required: true, message: "必填欄位", tigger: "blur" }],
+      },
 
       /* 補助餘額 */
       amtDialog: false,
@@ -850,39 +875,110 @@ export default {
       const vm = this;
       // let route = vm.$route.path.split("/")[1];
       // vm.$cl(route);
-      vm.temp.reserveDate = `${vm.temp.date} ${vm.temp.time}`;
-      vm.temp.carCategoryName = vm.carCategorysList.filter((i) => {
-        return i.dtValue === vm.temp.carCategoryId;
-      })[0].name;
-      vm.temp.fromAddr = vm.fromAddr;
-      vm.temp.toAddr = vm.toAddr;
-      vm.temp.userId = vm.$route.params.id.split("-")[0];
-      vm.temp.caseUserId = vm.$route.params.id.split("-")[1];
-      vm.$cl(vm.temp);
-      orderCaseUser.add(vm.temp).then((res) => {
-        vm.$cl(res);
 
-        //有預約回程時
-        if (vm.temp.isBack) {
-          //複製temp
-          let backTemp = Object.assign({}, vm.temp);
-          //修改時間
-          backTemp.reserveDate = `${backTemp.date} ${backTemp.reTime}`;
-          //修改起點 (去程迄點)
-          backTemp.fromAddr = backTemp.toAddr;
-          //修改迄點 (身份居住地址)
-          backTemp.toAddr = `${vm.roleInfo.county}${vm.roleInfo.district}${vm.roleInfo.addr}`;
-
-          vm.$cl(backTemp);
-          orderCaseUser.add(backTemp).then((res) => {
-            this.$router.go(-1);
-            // vm.$router.push(`/${route}/index`);
-          });
+      vm.$refs.form.validate((valid) => {
+        if (valid) {
+          if (vm.specialValidate(vm.temp)) {
+            vm.temp.reserveDate = `${vm.temp.date} ${vm.temp.time}`;
+            vm.temp.carCategoryName = vm.carCategorysList.filter((i) => {
+              return i.dtValue === vm.temp.carCategoryId;
+            })[0].name;
+            vm.temp.fromAddr = vm.fromAddr;
+            vm.temp.toAddr = vm.toAddr;
+            vm.temp.userId = vm.$route.params.id.split("-")[0];
+            vm.temp.caseUserId = vm.$route.params.id.split("-")[1];
+            vm.$cl(vm.temp);
+            orderCaseUser.add(vm.temp).then((res) => {
+              vm.$cl(res);
+              //有預約回程時
+              if (vm.temp.isBack) {
+                //複製temp
+                let backTemp = Object.assign({}, vm.temp);
+                //修改時間
+                backTemp.reserveDate = `${backTemp.date} ${backTemp.reTime}`;
+                //修改起點 (去程迄點)
+                backTemp.fromAddr = backTemp.toAddr;
+                //修改迄點 (身份居住地址)
+                backTemp.toAddr = `${vm.roleInfo.county}${vm.roleInfo.district}${vm.roleInfo.addr}`;
+                vm.$cl(backTemp);
+                orderCaseUser.add(backTemp).then((res) => {
+                  this.$router.go(-1);
+                  // vm.$router.push(`/${route}/index`);
+                });
+              } else {
+                // vm.$router.push(`/${route}/index`);
+                this.$router.go(-1);
+              }
+            });
+          } else {
+          }
         } else {
-          // vm.$router.push(`/${route}/index`);
-          this.$router.go(-1);
+          console.log("submit error");
         }
       });
+    },
+
+    /* 特殊欄位驗證 B單位順序 起點背著（其他） 迄點背著（其他） 回程時間 */
+    specialValidate(data) {
+      const vm = this;
+      let validateTemp = [
+        //驗證B單位是否排序
+        () => {
+          if (data.transOrgs.length <= 0) {
+            return "請確實排序優先搭乘車行";
+          } else {
+            return true;
+          }
+        },
+
+        //起點備註若是選擇其他
+        () => {
+          if (data.fromAddrRemark === "其他" && data.fromRemark === "") {
+            return "請確實填寫起點備註";
+          } else {
+            return true;
+          }
+        },
+
+        //迄點備註若是選擇其他
+        () => {
+          if (data.toAddrRemark === "其他" && data.toRemark === "") {
+            return "請確實填寫迄點備註";
+          } else {
+            return true;
+          }
+        },
+
+        //預約回程
+        () => {
+          if (data.isBack && data.reTime === null) {
+            return "請確實填寫回程乘車時間";
+          } else {
+            return true;
+          }
+        },
+      ].map((fn) => {
+        return fn();
+      });
+      this.$cl(validateTemp);
+
+      if (validateTemp.every((result) => result === true)) {
+        this.$cl("pass");
+        return true;
+      } else {
+        this.$cl("NoPass");
+        let alertMsg = validateTemp
+          .filter((res) => {
+            return res !== true;
+          })
+          .join(",");
+        vm.$alertM.fire({
+          icon: "error",
+          title: alertMsg,
+        });
+        this.$cl(alertMsg);
+        return false;
+      }
     },
 
     /* 補助餘額查詢 */

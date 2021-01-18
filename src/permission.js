@@ -21,6 +21,10 @@ let routerMappingList = [
     path: "/orderbususer/index",
     title: "預約訂單 / 巴士訂單",
   },
+  {
+    path: "/ordercaseuser/index",
+    title: "預約訂單 / 長照訂單",
+  },
 
   /* 用戶資料 */
   {

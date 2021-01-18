@@ -35,11 +35,11 @@
           @selection-change="handleSelectionChange"
           @row-click="rowClick"
         >
-          <el-table-column
+          <!-- <el-table-column
             type="selection"
             width="55"
             align="center"
-          ></el-table-column>
+          ></el-table-column> -->
           <el-table-column
             property="name"
             label="用戶姓名"

@@ -28,6 +28,22 @@
   }
 }
 
+/* custom dialog */
+.el-dialog {
+  border-radius: 0.5rem;
+}
+
+.el-dialog__header {
+  border-radius: 0.5rem 0.5rem 0 0;
+  background: $--color-primary-light-8;
+}
+
+.el-dialog__footer {
+  padding: 10px 20px;
+  background: $--color-primary-light-8;
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
 /* disabled input background */
 .el-input.is-disabled .el-input__inner {
   background-color: $--color-primary-light-9;

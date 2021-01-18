@@ -397,8 +397,6 @@ export default {
         noticePhone: [
           { required: true, message: "必填欄位", tigger: "change" },
         ],
-        // name: [{ required: true, message: "必填欄位", tigger: "change" }],
-        // birth: [{ required: true, message: "必填欄位", tigger: "change" }],
         fromAddr: [{ required: true, message: "必填欄位", tigger: "change" }],
         toAddr: [{ required: true, message: "必填欄位", tigger: "change" }],
         required: [{ required: true, message: "必填欄位", tigger: "change" }],

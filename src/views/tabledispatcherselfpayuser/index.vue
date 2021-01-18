@@ -299,216 +299,14 @@
 
     <!-- 燈箱 -->
     <!-- eidt dialog -->
-    <el-dialog
-      title="編輯訂單"
-      @closed="temp.passengerNum = 0"
-      :visible.sync="editDialog"
-      width="800px"
-    >
-      <div class="editDialogBody">
-        <el-form
-          :label-position="labelPosition"
-          label-width="200px"
-          :model="temp"
-          ref="form"
-        >
-          <el-row :gutter="16">
-            <el-col :sm="12" :md="8">
-              <el-form-item label="預約日期">
-                <el-date-picker
-                  style="width: 100%"
-                  v-model="temp.date"
-                  type="date"
-                  placeholder="選擇日期"
-                  value-format="yyyy-MM-dd"
-                >
-                </el-date-picker>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="8">
-              <el-form-item label="預約時間">
-                <el-time-select
-                  style="width: 100%"
-                  v-model="temp.time"
-                  :picker-options="{
-                    start: '06:00',
-                    step: '00:10',
-                    end: '20:00',
-                  }"
-                  placeholder="選擇時間"
-                >
-                </el-time-select>
-              </el-form-item>
-            </el-col>
-
-            <el-col :sm="12" :md="8">
-              <el-form-item label="車輛類型">
-                <el-select
-                  style="width: 100%"
-                  v-model="temp.carCategoryId"
-                  placeholder="選擇車輛類型"
-                >
-                  <el-option
-                    v-for="type in carCategorysList"
-                    :key="type.id"
-                    :label="type.name"
-                    :value="type.dtValue"
-                  >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="8">
-              <el-form-item label="聯絡電話">
-                <el-input
-                  style="width: 100%"
-                  v-model="temp.noticePhone"
-                  placeholder="輸入聯絡電話"
-                >
-                </el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="8">
-              <el-form-item label="是否共乘">
-                <el-switch
-                  active-text="願意共乘"
-                  inactive-text="不共乘"
-                  v-model="temp.canShared"
-                ></el-switch>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="8">
-              <el-form-item label="搭乘人數">
-                <el-select
-                  style="width: 100%"
-                  v-model="temp.passengerNum"
-                  placeholder="選擇搭乘人數"
-                >
-                  <el-option
-                    v-for="num in 8"
-                    :key="num"
-                    :label="num"
-                    :value="num"
-                  >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <template v-if="passengerArr">
-              <el-col
-                class="passengerContainer"
-                :sm="4"
-                :md="24"
-                v-for="item in passengerArr"
-                :key="item.key"
-              >
-                <el-row :gutter="16">
-                  <el-col :sm="4" :md="6" :offset="3">
-                    <el-form-item label="姓名">
-                      <el-input
-                        style="width: 100%"
-                        v-model="item.name"
-                        placeholder="輸入姓名"
-                      >
-                      </el-input>
-                    </el-form-item>
-                  </el-col>
-
-                  <el-col :sm="4" :md="6">
-                    <el-form-item label="生日">
-                      <el-date-picker
-                        style="width: 100%"
-                        v-model="item.birth"
-                        type="date"
-                        placeholder="選擇生日"
-                        value-format="yyyy-MM-dd"
-                      >
-                      </el-date-picker>
-                    </el-form-item>
-                  </el-col>
-
-                  <el-col :sm="4" :md="6">
-                    <el-form-item label="聯絡電話">
-                      <el-input
-                        style="width: 100%"
-                        v-model="item.phone"
-                        placeholder="輸入聯絡電話"
-                      >
-                      </el-input>
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-              </el-col>
-            </template>
-            <el-col :sm="12" :md="18">
-              <el-form-item label="起點">
-                <el-input
-                  style="width: 100%"
-                  v-model="temp.fromAddr"
-                  placeholder="輸入起點"
-                >
-                </el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="4" :md="3">
-              <el-form-item label="起點經度">
-                <el-input
-                  style="width: 100%"
-                  v-model="temp.fromLon"
-                  placeholder="輸入起點經度"
-                >
-                </el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="4" :md="3">
-              <el-form-item label="起點緯度">
-                <el-input
-                  style="width: 100%"
-                  v-model="temp.fromLat"
-                  placeholder="輸入起點緯度"
-                >
-                </el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="18">
-              <el-form-item label="訖點">
-                <el-input
-                  style="width: 100%"
-                  v-model="temp.toAddr"
-                  placeholder="輸入訖點"
-                >
-                </el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="4" :md="3">
-              <el-form-item label="訖點經度">
-                <el-input
-                  style="width: 100%"
-                  v-model="temp.toLon"
-                  placeholder="輸入訖點經度"
-                >
-                </el-input>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="4" :md="3">
-              <el-form-item label="訖點緯度">
-                <el-input
-                  style="width: 100%"
-                  v-model="temp.toLat"
-                  placeholder="輸入訖點緯度"
-                >
-                </el-input>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </el-form>
-      </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="editDialog = false">取 消</el-button>
-        <el-button type="primary" @click="handleEdit()">確 定</el-button>
-      </span>
-    </el-dialog>
-
+    <EditDialog
+      :temp="temp"
+      :editDialogProp="editDialog"
+      :carCategorysList="carCategorysList"
+      :passengerArr="passengerArr"
+      @handleEdit="handleEdit"
+      @handleClose="handleClose"
+    ></EditDialog>
     <!-- carPool dialog -->
     <el-dialog title="共乘設定" :visible.sync="carPoolDialog" width="650px">
       <div class="carPoolDialogBody">
@@ -625,6 +423,7 @@
 import { mapGetters } from "vuex";
 import moment from "moment";
 import * as signalR from "@aspnet/signalr";
+
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import permissionBtn from "@/components/PermissionBtn";
@@ -632,6 +431,8 @@ import SubTitle from "@/components/SubTitle";
 import Pagination from "@/components/Pagination";
 import OrderStatusTag from "@/components/OrderStatusTag";
 import OrderCard from "@/components/OrderCard";
+import EditDialog from "@/components/Dialog/editSelfPayUserDespatch";
+
 import * as orderSelfPayUser from "@/api/orderSelfPayUser";
 import * as drivers from "@/api/drivers";
 import * as cars from "@/api/cars";
@@ -647,6 +448,7 @@ export default {
     Pagination,
     OrderStatusTag,
     OrderCard,
+    EditDialog,
   },
   computed: {
     ...mapGetters(["defaultorgid"]),
@@ -1174,6 +976,11 @@ export default {
         vm.editDialog = false;
         vm.getList();
       });
+    },
+
+    /* 關閉編輯燈箱 */
+    handleClose(status) {
+      this.editDialog = status;
     },
 
     /* 判斷可否共乘 */
