@@ -1,5 +1,6 @@
 <template>
-  <div class="subTitle">{{ title }}</div>
+  <div class="subTitle">{{ title }} <slot class='btn' name='btn'></slot>
+  </div>
 </template>
 
 <script>
@@ -24,6 +25,8 @@ export default {
   // transform: translateX(-8px);
   padding-bottom: 0.5rem;
   border-bottom: 1px solid $--color-primary;
+  display: flex;
+  align-items: center;
 
   &:nth-child(1) {
     margin-top: 1rem;

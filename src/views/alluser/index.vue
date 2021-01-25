@@ -982,7 +982,6 @@ export default {
               "YYYYMMDD"
             );
             vm.userTemp.account = vm.userTemp.uid;
-            console.log("vm.userTemp", vm.userTemp);
             users.addClient(vm.userTemp).then((res) => {
               vm.getList();
               console.log(res.result);

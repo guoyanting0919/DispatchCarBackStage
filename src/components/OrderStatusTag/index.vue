@@ -1,5 +1,5 @@
 <template>
-  <span class="orderStatusTag" :class="btnClass">
+  <span @click="handleSort" class="orderStatusTag" :class="btnClass">
     {{ msgMapping[type] }}
   </span>
 </template>
@@ -78,6 +78,11 @@ export default {
         classes.push(`orderStatusTag-${this.size}`);
       }
       return classes;
+    },
+  },
+  methods: {
+    handleSort() {
+      this.$emit("handleSort");
     },
   },
 };

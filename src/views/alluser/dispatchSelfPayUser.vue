@@ -3,15 +3,9 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 權限按鈕 -->
-        <el-button size="mini" @click="handleReservation" type="primary" plain
-          >預約</el-button
-        >
-        <el-button size="mini" @click="handleChange" type="info" plain
-          >起訖點互換</el-button
-        >
-        <el-button size="mini" @click="handleBack" type="success" plain
-          >回列表</el-button
-        >
+        <el-button size="mini" @click="handleReservation" type="primary" plain>預約</el-button>
+        <el-button size="mini" @click="handleChange" type="info" plain>起訖點互換</el-button>
+        <el-button size="mini" @click="handleBack" type="success" plain>回列表</el-button>
       </div>
     </sticky>
 
@@ -20,208 +14,142 @@
       <!-- 預約表單 -->
       <div class="dispatchContainer bg-white">
         <SubTitle title="預約表單"></SubTitle>
-        <el-form
-          :label-position="labelPosition"
-          label-width="200px"
-          :model="temp"
-          :rules="rules"
-          ref="form"
-        >
+        <el-form :label-position="labelPosition" label-width="200px" :model="temp" :rules="rules" ref="form">
           <el-row :gutter="16">
             <el-col :sm="12" :md="8">
               <el-form-item label="預約日期" prop="date">
-                <el-date-picker
-                  style="width: 100%"
-                  v-model="temp.date"
-                  type="date"
-                  placeholder="選擇日期"
-                  value-format="yyyy-MM-dd"
-                  :picker-options="{
+                <el-date-picker style="width: 100%" v-model="temp.date" type="date" placeholder="選擇日期" value-format="yyyy-MM-dd" :picker-options="{
                     disabledDate(time) {
                       return time.getTime() < Date.now() - 8.64e7;
                     },
-                  }"
-                >
+                  }">
                 </el-date-picker>
               </el-form-item>
             </el-col>
+
             <el-col :sm="12" :md="8">
               <el-form-item label="預約時間" prop="time">
-                <el-time-select
-                  style="width: 100%"
-                  v-model="temp.time"
-                  :picker-options="{
+                <el-time-select style="width: 100%" v-model="temp.time" :picker-options="{
                     start: timeStartTime,
                     step: '00:10',
                     end: '20:00',
-                  }"
-                  placeholder="選擇時間"
-                >
+                  }" placeholder="選擇時間">
                 </el-time-select>
               </el-form-item>
             </el-col>
 
             <el-col :sm="12" :md="8">
+              <el-form-item label="是否共乘">
+                <el-switch active-text="願意共乘" inactive-text="不共乘" v-model="temp.canShared"></el-switch>
+              </el-form-item>
+            </el-col>
+
+            <el-col :sm="12" :md="8">
               <el-form-item label="車輛類型" prop="carCategoryId">
-                <el-select
-                  style="width: 100%"
-                  v-model="temp.carCategoryId"
-                  placeholder="選擇車輛類型"
-                >
-                  <el-option
-                    v-for="type in carCategorysList"
-                    :key="type.id"
-                    :label="type.name"
-                    :value="type.dtValue"
-                  >
+                <el-select @change="temp.wheelchairType=''" style="width: 100%" v-model="temp.carCategoryId" placeholder="選擇車輛類型">
+                  <el-option v-for="type in carCategorysList" :key="type.id" :label="type.name" :value="type.dtValue">
                   </el-option>
                 </el-select>
               </el-form-item>
             </el-col>
+
+            <el-col :sm="12" :md="8">
+              <el-form-item label="輪椅類型" prop="wheelchairType">
+                <el-select style="width: 100%" v-model="temp.wheelchairType" placeholder="選擇輪椅類型">
+                  <el-option v-if="temp.carCategoryId === 'SYS_CAR_GENERAL'" value="無" label="無">無</el-option>
+                  <el-option v-if="temp.carCategoryId === 'SYS_CAR_GENERAL'" value="普通輪椅(可收折)" label="普通輪椅(可收折)">普通輪椅(可收折)</el-option>
+                  <el-option v-if="temp.carCategoryId === 'SYS_CAR_WEAL'" value="普通輪椅" label="普通輪椅">普通輪椅</el-option>
+                  <el-option value="高背輪椅" label="高背輪椅" v-if="temp.carCategoryId === 'SYS_CAR_WEAL'">高背輪椅</el-option>
+                  <el-option value="電動輪椅" label="電動輪椅" v-if="temp.carCategoryId === 'SYS_CAR_WEAL'">電動輪椅</el-option>
+                  <el-option value="電動高背輪椅" label="電動高背輪椅" v-if="temp.carCategoryId === 'SYS_CAR_WEAL'">電動高背輪椅</el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+
             <el-col :sm="12" :md="8">
               <el-form-item label="聯絡電話" prop="noticePhone">
-                <el-input
-                  style="width: 100%"
-                  v-model="temp.noticePhone"
-                  placeholder="輸入聯絡電話"
-                >
+                <el-input style="width: 100%" v-model="temp.noticePhone" placeholder="輸入聯絡電話">
                 </el-input>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="8">
-              <el-form-item label="是否共乘">
-                <el-switch
-                  active-text="願意共乘"
-                  inactive-text="不共乘"
-                  v-model="temp.canShared"
-                ></el-switch>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="12" :md="8">
               <el-form-item label="搭乘人數">
-                <el-select
-                  style="width: 100%"
-                  v-model="temp.passengerNum"
-                  placeholder="選擇搭乘人數"
-                >
-                  <el-option
-                    v-for="num in 8"
-                    :key="num"
-                    :label="num"
-                    :value="num"
-                  >
+                <el-select style="width: 100%" v-model="temp.passengerNum" placeholder="選擇搭乘人數">
+                  <el-option v-for="num in 8" :key="num" :label="num" :value="num">
                   </el-option>
                 </el-select>
               </el-form-item>
             </el-col>
+
             <template v-if="passengerArr">
-              <el-col
-                class="passengerContainer"
-                :sm="4"
-                :md="24"
-                v-for="item in passengerArr"
-                :key="item.key"
-              >
+              <el-col class="passengerContainer" :sm="4" :md="24" v-for="item in passengerArr" :key="item.key">
                 <el-row :gutter="16">
                   <el-col :sm="4" :md="6" :offset="3">
                     <el-form-item label="姓名" required>
-                      <el-input
-                        style="width: 100%"
-                        v-model="item.name"
-                        placeholder="輸入姓名"
-                      >
+                      <el-input style="width: 100%" v-model="item.name" placeholder="輸入姓名">
                       </el-input>
                     </el-form-item>
                   </el-col>
 
                   <el-col :sm="4" :md="6">
                     <el-form-item label="生日" required>
-                      <el-date-picker
-                        style="width: 100%"
-                        v-model="item.birth"
-                        type="date"
-                        placeholder="選擇生日"
-                        value-format="yyyy-MM-dd"
-                        :picker-options="{
+                      <el-date-picker style="width: 100%" v-model="item.birth" type="date" placeholder="選擇生日" value-format="yyyy-MM-dd" :picker-options="{
                           disabledDate(time) {
                             return time.getTime() > Date.now();
                           },
-                        }"
-                      >
+                        }">
                       </el-date-picker>
                     </el-form-item>
                   </el-col>
 
                   <el-col :sm="4" :md="6">
                     <el-form-item label="聯絡電話">
-                      <el-input
-                        style="width: 100%"
-                        v-model="item.phone"
-                        placeholder="輸入聯絡電話"
-                      >
+                      <el-input style="width: 100%" v-model="item.phone" placeholder="輸入聯絡電話">
                       </el-input>
                     </el-form-item>
                   </el-col>
                 </el-row>
               </el-col>
             </template>
+
             <el-col :sm="12" :md="18">
               <el-form-item label="起點" prop="fromAddr">
-                <el-input
-                  style="width: 100%"
-                  v-model="temp.fromAddr"
-                  placeholder="輸入起點"
-                >
+                <el-input style="width: 100%" v-model="temp.fromAddr" placeholder="輸入起點">
                 </el-input>
               </el-form-item>
             </el-col>
+
             <el-col :sm="4" :md="3">
               <el-form-item label="起點經度">
-                <el-input
-                  style="width: 100%"
-                  v-model="temp.fromLon"
-                  placeholder="輸入起點經度"
-                >
+                <el-input style="width: 100%" v-model="temp.fromLon" placeholder="輸入起點經度">
                 </el-input>
               </el-form-item>
             </el-col>
+
             <el-col :sm="4" :md="3">
               <el-form-item label="起點緯度">
-                <el-input
-                  style="width: 100%"
-                  v-model="temp.fromLat"
-                  placeholder="輸入起點緯度"
-                >
+                <el-input style="width: 100%" v-model="temp.fromLat" placeholder="輸入起點緯度">
                 </el-input>
               </el-form-item>
             </el-col>
+
             <el-col :sm="12" :md="18">
               <el-form-item label="訖點" prop="toAddr">
-                <el-input
-                  style="width: 100%"
-                  v-model="temp.toAddr"
-                  placeholder="輸入訖點"
-                >
+                <el-input style="width: 100%" v-model="temp.toAddr" placeholder="輸入訖點">
                 </el-input>
               </el-form-item>
             </el-col>
+
             <el-col :sm="4" :md="3">
               <el-form-item label="訖點經度">
-                <el-input
-                  style="width: 100%"
-                  v-model="temp.toLon"
-                  placeholder="輸入訖點經度"
-                >
+                <el-input style="width: 100%" v-model="temp.toLon" placeholder="輸入訖點經度">
                 </el-input>
               </el-form-item>
             </el-col>
+
             <el-col :sm="4" :md="3">
               <el-form-item label="訖點緯度">
-                <el-input
-                  style="width: 100%"
-                  v-model="temp.toLat"
-                  placeholder="輸入訖點緯度"
-                >
+                <el-input style="width: 100%" v-model="temp.toLat" placeholder="輸入訖點緯度">
                 </el-input>
               </el-form-item>
             </el-col>
@@ -233,49 +161,19 @@
 
       <div class="bg-white dispatchContainer">
         <SubTitle title="歷史訂單"></SubTitle>
-        <el-table
-          ref="mainTable"
-          :data="list"
-          border
-          fit
-          v-loading="listLoading"
-          highlight-current-row
-          style="width: 100%"
-          @selection-change="handleSelectionChange"
-          @row-click="rowClick"
-        >
-          <el-table-column
-            property="reserveDate"
-            label="預約日期"
-            width="150"
-            align="center"
-          >
+        <el-table ref="mainTable" :data="list" border fit v-loading="listLoading" highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" @row-click="rowClick">
+          <el-table-column property="reserveDate" label="預約日期" width="150" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.reserveDate | dateFilter }}</span>
             </template>
           </el-table-column>
-          <el-table-column
-            property="reserveDate"
-            label="預約時間"
-            width="100"
-            align="center"
-          >
+          <el-table-column property="reserveDate" label="預約時間" width="100" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.reserveDate | timeFilter }}</span>
             </template>
           </el-table-column>
-          <el-table-column
-            property="carCategoryName"
-            label="車輛類型"
-            width="200"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            property="noticePhone"
-            label="聯絡電話"
-            width="150"
-            align="center"
-          >
+          <el-table-column property="carCategoryName" label="車輛類型" width="200" align="center"></el-table-column>
+          <el-table-column property="noticePhone" label="聯絡電話" width="150" align="center">
           </el-table-column>
           <el-table-column property="canShared" label="是否共乘">
             <template slot-scope="scope">
@@ -283,27 +181,14 @@
               <span v-else>否</span>
             </template>
           </el-table-column>
-          <el-table-column
-            property="passengerNum"
-            label="搭乘人數"
-          ></el-table-column>
+          <el-table-column property="passengerNum" label="搭乘人數"></el-table-column>
           <el-table-column property="fromAddr" label="起點"></el-table-column>
           <el-table-column property="toAddr" label="訖點"></el-table-column>
 
-          <el-table-column
-            property="setting"
-            label="操作"
-            fixed="right"
-            width="100"
-          >
+          <el-table-column property="setting" label="操作" fixed="right" width="100">
             <template slot-scope="scope">
               <div class="buttonFlexBox">
-                <el-button
-                  size="mini"
-                  @click="handleCopy(scope.row)"
-                  type="success"
-                  >複製訂單</el-button
-                >
+                <el-button size="mini" @click="handleCopy(scope.row)" type="success">複製訂單</el-button>
               </div>
             </template>
           </el-table-column>
@@ -386,12 +271,17 @@ export default {
         status: 1,
         carCategoryId: null,
         CarCategoryName: "",
+        wheelchairType: "",
+
         remark: [{ name: "", birth: "" }],
       },
       rules: {
         date: [{ required: true, message: "必填欄位", tigger: "change" }],
         time: [{ required: true, message: "必填欄位", tigger: "change" }],
         carCategoryId: [
+          { required: true, message: "必填欄位", tigger: "change" },
+        ],
+        wheelchairType: [
           { required: true, message: "必填欄位", tigger: "change" },
         ],
         noticePhone: [
@@ -480,7 +370,7 @@ export default {
         vm.list = res.data;
         vm.total = res.count;
         vm.listLoading = false;
-        console.log(vm.list);
+        // console.log(vm.list);
       });
     },
 
@@ -568,8 +458,8 @@ export default {
       this.temp.remark = [{ name: "", birth: "", phone: "" }];
       this.$nextTick(() => {
         this.passengerArr = [];
-        console.log(this.passengerArr);
-        console.log(order.remark);
+        // console.log(this.passengerArr);
+        // console.log(order.remark);
         this.passengerArr = JSON.parse(order.remark);
         console.log(this.passengerArr);
       });
@@ -578,9 +468,7 @@ export default {
     /* 回列表 */
     handleBack() {
       //TODO:白牌用戶頁面跳轉記得換路徑
-      // this.$router.push("/alluser/index");
       this.$router.go(-1);
-      // this.$router.push("/selfpayuser/index");
     },
 
     /* 換頁 */
@@ -609,36 +497,21 @@ export default {
       this.temp.fromAddr = this.temp.toAddr;
       this.temp.toAddr = ex;
     },
-    querySearch(queryString, cb) {
-      var restaurants = this.restaurants;
-      var results = queryString
-        ? restaurants.filter(this.createFilter(queryString))
-        : restaurants;
-      // 调用 callback 返回建议列表的数据
-      cb(results);
+
+    /* 若params有order */
+    getOrder() {
+      if (this.$route.query.orderId) {
+        orderSelfPayUser.get({ id: this.$route.query.orderId }).then((res) => {
+          console.log(res);
+          this.temp = res.result;
+          this.passengerArr = [];
+          this.$nextTick(() => {
+            this.passengerArr = JSON.parse(res.result.remark);
+          });
+        });
+      }
     },
 
-    createFilter(queryString) {
-      return (restaurant) => {
-        return (
-          restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) ===
-          0
-        );
-      };
-    },
-    loadAll() {
-      return [
-        { value: "玉峰大橋", address: "24.654981, 121.306182" },
-        {
-          value: "秀巒部落",
-          address: " 24.670562, 121.265620",
-        },
-        {
-          value: "道下",
-          address: "24.620131, 121.286526",
-        },
-      ];
-    },
     handleSelect(item) {
       console.log(item);
     },
@@ -648,16 +521,20 @@ export default {
   },
   async mounted() {
     this.today = moment().format("yyyy-MM-DD");
-    this.restaurants = this.loadAll();
     this.getCarCategorys();
     this.getList();
+    this.getOrder();
     await this.getUser();
-    this.temp.passengerNum = 1;
-    this.$nextTick(() => {
-      this.passengerArr[0].name = this.userInfo.name;
-      this.passengerArr[0].birth = this.userInfo.birthday;
-      this.passengerArr[0].phone = this.userInfo.phone;
-    });
+
+    /* 若是沒有order query */
+    if (!this.$route.query.orderId) {
+      this.temp.passengerNum = 1;
+      this.$nextTick(() => {
+        this.passengerArr[0].name = this.userInfo.name;
+        this.passengerArr[0].birth = this.userInfo.birthday;
+        this.passengerArr[0].phone = this.userInfo.phone;
+      });
+    }
   },
 };
 </script>

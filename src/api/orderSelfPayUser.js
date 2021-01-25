@@ -23,6 +23,13 @@ export function get(params) {
     params,
   });
 }
+export function getDetail(params) {
+  return request({
+    url: "/orderOfSelfPayUsers/getDetail",
+    method: "get",
+    params,
+  });
+}
 
 export function receive(data) {
   return request({
@@ -74,7 +81,7 @@ export function loadDespatch(params) {
 
 export function cancel(data) {
   return request({
-    url: "/orderOfSelfPayUsers/cancelOrderReq",
+    url: "/orderOfSelfPayUsers/cancelOrder",
     method: "post",
     data,
   });

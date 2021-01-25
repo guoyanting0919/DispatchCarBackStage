@@ -1,121 +1,56 @@
 <template>
-  <el-dialog
-    title="編輯訂單"
-    @closed="temp.passengerNum = 0"
-    @close="handleClose()"
-    :visible.sync="editDialog"
-    width="800px"
-  >
+  <el-dialog title="編輯訂單" @closed="temp.passengerNum = 0" @close="handleClose()" :visible.sync="editDialog" width="800px">
     <div class="editDialogBody">
-      <el-form
-        :label-position="labelPosition"
-        label-width="200px"
-        :model="temp"
-        ref="form"
-        :rules="rules"
-      >
+      <el-form :label-position="labelPosition" label-width="200px" :model="temp" ref="form" :rules="rules">
         <el-row :gutter="16">
           <el-col :sm="12" :md="8">
             <el-form-item label="預約日期" prop="date">
-              <el-date-picker
-                style="width: 100%"
-                v-model="temp.date"
-                type="date"
-                placeholder="選擇日期"
-                value-format="yyyy-MM-dd"
-                :picker-options="{
+              <el-date-picker style="width: 100%" v-model="temp.date" type="date" placeholder="選擇日期" value-format="yyyy-MM-dd" :picker-options="{
                   disabledDate(time) {
                     return time.getTime() < Date.now() - 8.64e7;
                   },
-                }"
-              >
+                }">
               </el-date-picker>
             </el-form-item>
           </el-col>
           <el-col :sm="12" :md="8">
             <el-form-item label="預約時間" prop="time">
-              <el-time-select
-                style="width: 100%"
-                v-model="temp.time"
-                :picker-options="{
+              <el-time-select style="width: 100%" v-model="temp.time" :picker-options="{
                   start: timeStartTime,
                   step: '00:10',
                   end: '20:00',
-                }"
-                placeholder="選擇時間"
-              >
+                }" placeholder="選擇時間">
               </el-time-select>
             </el-form-item>
           </el-col>
           <el-col :sm="12" :md="8">
             <el-form-item label="搭乘人數">
-              <el-select
-                style="width: 100%"
-                v-model="temp.passengerNum"
-                placeholder="選擇搭乘人數"
-              >
-                <el-option
-                  v-for="num in 8"
-                  :key="num"
-                  :label="num"
-                  :value="num"
-                >
+              <el-select style="width: 100%" v-model="temp.passengerNum" placeholder="選擇搭乘人數">
+                <el-option v-for="num in 8" :key="num" :label="num" :value="num">
                 </el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :sm="12" :md="8">
             <el-form-item label="選擇路線" prop="stationLineId">
-              <el-select
-                style="width: 100%"
-                v-model="temp.stationLineId"
-                placeholder="選擇路線"
-                @change="handleLineChange()"
-              >
-                <el-option
-                  v-for="type in lineList"
-                  :key="type.id"
-                  :label="type.name"
-                  :value="type.id"
-                >
+              <el-select style="width: 100%" v-model="temp.stationLineId" placeholder="選擇路線" @change="handleLineChange()">
+                <el-option v-for="type in lineList" :key="type.id" :label="type.name" :value="type.id">
                 </el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :sm="12" :md="8">
             <el-form-item label="選擇起點站牌" prop="fromStationId">
-              <el-select
-                :disabled="temp.stationLineId == ''"
-                style="width: 100%"
-                v-model="temp.fromStationId"
-                placeholder="選擇路線"
-                @change="handleFromChange"
-              >
-                <el-option
-                  v-for="(type, idx) in lineStop"
-                  :key="type.id"
-                  :label="`${idx + 1}.${type.stationName}`"
-                  :value="type.id"
-                >
+              <el-select :disabled="temp.stationLineId == ''" style="width: 100%" v-model="temp.fromStationId" placeholder="選擇路線" @change="handleFromChange">
+                <el-option v-for="(type, idx) in lineStop" :key="type.id" :label="`${idx + 1}.${type.stationName}`" :value="type.id">
                 </el-option>
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :sm="12" :md="8">
             <el-form-item label="選擇終點站牌" prop="toStationId">
-              <el-select
-                :disabled="temp.fromStationId == ''"
-                style="width: 100%"
-                v-model="temp.toStationId"
-                placeholder="選擇路線"
-              >
-                <el-option
-                  :disabled="type.disabled"
-                  v-for="(type, idx) in toLineStop"
-                  :key="type.id"
-                  :label="`${idx + 1}.${type.stationName}`"
-                  :value="type.id"
-                >
+              <el-select :disabled="temp.fromStationId == ''" style="width: 100%" v-model="temp.toStationId" placeholder="選擇路線">
+                <el-option :disabled="type.disabled" v-for="(type, idx) in toLineStop" :key="type.id" :label="`${idx + 1}.${type.stationName}`" :value="type.id">
                 </el-option>
               </el-select>
             </el-form-item>

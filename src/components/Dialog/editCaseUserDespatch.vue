@@ -1,19 +1,8 @@
 <template>
-  <el-dialog
-    @close="handleClose()"
-    title="編輯訂單"
-    :visible.sync="editDialog"
-    width="800px"
-  >
+  <el-dialog @close="handleClose()" title="編輯訂單" :visible.sync="editDialog" width="800px">
     <div id="map" ref="map" style="width: 0%; height: 0%"></div>
     <div class="editDialogBody">
-      <el-form
-        :label-position="labelPosition"
-        label-width="200px"
-        :model="temp"
-        :rules="rules"
-        ref="form"
-      >
+      <el-form :label-position="labelPosition" label-width="200px" :model="temp" :rules="rules" ref="form">
         <el-row :gutter="16">
           <el-col :sm="12" :md="8">
             <el-form-item label="訂單編號">
@@ -45,18 +34,8 @@
 
           <el-col :sm="12" :md="8">
             <el-form-item label="車種" prop="carCategoryId">
-              <el-select
-                style="width: 100%"
-                v-model="temp.carCategoryId"
-                placeholder="選擇車種"
-                @change="temp.wheelchairType = ''"
-              >
-                <el-option
-                  v-for="type in carCategorysList"
-                  :key="type.id"
-                  :label="type.name"
-                  :value="type.dtValue"
-                >
+              <el-select style="width: 100%" v-model="temp.carCategoryId" placeholder="選擇車種" @change="temp.wheelchairType = ''">
+                <el-option v-for="type in carCategorysList" :key="type.id" :label="type.name" :value="type.dtValue">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -64,48 +43,13 @@
 
           <el-col :sm="12" :md="8">
             <el-form-item label="輪椅" prop="wheelchairType">
-              <el-select
-                clearable
-                v-model="temp.wheelchairType"
-                placeholder="請選擇輪椅"
-                style="width: 100%"
-              >
-                <el-option
-                  v-if="temp.carCategoryId === 'SYS_CAR_GENERAL'"
-                  value="無"
-                  label="無"
-                  >無</el-option
-                >
-                <el-option
-                  v-if="temp.carCategoryId === 'SYS_CAR_GENERAL'"
-                  value="普通輪椅(可收折)"
-                  label="普通輪椅(可收折)"
-                  >普通輪椅(可收折)</el-option
-                >
-                <el-option
-                  v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
-                  value="普通輪椅"
-                  label="普通輪椅"
-                  >普通輪椅</el-option
-                >
-                <el-option
-                  value="高背輪椅"
-                  label="高背輪椅"
-                  v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
-                  >高背輪椅</el-option
-                >
-                <el-option
-                  value="電動輪椅"
-                  label="電動輪椅"
-                  v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
-                  >電動輪椅</el-option
-                >
-                <el-option
-                  value="電動高背輪椅"
-                  label="電動高背輪椅"
-                  v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
-                  >電動高背輪椅</el-option
-                >
+              <el-select clearable v-model="temp.wheelchairType" placeholder="請選擇輪椅" style="width: 100%">
+                <el-option v-if="temp.carCategoryId === 'SYS_CAR_GENERAL'" value="無" label="無">無</el-option>
+                <el-option v-if="temp.carCategoryId === 'SYS_CAR_GENERAL'" value="普通輪椅(可收折)" label="普通輪椅(可收折)">普通輪椅(可收折)</el-option>
+                <el-option v-if="temp.carCategoryId === 'SYS_CAR_WEAL'" value="普通輪椅" label="普通輪椅">普通輪椅</el-option>
+                <el-option value="高背輪椅" label="高背輪椅" v-if="temp.carCategoryId === 'SYS_CAR_WEAL'">高背輪椅</el-option>
+                <el-option value="電動輪椅" label="電動輪椅" v-if="temp.carCategoryId === 'SYS_CAR_WEAL'">電動輪椅</el-option>
+                <el-option value="電動高背輪椅" label="電動高背輪椅" v-if="temp.carCategoryId === 'SYS_CAR_WEAL'">電動高背輪椅</el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -121,50 +65,29 @@
 
           <el-col :sm="12" :md="8">
             <el-form-item label="乘車日期" prop="date">
-              <el-date-picker
-                v-model="temp.date"
-                type="date"
-                placeholder="請選擇乘車日期"
-                value-format="yyyy-MM-dd"
-                style="width: 100%"
-                :picker-options="{
+              <el-date-picker v-model="temp.date" type="date" placeholder="請選擇乘車日期" value-format="yyyy-MM-dd" style="width: 100%" :picker-options="{
                   disabledDate(time) {
                     return time.getTime() < Date.now() - 8.64e7;
                   },
-                }"
-              ></el-date-picker>
+                }"></el-date-picker>
             </el-form-item>
           </el-col>
 
           <el-col :sm="12" :md="8">
             <el-form-item label="乘車時間" prop="time">
-              <el-time-select
-                v-model="temp.time"
-                :picker-options="{
+              <el-time-select v-model="temp.time" :picker-options="{
                   start: timeStartTime,
                   step: '00:10',
                   end: '20:00',
-                }"
-                placeholder="請選擇乘車時間"
-                style="width: 100%"
-              >
+                }" placeholder="請選擇乘車時間" style="width: 100%">
               </el-time-select>
             </el-form-item>
           </el-col>
 
           <el-col :sm="12" :md="8">
             <el-form-item label="陪同人數" prop="familyWith">
-              <el-select
-                style="width: 100%"
-                v-model="temp.familyWith"
-                placeholder="選擇陪同人數"
-              >
-                <el-option
-                  v-for="num in 8"
-                  :key="num"
-                  :label="num - 1"
-                  :value="num - 1"
-                >
+              <el-select style="width: 100%" v-model="temp.familyWith" placeholder="選擇陪同人數">
+                <el-option v-for="num in 8" :key="num" :label="num - 1" :value="num - 1">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -172,50 +95,16 @@
 
           <el-col :sm="12" :md="24">
             <el-form-item label="起點" prop="fromAddr">
-              <el-select
-                filterable
-                :default-first-option="false"
-                remote
-                :remote-method="remoteMethod"
-                @change="handleChange('from')"
-                @visible-change="handleVisibleChange"
-                ref="atc"
-                :trigger-on-focus="false"
-                v-model="temp.fromAddr"
-                placeholder="請輸入起點"
-                style="width: 100%"
-              >
-                <el-option
-                  v-for="item in searchResults"
-                  :key="item.place_id"
-                  :value="item.place_id"
-                  :label="item.description"
-                ></el-option>
+              <el-select filterable :default-first-option="false" remote :remote-method="remoteMethod" @change="handleChange('from')" @visible-change="handleVisibleChange" ref="atc" :trigger-on-focus="false" v-model="temp.fromAddr" placeholder="請輸入起點" style="width: 100%">
+                <el-option v-for="item in searchResults" :key="item.place_id" :value="item.place_id" :label="item.description"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
 
           <el-col :sm="12" :md="24">
             <el-form-item label="迄點" prop="toAddr">
-              <el-select
-                filterable
-                :default-first-option="false"
-                remote
-                :remote-method="remoteMethod"
-                @change="handleChange('to')"
-                @visible-change="handleVisibleChange"
-                ref="atc"
-                :trigger-on-focus="false"
-                v-model="temp.toAddr"
-                placeholder="請輸入迄點"
-                style="width: 100%"
-              >
-                <el-option
-                  v-for="item in searchResults"
-                  :key="item.place_id"
-                  :value="item.place_id"
-                  :label="item.description"
-                ></el-option>
+              <el-select filterable :default-first-option="false" remote :remote-method="remoteMethod" @change="handleChange('to')" @visible-change="handleVisibleChange" ref="atc" :trigger-on-focus="false" v-model="temp.toAddr" placeholder="請輸入迄點" style="width: 100%">
+                <el-option v-for="item in searchResults" :key="item.place_id" :value="item.place_id" :label="item.description"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -319,7 +208,6 @@ export default {
         this.$cl(nowHr);
         let nowMin =
           (Math.floor(moment().format("hh:mm").split(":")[1] / 10) + 1) * 10;
-
         if (nowMin == 60) {
           nowMin = "00";
           nowHr++;
