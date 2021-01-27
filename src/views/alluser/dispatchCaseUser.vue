@@ -5,12 +5,8 @@
         <!-- 權限按鈕 -->
         <!-- <el-button size="mini" type="primary">立即預約</el-button>
         <el-button size="mini" type="info">新增下個地點</el-button>-->
-        <el-button size="mini" type="info" @click="handleCheckAmt"
-          >可用補助額查詢</el-button
-        >
-        <el-button size="mini" type="info" @click="handleChangeAddr"
-          >起迄點互換</el-button
-        >
+        <el-button size="mini" type="info" @click="handleCheckAmt">可用補助額查詢</el-button>
+        <el-button size="mini" type="info" @click="handleChangeAddr">起迄點互換</el-button>
       </div>
     </sticky>
 
@@ -28,10 +24,7 @@
           <div class="directionContainer">
             <h3 class="directionTitle">
               本日行程一覽
-              <i
-                class="iconfont icon-down tableToggle"
-                @click="tableToggle = !tableToggle"
-              ></i>
+              <i class="iconfont icon-down tableToggle" @click="tableToggle = !tableToggle"></i>
             </h3>
             <div class="orderAddr">
               <i class="iconfont icon-circle"></i>
@@ -42,36 +35,15 @@
               <p class="endAddr">{{ toAddr }}</p>
             </div>
           </div>
-          <el-table
-            v-if="tableToggle"
-            height="103px"
-            :data="discountData"
-            style="width: 100%"
-          >
-            <el-table-column
-              align="center"
-              prop="direction"
-              label="行程"
-              width="50"
-              fixed="left"
-            >
+          <el-table v-if="tableToggle" height="103px" :data="discountData" style="width: 100%">
+            <el-table-column align="center" prop="direction" label="行程" width="50" fixed="left">
             </el-table-column>
-            <el-table-column
-              align="center"
-              prop="distance"
-              label="預估距離"
-              width="100"
-            >
+            <el-table-column align="center" prop="distance" label="預估距離" width="100">
               <template slot-scope="scope">
                 {{ scope.row.distance | distanceFilter }}公里
               </template>
             </el-table-column>
-            <el-table-column
-              width="100"
-              align="center"
-              prop="duration"
-              label="預估時間"
-            >
+            <el-table-column width="100" align="center" prop="duration" label="預估時間">
               <template slot-scope="scope">
                 {{ scope.row.duration | durationFilter }}分鐘
               </template>
@@ -96,12 +68,7 @@
                 $ {{ scope.row.withAmt }}
               </template>
             </el-table-column>
-            <el-table-column
-              fixed="right"
-              align="center"
-              prop="withAmt"
-              label="個案負擔"
-            >
+            <el-table-column fixed="right" align="center" prop="withAmt" label="個案負擔">
               <template slot-scope="scope">
                 $ {{ scope.row.withAmt + scope.row.selfPayAmt }}
               </template>
@@ -113,59 +80,32 @@
         <div class="dispatchContainer">
           <div class="caseUserName">{{ userInfo.name }}</div>
           <div class="dispatchDetail customScrollBar">
-            <el-form
-              :label-position="labelPosition"
-              label-width="200px"
-              :model="temp"
-              ref="form"
-              :rules="rules"
-            >
+            <el-form :label-position="labelPosition" label-width="200px" :model="temp" ref="form" :rules="rules">
               <el-row :gutter="8">
                 <el-col :sm="24" :md="15">
                   <el-form-item label="乘車日期" prop="date">
-                    <el-date-picker
-                      v-model="temp.date"
-                      type="date"
-                      placeholder="請選擇乘車日期"
-                      value-format="yyyy-MM-dd"
-                      style="width: 100%"
-                      :picker-options="{
+                    <el-date-picker v-model="temp.date" type="date" placeholder="請選擇乘車日期" value-format="yyyy-MM-dd" style="width: 100%" :picker-options="{
                         disabledDate(time) {
                           return time.getTime() < Date.now() - 8.64e7;
                         },
-                      }"
-                      @change="getDiscount"
-                    ></el-date-picker>
+                      }" @change="getDiscount"></el-date-picker>
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="9" v-if="temp.date">
                   <el-form-item label="乘車時間" prop="time">
-                    <el-time-select
-                      @change="getDiscount"
-                      v-model="temp.time"
-                      :picker-options="{
+                    <el-time-select @change="getDiscount" v-model="temp.time" :picker-options="{
                         start: timeStartTime,
                         step: '00:10',
                         end: '20:00',
-                      }"
-                      placeholder="請選擇乘車時間"
-                      style="width: 100%"
-                    >
+                      }" placeholder="請選擇乘車時間" style="width: 100%">
                     </el-time-select>
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="24">
                   <div>
-                    <span class="unitBTitle"
-                      >優先搭乘車行排序 (請依序點擊完成排序)</span
-                    >
+                    <span class="unitBTitle">優先搭乘車行排序 (請依序點擊完成排序)</span>
                     <div class="unitBContainer" v-if="roleOrgB">
-                      <div
-                        @click="handleOrgBSelect(item.id)"
-                        v-for="item in roleOrgB"
-                        :key="item.id"
-                        class="unitBBox"
-                      >
+                      <div @click="handleOrgBSelect(item.id)" v-for="item in roleOrgB" :key="item.id" class="unitBBox">
                         {{ item.name }}
                         <div class="orgBIndex" v-if="orgBIndex(item.id) !== -1">
                           {{ orgBIndex(item.id) + 1 }}
@@ -176,12 +116,7 @@
                 </el-col>
                 <el-col :sm="24" :md="24">
                   <el-form-item label="訂車人身份" prop="createdIdentity">
-                    <el-select
-                      clearable
-                      v-model="temp.createdIdentity"
-                      placeholder="請選擇訂車人身份"
-                      style="width: 100%"
-                    >
+                    <el-select clearable v-model="temp.createdIdentity" placeholder="請選擇訂車人身份" style="width: 100%">
                       <el-option value="本人" label="本人">本人</el-option>
                       <el-option value="家屬" label="家屬">家屬</el-option>
                       <el-option value="A單位" label="A單位">A單位</el-option>
@@ -191,111 +126,48 @@
                 </el-col>
                 <el-col :sm="24" :md="18">
                   <el-form-item label="起點" prop="fromAddr">
-                    <el-select
-                      filterable
-                      :default-first-option="false"
-                      remote
-                      :remote-method="remoteMethodFrom"
-                      @change="handleChange('from')"
-                      @visible-change="handleVisibleChangeFrom"
-                      ref="atc"
-                      :trigger-on-focus="false"
-                      v-model="temp.fromAddr"
-                      placeholder="請輸入起點"
-                      style="width: 100%"
-                    >
-                      <el-option
-                        v-for="item in searchResultsFrom"
-                        :key="item.place_id"
-                        :value="item.place_id"
-                        :label="item.description"
-                      ></el-option>
+                    <el-select filterable :default-first-option="false" remote :remote-method="remoteMethodFrom" @change="handleChange('from')" @visible-change="handleVisibleChangeFrom" ref="atc" :trigger-on-focus="false" v-model="temp.fromAddr" placeholder="請輸入起點" style="width: 100%">
+                      <el-option v-for="item in searchResultsFrom" :key="item.place_id" :value="item.place_id" :label="item.description"></el-option>
                     </el-select>
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="6">
                   <el-form-item label="起點備註" prop="fromAddrRemark">
-                    <el-select
-                      clearable
-                      v-model="temp.fromAddrRemark"
-                      placeholder="請選擇備註"
-                      style="width: 100%"
-                    >
-                      <el-option value="醫院診所" label="醫院診所"
-                        >醫院診所</el-option
-                      >
-                      <el-option value="洗腎中心" label="洗腎中心"
-                        >洗腎中心</el-option
-                      >
-                      <el-option value="復健診所" label="復健診所"
-                        >復健診所</el-option
-                      >
+                    <el-select clearable v-model="temp.fromAddrRemark" placeholder="請選擇備註" style="width: 100%">
+                      <el-option value="醫院診所" label="醫院診所">醫院診所</el-option>
+                      <el-option value="洗腎中心" label="洗腎中心">洗腎中心</el-option>
+                      <el-option value="復健診所" label="復健診所">復健診所</el-option>
                       <el-option value="住家" label="住家">住家</el-option>
                       <el-option value="其他" label="其他">其他</el-option>
                     </el-select>
                   </el-form-item>
                 </el-col>
-                <el-col v-if="temp.fromAddrRemark === '其他'" :sm="24" :md="24">
+                <el-col v-if="!['醫院診所','洗腎中心','復健診所','住家',''].includes(temp.fromAddrRemark)" :sm="24" :md="24">
                   <el-form-item label="起點備註-其他">
-                    <el-input
-                      v-model="temp.fromRemark"
-                      placeholder="請輸入起點備註"
-                    ></el-input>
+                    <el-input v-model="temp.fromRemark" placeholder="請輸入起點備註"></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="18">
                   <el-form-item label="迄點" prop="toAddr">
-                    <el-select
-                      filterable
-                      :default-first-option="false"
-                      remote
-                      :remote-method="remoteMethodTo"
-                      @change="handleChange('to')"
-                      @visible-change="handleVisibleChangeTo"
-                      ref="atc"
-                      :trigger-on-focus="false"
-                      v-model="temp.toAddr"
-                      placeholder="請輸入迄點"
-                      style="width: 100%"
-                    >
-                      <el-option
-                        v-for="item in searchResultsTo"
-                        :key="item.place_id"
-                        :value="item.place_id"
-                        :label="item.description"
-                      ></el-option>
+                    <el-select filterable :default-first-option="false" remote :remote-method="remoteMethodTo" @change="handleChange('to')" @visible-change="handleVisibleChangeTo" ref="atc" :trigger-on-focus="false" v-model="temp.toAddr" placeholder="請輸入迄點" style="width: 100%">
+                      <el-option v-for="item in searchResultsTo" :key="item.place_id" :value="item.place_id" :label="item.description"></el-option>
                     </el-select>
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="6">
                   <el-form-item label="訖點備註" prop="toAddrRemark">
-                    <el-select
-                      clearable
-                      v-model="temp.toAddrRemark"
-                      placeholder="請選擇備註"
-                      style="width: 100%"
-                    >
-                      <el-option value="醫院診所" label="醫院診所"
-                        >醫院診所</el-option
-                      >
-                      <el-option value="洗腎中心" label="洗腎中心"
-                        >洗腎中心</el-option
-                      >
-                      <el-option value="復健診所" label="復健診所"
-                        >復健診所</el-option
-                      >
+                    <el-select clearable v-model="temp.toAddrRemark" placeholder="請選擇備註" style="width: 100%">
+                      <el-option value="醫院診所" label="醫院診所">醫院診所</el-option>
+                      <el-option value="洗腎中心" label="洗腎中心">洗腎中心</el-option>
+                      <el-option value="復健診所" label="復健診所">復健診所</el-option>
                       <el-option value="住家" label="住家">住家</el-option>
                       <el-option value="其他" label="其他">其他</el-option>
                     </el-select>
                   </el-form-item>
                 </el-col>
-                <el-col v-if="temp.toAddrRemark === '其他'" :sm="24" :md="24">
-                  <!-- FIXME:remark 欄位缺少 -->
+                <el-col v-if="!['醫院診所','洗腎中心','復健診所','住家',''].includes(temp.toAddrRemark)" :sm="24" :md="24">
                   <el-form-item label="訖點備註-其他">
-                    <el-input
-                      v-model="temp.toRemark"
-                      placeholder="請輸入訖點備註"
-                    ></el-input>
+                    <el-input v-model="temp.toRemark" placeholder="請輸入訖點備註"></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="12">
@@ -308,17 +180,11 @@
                 </el-col>
                 <el-col :sm="24" :md="12">
                   <el-form-item label="回程乘車時間">
-                    <el-time-select
-                      :disabled="!temp.isBack"
-                      v-model="temp.reTime"
-                      :picker-options="{
+                    <el-time-select :disabled="!temp.isBack" v-model="temp.reTime" :picker-options="{
                         start: '08:30',
                         step: '00:15',
                         end: '18:30',
-                      }"
-                      placeholder="請選擇回程乘車時間"
-                      style="width: 100%"
-                    >
+                      }" placeholder="請選擇回程乘車時間" style="width: 100%">
                     </el-time-select>
                   </el-form-item>
                 </el-col>
@@ -331,105 +197,42 @@
                   </el-form-item>
                 </el-col>
 
-                <!-- FIXME:車種/輪椅對應關係確認 -->
                 <el-col :sm="24" :md="6">
                   <el-form-item label="車種" prop="carCategoryId">
-                    <el-select
-                      clearable
-                      v-model="temp.carCategoryId"
-                      placeholder="請選擇車種"
-                      style="width: 100%"
-                      @change="temp.wheelchairType = ''"
-                    >
-                      <el-option
-                        v-for="item in carCategorysList"
-                        :value="item.dtValue"
-                        :label="item.name"
-                        :key="item.id"
-                      ></el-option>
+                    <el-select clearable v-model="temp.carCategoryId" placeholder="請選擇車種" style="width: 100%" @change="temp.wheelchairType = ''">
+                      <el-option v-for="item in carCategorysList" :value="item.dtValue" :label="item.name" :key="item.id"></el-option>
                     </el-select>
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="6">
                   <el-form-item label="輪椅" prop="wheelchairType">
-                    <el-select
-                      clearable
-                      v-model="temp.wheelchairType"
-                      placeholder="請選擇輪椅"
-                      style="width: 100%"
-                    >
-                      <el-option
-                        v-if="temp.carCategoryId === 'SYS_CAR_GENERAL'"
-                        value="無"
-                        label="無"
-                        >無</el-option
-                      >
-                      <el-option
-                        v-if="temp.carCategoryId === 'SYS_CAR_GENERAL'"
-                        value="普通輪椅(可收折)"
-                        label="普通輪椅(可收折)"
-                        >普通輪椅(可收折)</el-option
-                      >
-                      <el-option
-                        v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
-                        value="普通輪椅"
-                        label="普通輪椅"
-                        >普通輪椅</el-option
-                      >
-                      <el-option
-                        value="高背輪椅"
-                        label="高背輪椅"
-                        v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
-                        >高背輪椅</el-option
-                      >
-                      <el-option
-                        value="電動輪椅"
-                        label="電動輪椅"
-                        v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
-                        >電動輪椅</el-option
-                      >
-                      <el-option
-                        value="電動高背輪椅"
-                        label="電動高背輪椅"
-                        v-if="temp.carCategoryId === 'SYS_CAR_WEAL'"
-                        >電動高背輪椅</el-option
-                      >
+                    <el-select clearable v-model="temp.wheelchairType" placeholder="請選擇輪椅" style="width: 100%">
+                      <el-option v-if="temp.carCategoryId === 'SYS_CAR_GENERAL'" value="無" label="無">無</el-option>
+                      <el-option v-if="temp.carCategoryId === 'SYS_CAR_GENERAL'" value="普通輪椅(可收折)" label="普通輪椅(可收折)">普通輪椅(可收折)</el-option>
+                      <el-option v-if="temp.carCategoryId === 'SYS_CAR_WEAL'" value="普通輪椅" label="普通輪椅">普通輪椅</el-option>
+                      <el-option value="高背輪椅" label="高背輪椅" v-if="temp.carCategoryId === 'SYS_CAR_WEAL'">高背輪椅</el-option>
+                      <el-option value="電動輪椅" label="電動輪椅" v-if="temp.carCategoryId === 'SYS_CAR_WEAL'">電動輪椅</el-option>
+                      <el-option value="電動高背輪椅" label="電動高背輪椅" v-if="temp.carCategoryId === 'SYS_CAR_WEAL'">電動高背輪椅</el-option>
                     </el-select>
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="12">
                   <el-form-item label="陪同人數" prop="familyWith">
-                    <el-select
-                      clearable
-                      @change="getDiscount"
-                      v-model.number="temp.familyWith"
-                      placeholder="請選擇陪同人數"
-                      style="width: 100%"
-                    >
-                      <el-option
-                        v-for="num in 8"
-                        :key="num - 1"
-                        :value="num - 1"
-                        :label="`${num - 1}人`"
-                      ></el-option>
+                    <el-select clearable @change="getDiscount" v-model.number="temp.familyWith" placeholder="請選擇陪同人數" style="width: 100%">
+                      <el-option v-for="num in 8" :key="num - 1" :value="num - 1" :label="`${num - 1}人`"></el-option>
                     </el-select>
                   </el-form-item>
                 </el-col>
                 <el-col :sm="24" :md="12">
                   <el-form-item label="簡訊號碼" prop="noticePhone">
-                    <el-input
-                      v-model="temp.noticePhone"
-                      placeholder="請輸入簡訊號碼"
-                    ></el-input>
+                    <el-input v-model="temp.noticePhone" placeholder="請輸入簡訊號碼"></el-input>
                   </el-form-item>
                 </el-col>
               </el-row>
             </el-form>
           </div>
           <div class="dispatchFooter">
-            <el-button style="height: 40px" type="info" @click="handleSubmit"
-              >立即預約</el-button
-            >
+            <el-button style="height: 40px" type="info" @click="handleSubmit">立即預約</el-button>
             <el-button style="height: 40px" type="info">新增下個地點</el-button>
           </div>
         </div>
@@ -712,6 +515,24 @@ export default {
       }
     },
 
+    /* 放置舊marker */
+    setOldMarker(data) {
+      const vm = this;
+      let position = {
+        lat: data.lat, // 經度
+        lng: data.lon, // 緯度
+      };
+      let marker = new google.maps.Marker({
+        position,
+        map: vm.map,
+      });
+      vm.map.panTo(position);
+      if (vm.fromAddr && vm.toAddr) {
+        //判斷起訖點是否都有值了 若有則畫出路徑
+        vm.handleDrawRoute();
+      }
+    },
+
     /* 畫路徑線 */
     handleDrawRoute() {
       let bounds = new google.maps.LatLngBounds();
@@ -873,9 +694,6 @@ export default {
     /* 立即預約 */
     handleSubmit() {
       const vm = this;
-      // let route = vm.$route.path.split("/")[1];
-      // vm.$cl(route);
-
       vm.$refs.form.validate((valid) => {
         if (valid) {
           if (vm.specialValidate(vm.temp)) {
@@ -887,11 +705,21 @@ export default {
             vm.temp.toAddr = vm.toAddr;
             vm.temp.userId = vm.$route.params.id.split("-")[0];
             vm.temp.caseUserId = vm.$route.params.id.split("-")[1];
+            vm.temp.toAddrRemark =
+              vm.temp.toAddrRemark === "其他"
+                ? vm.temp.toRemark
+                : vm.temp.toAddrRemark;
+            vm.temp.fromAddrRemark =
+              vm.temp.fromAddrRemark === "其他"
+                ? vm.temp.fromRemark
+                : vm.temp.fromAddrRemark;
             vm.$cl(vm.temp);
             orderCaseUser.add(vm.temp).then((res) => {
               vm.$cl(res);
               //有預約回程時
               if (vm.temp.isBack) {
+                //起迄點背著互換
+                vm.fromAddrRemark = vm.toAddrRemark;
                 //複製temp
                 let backTemp = Object.assign({}, vm.temp);
                 //修改時間
@@ -986,6 +814,46 @@ export default {
       const vm = this;
       vm.amtDialog = true;
     },
+
+    /* 若有query 有 orderId */
+    getOrder() {
+      const vm = this;
+      if (this.$route.query.orderId) {
+        orderCaseUser.get({ id: this.$route.query.orderId }).then((res) => {
+          console.log(res);
+          this.temp = res.result;
+          vm.$set(this.temp, "transOrgs", []);
+          vm.$set(this.temp, "isBack", false);
+          vm.$set(this.temp, "reTime", null);
+          vm.$set(this.temp, "date", "");
+          vm.$set(this.temp, "time", "");
+          vm.$set(this.temp, "toRemark", this.temp.toAddrRemark);
+          vm.$set(this.temp, "fromRemark", this.temp.fromAddrRemark);
+          this.temp.toAddrRemark = [
+            "醫院診所",
+            "洗腎中心",
+            "復健診所",
+            "住家",
+          ].includes(this.temp.toAddrRemark)
+            ? this.temp.toAddrRemark
+            : "其他";
+          this.temp.fromAddrRemark = [
+            "醫院診所",
+            "洗腎中心",
+            "復健診所",
+            "住家",
+          ].includes(this.temp.fromAddrRemark)
+            ? this.temp.fromAddrRemark
+            : "其他";
+          vm.toAddr = vm.temp.fromAddr;
+          vm.fromAddr = vm.temp.toAddr;
+          vm.$nextTick(() => {
+            vm.setOldMarker({ lat: vm.temp.fromLat, lon: vm.temp.fromLon });
+            vm.setOldMarker({ lat: vm.temp.toLat, lon: vm.temp.toLon });
+          });
+        });
+      }
+    },
   },
   async mounted() {
     this.today = moment().format("yyyy-MM-DD");
@@ -994,6 +862,7 @@ export default {
     this.getCarCategorys();
     await this.getOrgB();
     this.getRole();
+    this.getOrder();
   },
 };
 </script>

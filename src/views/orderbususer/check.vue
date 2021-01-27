@@ -1,66 +1,79 @@
 <template>
   <div class="flex-column allOrderDetail">
     <sticky :className="'sub-navbar'">
-      <el-button
-        type="info"
-        plain
-        size="mini"
-        @click="$router.push('/orderbususer')"
-        >回列表</el-button
-      >
+      <el-button type="info" plain size="mini" @click="$router.push('/orderbususer')">回列表</el-button>
     </sticky>
     <div class="app-container flex-item" style="display: flex; flex-wrap: wrap">
       <Title title="查看訂單" style="width: 100%"></Title>
 
       <!-- 訂單資訊卡片 -->
-      <div
-        class="formContainer bg-white customScrollBar"
-        style="height: calc(100% - 80px); width: 49%; margin-right: 2%"
-      >
+      <div class="formContainer bg-white customScrollBar" style="height: calc(100% - 80px); width: 49%; margin-right: 2%">
         <div class="userInfo">
           <SubTitle title="訂單資訊"></SubTitle>
           <el-row :gutter="16" v-if="order">
+
             <el-col :sm="12" :md="12">
               <div class="inputBox">
                 <div class="inputLable">訂單編號</div>
                 <div class="inputValue">{{ order.orderNo }}</div>
               </div>
             </el-col>
+
             <el-col :sm="12" :md="12">
               <div class="inputBox">
                 <div class="inputLable">訂單狀態</div>
                 <div class="inputValue">
-                  <OrderStatusTag
-                    size="normal"
-                    :type="orderStatusMapping[order.status - 1]"
-                  ></OrderStatusTag>
+                  <OrderStatusTag size="normal" :type="orderStatusMapping[order.status - 1]"></OrderStatusTag>
                 </div>
               </div>
             </el-col>
+
+            <el-col :sm="12" :md="12">
+              <div class="inputBox">
+                <div class="inputLable">建單者</div>
+                <div class="inputValue">
+                  <div class="inputValue">{{ order.createUserName }}</div>
+                </div>
+              </div>
+            </el-col>
+
+            <el-col :sm="12" :md="12">
+              <div class="inputBox">
+                <div class="inputLable">承接車行</div>
+                <div class="inputValue">
+                  <div class="inputValue">{{ order.orgName }}</div>
+                </div>
+              </div>
+            </el-col>
+
             <el-col :sm="12" :md="12">
               <div class="inputBox">
                 <div class="inputLable">訂車人姓名</div>
                 <div class="inputValue">{{ order.userName }}</div>
               </div>
             </el-col>
+
             <el-col :sm="12" :md="12">
               <div class="inputBox">
                 <div class="inputLable">預約乘車路線</div>
                 <div class="inputValue">{{ order.stationLineName }}</div>
               </div>
             </el-col>
+
             <el-col :sm="12" :md="12">
               <div class="inputBox">
                 <div class="inputLable">預約乘車時間</div>
                 <div class="inputValue">{{ order.reserveDate }}</div>
               </div>
             </el-col>
+
             <el-col :sm="12" :md="12">
               <div class="inputBox">
                 <div class="inputLable">乘車人數</div>
                 <div class="inputValue">{{ order.passengerNum }}</div>
               </div>
             </el-col>
+
             <el-col :sm="12" :md="12">
               <div class="inputBox">
                 <div class="inputLable">司機</div>
@@ -69,15 +82,17 @@
                 </div>
               </div>
             </el-col>
+
             <el-col :sm="12" :md="12">
               <div class="inputBox">
-                <div class="inputLable">車輛(車號/車種)</div>
-                <div v-if="order.carId" class="inputValue">
-                  {{ order.carNo }} / {{ order.carCategoryName }}
+                <div class="inputLable">車輛</div>
+                <div v-if="order.carNo" class="inputValue">
+                  {{ order.carNo }}
                 </div>
                 <div class="inputValue" v-else>尚未排班</div>
               </div>
             </el-col>
+
             <el-col :sm="12" :md="24">
               <div class="inputBox" style="margin-bottom: 8px">
                 <div class="inputLable">起迄點</div>
@@ -95,26 +110,17 @@
                 </div>
               </div>
             </el-col>
+
           </el-row>
         </div>
       </div>
 
       <!-- 訂單歷程卡片 -->
-      <div
-        class="formContainer bg-white"
-        style="height: calc(100% - 80px); width: 49%"
-      >
+      <div class="formContainer bg-white" style="height: calc(100% - 80px); width: 49%">
         <div class="userInfo">
           <SubTitle title="訂單歷程"></SubTitle>
           <div style="height: calc(100% - 80px)">
-            <el-table
-              ref="mainTable"
-              height="100%"
-              :data="order.statusLogs"
-              border
-              fit
-              style="width: 100%"
-            >
+            <el-table ref="mainTable" height="100%" :data="order.orderStatusLogs" border fit style="width: 100%">
               <el-table-column label="變更時間" align="center">
                 <template slot-scope="scope">
                   <div>
@@ -131,9 +137,7 @@
               </el-table-column>
               <el-table-column label="狀態" align="center">
                 <template slot-scope="scope">
-                  <OrderStatusTag
-                    :type="orderStatusMapping[scope.row.status - 1]"
-                  ></OrderStatusTag>
+                  <OrderStatusTag :type="orderStatusMapping[scope.row.status - 1]"></OrderStatusTag>
                 </template>
               </el-table-column>
             </el-table>
@@ -145,11 +149,11 @@
 </template>
 
 <script>
-import moment from "moment";
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import SubTitle from "@/components/SubTitle";
 import OrderStatusTag from "@/components/OrderStatusTag";
+
 import * as orderBusUser from "@/api/orderBusUser";
 export default {
   name: "busUserOrderDetail",
@@ -158,13 +162,6 @@ export default {
     Title,
     SubTitle,
     OrderStatusTag,
-  },
-  filters: {
-    dateFilter(date) {
-      let day = moment(date).format("yyyy-MM-DD");
-      let time = moment(date).format("HH:mm");
-      return `${day} ${time}`;
-    },
   },
   data() {
     return {
@@ -197,7 +194,7 @@ export default {
     /* 獲取訂單 */
     getOrderList() {
       const vm = this;
-      orderBusUser.get({ id: vm.$route.params.id }).then((res) => {
+      orderBusUser.getDetail({ orderId: vm.$route.params.id }).then((res) => {
         console.log(res.result);
         vm.order = res.result;
         vm.selfPayUserId = res.result.selfPayUserId;

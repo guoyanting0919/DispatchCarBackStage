@@ -16,4 +16,3 @@ export default {
   filters: {},
 };
 </script>
-

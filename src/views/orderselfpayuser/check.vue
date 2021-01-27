@@ -150,11 +150,11 @@
 </template>
 
 <script>
-import moment from "moment";
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import SubTitle from "@/components/SubTitle";
 import OrderStatusTag from "@/components/OrderStatusTag";
+
 import * as orderSelfPayUser from "@/api/orderSelfPayUser";
 export default {
   name: "allOrderDetail",
@@ -163,13 +163,6 @@ export default {
     Title,
     SubTitle,
     OrderStatusTag,
-  },
-  filters: {
-    dateFilter(date) {
-      let day = moment(date).format("yyyy-MM-DD");
-      let time = moment(date).format("HH:mm");
-      return `${day} ${time}`;
-    },
   },
   data() {
     return {

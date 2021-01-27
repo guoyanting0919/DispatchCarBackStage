@@ -66,7 +66,7 @@ export function loadDespatch(params) {
 
 export function cancel(data) {
   return request({
-    url: "/orderOfCaseUsers/cancelOrderReq",
+    url: "/orderOfCaseUsers/CancelOrder",
     method: "post",
     data,
   });

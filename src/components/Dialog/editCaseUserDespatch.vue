@@ -4,7 +4,7 @@
     <div class="editDialogBody">
       <el-form :label-position="labelPosition" label-width="200px" :model="temp" :rules="rules" ref="form">
         <el-row :gutter="16">
-          <el-col :sm="12" :md="8">
+          <!-- <el-col :sm="12" :md="8">
             <el-form-item label="訂單編號">
               <el-input disabled style="width: 100%" v-model="temp.despatchNo">
               </el-input>
@@ -23,7 +23,7 @@
               <el-input disabled style="width: 100%" v-model="temp.uid">
               </el-input>
             </el-form-item>
-          </el-col>
+          </el-col> -->
 
           <el-col :sm="12" :md="8">
             <el-form-item label="聯絡電話" prop="noticePhone">
@@ -35,7 +35,7 @@
           <el-col :sm="12" :md="8">
             <el-form-item label="車種" prop="carCategoryId">
               <el-select style="width: 100%" v-model="temp.carCategoryId" placeholder="選擇車種" @change="temp.wheelchairType = ''">
-                <el-option v-for="type in carCategorysList" :key="type.id" :label="type.name" :value="type.dtValue">
+                <el-option v-for="type in carCategorysList" :key="type.id" :label="type.label" :value="type.value">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -93,7 +93,7 @@
             </el-form-item>
           </el-col>
 
-          <el-col :sm="12" :md="24">
+          <el-col :sm="12" :md="18">
             <el-form-item label="起點" prop="fromAddr">
               <el-select filterable :default-first-option="false" remote :remote-method="remoteMethod" @change="handleChange('from')" @visible-change="handleVisibleChange" ref="atc" :trigger-on-focus="false" v-model="temp.fromAddr" placeholder="請輸入起點" style="width: 100%">
                 <el-option v-for="item in searchResults" :key="item.place_id" :value="item.place_id" :label="item.description"></el-option>
@@ -101,11 +101,44 @@
             </el-form-item>
           </el-col>
 
-          <el-col :sm="12" :md="24">
+          <el-col :sm="24" :md="6">
+            <el-form-item label="起點備註" prop="fromAddrRemark">
+              <el-select clearable v-model="temp.fromAddrRemark" placeholder="請選擇備註" style="width: 100%">
+                <el-option value="醫院診所" label="醫院診所">醫院診所</el-option>
+                <el-option value="洗腎中心" label="洗腎中心">洗腎中心</el-option>
+                <el-option value="復健診所" label="復健診所">復健診所</el-option>
+                <el-option value="住家" label="住家">住家</el-option>
+                <el-option value="其他" label="其他">其他</el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col v-if="!['醫院診所','洗腎中心','復健診所','住家',''].includes(temp.fromAddrRemark)" :sm="24" :md="24">
+            <el-form-item label="起點備註-其他">
+              <el-input v-model="temp.fromRemark" placeholder="請輸入起點備註"></el-input>
+            </el-form-item>
+          </el-col>
+
+          <el-col :sm="12" :md="18">
             <el-form-item label="迄點" prop="toAddr">
               <el-select filterable :default-first-option="false" remote :remote-method="remoteMethod" @change="handleChange('to')" @visible-change="handleVisibleChange" ref="atc" :trigger-on-focus="false" v-model="temp.toAddr" placeholder="請輸入迄點" style="width: 100%">
                 <el-option v-for="item in searchResults" :key="item.place_id" :value="item.place_id" :label="item.description"></el-option>
               </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :sm="24" :md="6">
+            <el-form-item label="訖點備註" prop="toAddrRemark">
+              <el-select clearable v-model="temp.toAddrRemark" placeholder="請選擇備註" style="width: 100%">
+                <el-option value="醫院診所" label="醫院診所">醫院診所</el-option>
+                <el-option value="洗腎中心" label="洗腎中心">洗腎中心</el-option>
+                <el-option value="復健診所" label="復健診所">復健診所</el-option>
+                <el-option value="住家" label="住家">住家</el-option>
+                <el-option value="其他" label="其他">其他</el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col v-if="!['醫院診所','洗腎中心','復健診所','住家',''].includes(temp.toAddrRemark)" :sm="24" :md="24">
+            <el-form-item label="訖點備註-其他">
+              <el-input v-model="temp.toRemark" placeholder="請輸入訖點備註"></el-input>
             </el-form-item>
           </el-col>
         </el-row>

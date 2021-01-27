@@ -2,29 +2,29 @@
   <div class="flex-column orderSelfPayUser">
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
-        <!--   <i class="iconfont icon-circle"></i> -->
-        <!-- 車行選擇 -->
-        <el-input style="width: 200px; margin-right: 0.5rem" size="mini" v-model="listQuery.key" clearable placeholder="請輸入關鍵字">
+        <!-- 關鍵字 -->
+        <el-input @clear="getList" @keyup.native.enter="getList" style="width: 200px; margin-right: 0.5rem" size="mini" v-model="listQuery.key" clearable placeholder="請輸入關鍵字">
         </el-input>
 
         <!-- 日期選擇 -->
         <el-date-picker size="mini" v-model="dateRange" type="daterange" range-separator="至" start-placeholder="開始日期" end-placeholder="结束日期">
         </el-date-picker>
 
-        <!-- 權限按鈕 -->
-        <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
-
         <!-- 排序 姓名name 乘車時間reserveDate 起點fromAddr 迄點toAddr + desc-->
-        <el-select clearable @change="getList()" size="mini" v-model="orderby" placeholder="請選擇排序方式">
+        <el-select style="margin-left:.5rem;width:150px" clearable @change="getList()" size="mini" v-model="orderby" placeholder="請選擇排序方式">
           <el-option label="姓名" value="name"></el-option>
           <el-option label="預約乘車時間" value="reserveDate"></el-option>
           <el-option label="起點" value="fromAddr"></el-option>
           <el-option label="迄點" value="toAddr"></el-option>
         </el-select>
-        <el-button @click="desc=!desc,getList()" class="sortBtn" size="mini" type="info" plain>
+        <el-button @click="desc=!desc,getList()" class="sortBtn" size="mini" plain>
           <i v-if="!desc" class="iconfont icon-sortalphaasc"></i>
           <i v-else class="iconfont icon-sortalphadesc"></i>
         </el-button>
+
+        <!-- 權限按鈕 -->
+        <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
+
       </div>
     </sticky>
 
@@ -33,22 +33,19 @@
       <Title title="白牌車訂單"></Title>
       <div class="bg-white customScrollBar" style="height: calc(100% - 50px)">
         <div class="orderTableContainer customScrollBar">
-          <div class="orderFilterContainer">
-            <OrderStatusTag @handleSort="handleSort('-1')" size="big" type="default"></OrderStatusTag>
-            <OrderStatusTag @handleSort="handleSort('1')" size="big" type="newOrder"></OrderStatusTag>
-            <OrderStatusTag @handleSort="handleSort('2')" size="big" type="ready"></OrderStatusTag>
-            <OrderStatusTag @handleSort="handleSort('3')" size="big" type="arrival"></OrderStatusTag>
-            <OrderStatusTag @handleSort="handleSort('4')" size="big" type="boarding"></OrderStatusTag>
-            <OrderStatusTag @handleSort="handleSort('5')" size="big" type="complete"></OrderStatusTag>
-            <OrderStatusTag @handleSort="handleSort('9')" size="big" type="cancel"></OrderStatusTag>
-          </div>
+
+          <OrderStatusFilter @handleSort="handleSort"></OrderStatusFilter>
+
           <div v-for="order in list" :key="order.id" class="orderContainer">
             <div class="orderLeft">
               <div class="orderLeftTitle">訂單編號 {{ order.orderNo }}</div>
               <div class="orderLeftDetail">
                 <p>承接單位：{{ order.orgName }}</p>
                 <p>車種類型：{{ order.carCategoryName }}</p>
-                <p>預約時間：{{ order.reserveDate | dateFilter }}</p>
+                <p>
+                  預約時間：{{ order.reserveDate | globalDateFilter('yyyy-MM-DD') }}
+                  {{order.reserveDate | globalDateFilter('HH:mm')}}
+                </p>
                 <!-- <p>建立時間：{{ order.createDate | dateFilter }}</p> -->
                 <!-- <p>行程：回程</p> -->
                 <!-- <p>訂車人身分：B單位</p> -->
@@ -107,13 +104,11 @@
                   <button class="orderButton orderCancel" v-if="(order.status == 1 || order.status == 2 || order.status == 3) && hasButton('cancel') " @click="handleCancelOrder(order.id)">
                     取消訂單
                   </button>
-                  <!-- <button class="orderButton orderCancel" v-if="order.status == 2" @click="handleCancelDispatch(order.despatchNo)">
-                    取消排班
-                  </button> -->
                 </div>
               </div>
             </div>
           </div>
+
         </div>
 
         <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handleCurrentChange" />
@@ -134,11 +129,11 @@ import permissionBtn from "@/components/PermissionBtn";
 import elDragDialog from "@/directive/el-dragDialog";
 import Pagination from "@/components/Pagination";
 import OrderStatusTag from "@/components/OrderStatusTag";
+import OrderStatusFilter from "@/components/OrderStatusFilter";
 import EditDialog from "@/components/Dialog/editSelfPayUserDespatch";
 
 import * as orderSelfPayUser from "@/api/orderSelfPayUser";
 import * as categorys from "@/api/categorys";
-
 import * as dispatch from "@/api/dispatchs";
 export default {
   name: "orderSelfPayUser",
@@ -147,22 +142,16 @@ export default {
     Title,
     permissionBtn,
     Pagination,
+    OrderStatusFilter,
     OrderStatusTag,
     EditDialog,
   },
   directives: {
     elDragDialog,
   },
-  filters: {
-    dateFilter(date) {
-      let day = moment(date).format("yyyy-MM-DD");
-      let time = moment(date).format("HH:mm");
-      return `${day} ${time}`;
-    },
-  },
   data() {
     return {
-      // 權限按鈕
+      /* 權限按鈕 */
       buttons: [],
       /* 車輛類別 */
       carCategorysList: [],
@@ -172,7 +161,7 @@ export default {
       desc: true,
       dateRange: null,
 
-      //table
+      /* table */
       list: [],
       listLoading: false,
       total: 0,
@@ -185,13 +174,15 @@ export default {
         key: undefined,
         orderby: null, //姓名name 乘車時間reserveDate 起點fromAddr 迄點toAddr + desc
       },
-      multipleSelection: [], // 列表checkbox選中的值
-      // 表單相關
+
+      /* 列表checkbox選中的值 */
+      multipleSelection: [],
+
+      /* 表單相關 */
       labelPosition: "top",
       passengerArr: [],
       passengerNum: 1,
       temp: {
-        // 日期
         date: "",
         time: "",
         id: "",
@@ -214,12 +205,11 @@ export default {
         remark: [{ name: "", birth: "" }],
       },
 
-      // dialog
-
+      /* dialog */
       violationDialog: false,
       editDialog: false,
 
-      // order status mapping
+      /*  order status mapping */
       orderStatusMapping: [
         "newOrder",
         "ready",
@@ -252,7 +242,7 @@ export default {
       }
     },
 
-    /* 起迄日期 */
+    /* 起迄日期搜尋 */
     dateRange(val) {
       const vm = this;
       if (val != null) {
@@ -273,10 +263,12 @@ export default {
         this.buttons.push(el.domId);
       });
     },
+
     /* 是否擁有按鈕功能權限 */
     hasButton(domId) {
       return this.buttons.includes(domId);
     },
+
     /* 獲取訂單 */
     getList() {
       const vm = this;
@@ -415,8 +407,8 @@ export default {
     onBtnClicked(domId) {
       this.$cl(domId);
       switch (domId) {
-        case "violationBtn":
-          this.violationDialog = true;
+        case "search":
+          this.getList();
           break;
         default:
           break;
@@ -431,4 +423,6 @@ export default {
 };
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+// TODO:css 在 assets/css/views/order/_orderSelfPayUser.scss
+</style>

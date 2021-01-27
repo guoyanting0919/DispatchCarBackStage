@@ -21,6 +21,11 @@ export default {
     };
   },
   props: {
+    active: {
+      type: Boolean,
+      default: false,
+      require: false,
+    },
     size: {
       type: String,
       default: "mini",
@@ -77,6 +82,10 @@ export default {
       if (this.size) {
         classes.push(`orderStatusTag-${this.size}`);
       }
+
+      if (this.active) {
+        classes.push(`orderStatusTag-active`);
+      }
       return classes;
     },
   },
@@ -111,6 +120,7 @@ $cancel: #f5222d;
   box-sizing: border-box;
   display: inline-block;
   line-height: 19px;
+  transition: 0.5s;
 
   @each $type,
     $color
@@ -140,5 +150,9 @@ $cancel: #f5222d;
     padding: 4px 8px;
     border: 2px solid;
   }
+}
+.orderStatusTag-active {
+  box-shadow: 2px 2px 8px;
+  font-weight: 700;
 }
 </style>

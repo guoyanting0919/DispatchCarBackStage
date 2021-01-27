@@ -24,6 +24,14 @@ export function get(params) {
   });
 }
 
+export function getDetail(params) {
+  return request({
+    url: "/orderOfBusUsers/getDetail",
+    method: "get",
+    params,
+  });
+}
+
 export function receive(data) {
   return request({
     url: "/orderOfBusUsers/updateOrgId",
@@ -58,7 +66,7 @@ export function remove(data) {
 
 export function cancel(data) {
   return request({
-    url: "/orderOfBusUsers/cancelOrderReq",
+    url: "/orderOfBusUsers/CancelOrder",
     method: "post",
     data,
   });

@@ -3,31 +3,30 @@
     <div id="map" ref="map" style="width: 0%; height: 0%"></div>
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
-        <!-- 車行選擇 -->
-        <el-input
-          style="width: 200px; margin-right: 0.5rem"
-          size="mini"
-          v-model="value"
-          clearable
-          placeholder="請輸入關鍵字"
-        ></el-input>
+        <!-- 關鍵字 -->
+        <el-input @clear='getList' @keyup.native.enter="getList" style="width: 200px; margin-right: 0.5rem" size="mini" v-model="listQuery.key" clearable placeholder="請輸入關鍵字">
+        </el-input>
 
         <!-- 日期選擇 -->
-        <el-date-picker
-          size="mini"
-          v-model="value1"
-          type="daterange"
-          range-separator="至"
-          start-placeholder="開始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
+        <el-date-picker size="mini" v-model="dateRange" type="daterange" range-separator="至" start-placeholder="開始日期" end-placeholder="结束日期">
+        </el-date-picker>
+
+        <!-- 排序 姓名name 乘車時間reserveDate 起點fromStationName 迄點toStationName + desc-->
+        <el-select style="margin-left:.5rem;width:150px" clearable @change="getList()" size="mini" v-model="orderby" placeholder="請選擇排序方式">
+          <el-option label="姓名" value="name"></el-option>
+          <el-option label="聯絡電話" value="phone"></el-option>
+          <el-option label="個案編號" value="caseUserNo"></el-option>
+          <el-option label="身分證字號" value="uid"></el-option>
+          <el-option label="起點" value="fromAddr"></el-option>
+          <el-option label="迄點" value="toAddr"></el-option>
+        </el-select>
+        <el-button @click="desc=!desc,getList()" class="sortBtn" size="mini" plain>
+          <i v-if="!desc" class="iconfont icon-sortalphaasc"></i>
+          <i v-else class="iconfont icon-sortalphadesc"></i>
+        </el-button>
 
         <!-- 權限按鈕 -->
-        <permission-btn
-          moduleName="builderTables"
-          size="mini"
-          v-on:btn-event="onBtnClicked"
-        ></permission-btn>
+        <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
       </div>
     </sticky>
 
@@ -36,15 +35,9 @@
       <Title title="長照訂單"></Title>
       <div class="bg-white customScrollBar" style="height: calc(100% - 50px)">
         <div class="orderTableContainer customScrollBar">
-          <div class="orderFilterContainer">
-            <OrderStatusTag size="big" type="default"></OrderStatusTag>
-            <OrderStatusTag size="big" type="newOrder"></OrderStatusTag>
-            <OrderStatusTag size="big" type="ready"></OrderStatusTag>
-            <OrderStatusTag size="big" type="arrival"></OrderStatusTag>
-            <OrderStatusTag size="big" type="boarding"></OrderStatusTag>
-            <OrderStatusTag size="big" type="complete"></OrderStatusTag>
-            <OrderStatusTag size="big" type="cancel"></OrderStatusTag>
-          </div>
+
+          <OrderStatusFilter @handleSort="handleSort"></OrderStatusFilter>
+
           <div v-for="order in list" :key="order.id" class="orderContainer">
             <div class="orderLeft">
               <div class="orderLeftTitle">訂單編號 {{ order.orderNo }}</div>
@@ -52,9 +45,9 @@
                 <p>承接單位：{{ order.orgName }}</p>
                 <p>車種類型：{{ order.carCategoryName }}</p>
                 <p>預約時間：{{ order.reserveDate | dateFilter }}</p>
-                <p>建立時間：{{ order.createDate | dateFilter }}</p>
+                <!-- <p>建立時間：{{ order.createDate | dateFilter }}</p>
                 <p>行程：{{ order.isBack ? "去程" : "回程" }}</p>
-                <p>訂車人身分：{{ order.createdIdentity }}</p>
+                <p>訂車人身分：{{ order.createdIdentity }}</p> -->
                 <!-- <p>行程：回程</p> -->
                 <!-- <p>訂車人身分：B單位</p> -->
               </div>
@@ -71,20 +64,17 @@
               </div>
               <div class="orderCenterDetail">
                 <div class="driverInfo">
-                  <div class="userInfo">個案姓名：{{ order.userName }}</div>
-                  <div class="userInfo">個案編號：{{ order.noticePhone }}</div>
-                  <div class="userInfo">
+                  <div class="driverName">
+                    {{ order.name }}
+                  </div>
+                  <!-- <div class="userInfo">個案編號：{{ order.noticePhone }}</div> -->
+                  <!-- <div class="userInfo">
                     身分證字號：{{ order.noticePhone }}
-                  </div>
-                  <div class="userInfo">
+                  </div> -->
+                  <!-- <div class="userInfo">
                     接收簡訊號碼：{{ order.noticePhone }}
-                  </div>
-                  <i
-                    style="margin-right: 4px"
-                    class="iconfont icon-member"
-                    v-for="item in order.familyWith + 1"
-                    :key="item"
-                  ></i>
+                  </div> -->
+                  <i style="margin-right: 4px" class="iconfont icon-member" v-for="item in order.familyWith + 1" :key="item"></i>
                 </div>
                 <div class="addressInfo">
                   <p class="startAdd textNoWrap">
@@ -97,74 +87,44 @@
             </div>
             <div class="orderRight">
               <div class="orderRightTitle">
-                <el-button style="padding: 0px 10px" type="primary"
-                  >轉單</el-button
-                >
+                <el-button style="padding: 0px 10px" type="danger">記點</el-button>
+                <el-button style="padding: 0px 10px" type="info">修改狀態</el-button>
                 <p class="orderStatus">
-                  <OrderStatusTag
-                    :type="orderStatusMapping[order.status - 1]"
-                    size="mini"
-                  ></OrderStatusTag>
+                  <OrderStatusTag :type="orderStatusMapping[order.status - 1]" size="mini"></OrderStatusTag>
                 </p>
               </div>
               <div class="orderRightDetail">
-                <p>個案負擔：$ {{ order.withAmt }}</p>
                 <div class="rightBtnBox">
-                  <button
-                    class="orderButton orderDetail"
-                    @click="handleCheck(order.id)"
-                  >
+                  <button class="orderButton orderDetail" @click="handleCheck(order.id)">
                     查看訂單
                   </button>
-                  <button
-                    class="orderButton orderEdit"
-                    @click="
+                  <button class="orderButton orderEdit" @click="
                       editDialog = true;
                       getOrder(order.id);
-                    "
-                    v-if="order.status == 1"
-                  >
+                    " v-if="(order.status == 1 || order.status == 2 || order.status == 3) && hasButton('edit') ">
                     編輯訂單
                   </button>
-                  <button class="orderButton orderStatus">修改狀態</button>
-                  <button
-                    class="orderButton orderCancel"
-                    v-if="order.status == 1"
-                    @click="handleCancelOrder(order.id)"
-                  >
+                  <button @click="handleDespatch(order)" class="orderButton orderStatus" v-if="hasButton('dispatch')">
+                    快速預約
+                  </button>
+                  <button class="orderButton orderCancel" v-if="order.status == 1" @click="handleCancelOrder(order.id)">
                     取消訂單
                   </button>
-                  <button
-                    class="orderButton orderCancel"
-                    v-if="order.status == 2"
-                    @click="handleCancelDispatch(order.despatchNo)"
-                  >
+                  <!-- <button class="orderButton orderCancel" v-if="order.status == 2" @click="handleCancelDispatch(order.despatchNo)">
                     取消排班
-                  </button>
+                  </button> -->
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <pagination
-          v-show="total > 0"
-          :total="total"
-          :page.sync="listQuery.page"
-          :limit.sync="listQuery.limit"
-          @pagination="handleCurrentChange"
-        />
+        <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handleCurrentChange" />
       </div>
     </div>
 
     <!-- eidt dialog -->
-    <EditDialog
-      :temp="temp"
-      :editDialogProp="editDialog"
-      :carCategorysList="carCategorysList"
-      @handleEdit="handleEdit"
-      @handleClose="handleClose"
-    ></EditDialog>
+    <EditDialog :temp="temp" :editDialogProp="editDialog" :carCategorysList="carCategorysList" @handleEdit="handleEdit" @handleClose="handleClose"></EditDialog>
   </div>
 </template>
 
@@ -176,11 +136,11 @@ import permissionBtn from "@/components/PermissionBtn";
 import elDragDialog from "@/directive/el-dragDialog";
 import Pagination from "@/components/Pagination";
 import OrderStatusTag from "@/components/OrderStatusTag";
+import OrderStatusFilter from "@/components/OrderStatusFilter";
 import EditDialog from "@/components/Dialog/editCaseUserDespatch";
 
 import * as orderCaseUser from "@/api/orderCaseUser";
 import * as categorys from "@/api/categorys";
-
 import * as dispatch from "@/api/dispatchs";
 export default {
   name: "orderCaseUser",
@@ -191,6 +151,7 @@ export default {
     Pagination,
     OrderStatusTag,
     EditDialog,
+    OrderStatusFilter,
   },
   directives: {
     elDragDialog,
@@ -204,16 +165,28 @@ export default {
   },
   data() {
     return {
-      //車輛類別
+      /* 權限按鈕 */
+      buttons: [],
+      /* 車輛類別 */
       carCategorysList: [],
-      //table
+
+      /* filter */
+      orderby: null,
+      desc: true,
+      dateRange: null,
+
+      /* table */
       list: [],
       listLoading: false,
       total: 0,
       listQuery: {
+        Status: -1,
+        StartDate: null,
+        EndDate: null,
         page: 1,
         limit: 10,
         key: undefined,
+        orderby: null, //姓名name 乘車時間reserveDate 起點fromStationName 迄點toStationName + desc
       },
       multipleSelection: [], // 列表checkbox選中的值
       // 表單相關
@@ -266,28 +239,41 @@ export default {
     };
   },
   watch: {
-    "temp.passengerNum"(val, oldVal) {
+    /* 起迄日期搜尋 */
+    dateRange(val) {
       const vm = this;
-      if (val > oldVal) {
-        for (let index = oldVal + 1; index <= val; index++) {
-          let obj = {
-            name: "",
-            birth: "",
-            //TODO:這邊暫時用第一筆資料的電話當預設聯絡電話
-            phone: vm.passengerArr[0]?.phone || "",
-            key: index,
-          };
-          vm.passengerArr.push(obj);
-        }
+      if (val != null) {
+        vm.listQuery.StartDate = moment(val[0]).format("yyyy-MM-DD");
+        vm.listQuery.EndDate = moment(val[1]).format("yyyy-MM-DD");
+        vm.getList();
       } else {
-        vm.passengerArr = vm.passengerArr.slice(0, val);
+        vm.listQuery.StartDate = null;
+        vm.listQuery.EndDate = null;
+        vm.getList();
       }
     },
   },
   methods: {
+    /* 獲取本路由下所有功能按鈕 */
+    getButtons() {
+      this.$route.meta.elements.forEach((el) => {
+        this.buttons.push(el.domId);
+      });
+    },
+
+    /* 是否擁有按鈕功能權限 */
+    hasButton(domId) {
+      return this.buttons.includes(domId);
+    },
+
     /* 獲取訂單 */
     getList() {
       const vm = this;
+      if (!vm.desc) {
+        vm.listQuery.orderby = vm.orderby || null;
+      } else {
+        vm.listQuery.orderby = vm.orderby ? `${vm.orderby} desc` : null;
+      }
       orderCaseUser.load(vm.listQuery).then((res) => {
         vm.list = res.data;
         vm.total = res.count;
@@ -303,10 +289,10 @@ export default {
         limit: 20,
         TypeId: "SYS_CAR",
       };
-      categorys.getList(query).then((res) => {
-        vm.carCategorysList = res.data.filter((car) => {
+      categorys.getSimpleList(query).then((res) => {
+        vm.carCategorysList = res.result.filter((car) => {
           return (
-            car.dtValue === "SYS_CAR_GENERAL" || car.dtValue === "SYS_CAR_WEAL"
+            car.value === "SYS_CAR_GENERAL" || car.value === "SYS_CAR_WEAL"
           );
         });
       });
@@ -319,6 +305,36 @@ export default {
         vm.temp = Object.assign({}, res.result); // copy obj
         vm.temp.fromAddrDetail = vm.temp.fromAddr;
         vm.temp.toAddrDetail = vm.temp.toAddr;
+        let fromRemark = ["醫院診所", "洗腎中心", "復健診所", "住家"].includes(
+          vm.temp.fromAddrRemark
+        )
+          ? ""
+          : vm.temp.fromAddrRemark;
+        this.$set(vm.temp, "fromRemark", fromRemark);
+
+        let toRemark = ["醫院診所", "洗腎中心", "復健診所", "住家"].includes(
+          vm.temp.toAddrRemark
+        )
+          ? ""
+          : vm.temp.toAddrRemark;
+        this.$set(vm.temp, "toRemark", toRemark);
+
+        vm.temp.toAddrRemark = [
+          "醫院診所",
+          "洗腎中心",
+          "復健診所",
+          "住家",
+        ].includes(vm.temp.toAddrRemark)
+          ? vm.temp.toAddrRemark
+          : "其他";
+        vm.temp.fromAddrRemark = [
+          "醫院診所",
+          "洗腎中心",
+          "復健診所",
+          "住家",
+        ].includes(vm.temp.fromAddrRemark)
+          ? vm.temp.fromAddrRemark
+          : "其他";
         this.$set(vm.temp, "date", res.result.reserveDate.split(" ")[0]);
         this.$set(
           vm.temp,
@@ -326,6 +342,20 @@ export default {
           res.result.reserveDate.split(" ")[1].slice(0, 5)
         );
       });
+    },
+
+    /* 篩選訂單狀態 */
+    handleSort(a) {
+      this.listQuery.Status = a * 1;
+      this.getList();
+    },
+
+    /* 快速預約 */
+    handleDespatch(order) {
+      const vm = this;
+      vm.$router.push(
+        `/ordercaseuser/dispatch/${order.userId}-${order.caseUserId}?orderId=${order.id}`
+      );
     },
 
     /* 關閉編輯燈箱 */
@@ -337,10 +367,14 @@ export default {
     handleEdit(data) {
       console.log(data);
       const vm = this;
+      data.toAddrRemark =
+        data.toAddrRemark === "其他" ? data.toRemark : data.toAddrRemark;
+      data.fromAddrRemark =
+        data.fromAddrRemark === "其他" ? data.fromRemark : data.fromAddrRemark;
       data.reserveDate = `${data.date} ${data.time}`;
       data.carCategoryName = vm.carCategorysList.filter((i) => {
-        return i.dtValue === data.carCategoryId;
-      })[0].name;
+        return i.value === data.carCategoryId;
+      })[0].label;
       data.fromAddr = data.fromAddrDetail;
       data.toAddr = data.toAddrDetail;
       orderCaseUser.update(data).then(() => {
@@ -399,8 +433,8 @@ export default {
     onBtnClicked(domId) {
       this.$cl(domId);
       switch (domId) {
-        case "violationBtn":
-          this.violationDialog = true;
+        case "search":
+          this.getList();
           break;
         default:
           break;
@@ -408,6 +442,7 @@ export default {
     },
   },
   mounted() {
+    this.getButtons();
     this.getList();
     this.getCarCategorys();
   },
@@ -459,7 +494,7 @@ export default {
 
 .orderContainer {
   display: flex;
-  height: 200px;
+  height: 160px;
   margin-bottom: 1rem;
 
   @include rwd($md) {
