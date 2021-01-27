@@ -8,6 +8,14 @@ export function load(params) {
   });
 }
 
+export function loadHistory(params) {
+  return request({
+    url: "/orderOfSelfPayUsers/loadHistory",
+    method: "get",
+    params,
+  });
+}
+
 export function loadNoOrg(params) {
   return request({
     url: "/orderOfSelfPayUsers/loadNoOrg",
@@ -23,6 +31,7 @@ export function get(params) {
     params,
   });
 }
+
 export function getDetail(params) {
   return request({
     url: "/orderOfSelfPayUsers/getDetail",

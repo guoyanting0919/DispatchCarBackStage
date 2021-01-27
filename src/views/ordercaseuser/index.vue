@@ -87,15 +87,15 @@
             </div>
             <div class="orderRight">
               <div class="orderRightTitle">
-                <el-button style="padding: 0px 10px" type="danger">記點</el-button>
-                <el-button style="padding: 0px 10px" type="info">修改狀態</el-button>
+                <el-button style="padding: 0px 10px" type="danger" @click="handleViolation(order)">記點</el-button>
+                <!-- <el-button style="padding: 0px 10px" type="info">修改狀態</el-button> -->
                 <p class="orderStatus">
                   <OrderStatusTag :type="orderStatusMapping[order.status - 1]" size="mini"></OrderStatusTag>
                 </p>
               </div>
               <div class="orderRightDetail">
                 <div class="rightBtnBox">
-                  <button class="orderButton orderDetail" @click="handleCheck(order.id)">
+                  <button class="orderButton orderDetail" @click="handleCheck(order)">
                     查看訂單
                   </button>
                   <button class="orderButton orderEdit" @click="
@@ -125,6 +125,23 @@
 
     <!-- eidt dialog -->
     <EditDialog :temp="temp" :editDialogProp="editDialog" :carCategorysList="carCategorysList" @handleEdit="handleEdit" @handleClose="handleClose"></EditDialog>
+
+    <!-- violation dialog -->
+    <el-dialog title="記點" :visible.sync="violationDialog" width="475px" :before-close="handleClose">
+      <el-form ref="dataForm" :model="violationTemp" label-position="right" label-width="80px">
+        <el-form-item size="mini" :label="'記點點數'">
+          <el-input-number v-model="violationTemp.point" :min="0" :max="10"></el-input-number>
+        </el-form-item>
+        <el-form-item size="mini" :label="'記點原因'">
+          <el-input v-model="violationTemp.remark"></el-input>
+        </el-form-item>
+
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="violationDialog = false">取 消</el-button>
+        <el-button type="danger" @click="handleConfirmViolation">確 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -188,13 +205,15 @@ export default {
         key: undefined,
         orderby: null, //姓名name 乘車時間reserveDate 起點fromStationName 迄點toStationName + desc
       },
-      multipleSelection: [], // 列表checkbox選中的值
-      // 表單相關
+
+      /* 列表checkbox選中的值 */
+      multipleSelection: [],
+
+      /* 表單相關 */
       labelPosition: "top",
       passengerArr: [],
       passengerNum: 1,
       temp: {
-        // 日期
         date: "",
         time: "",
         id: "",
@@ -216,12 +235,20 @@ export default {
         remark: [{ name: "", birth: "" }],
       },
 
-      // dialog
+      /* 記點temp */
+      violationTemp: {
+        userId: "",
+        caseUserId: "",
+        orderId: "",
+        point: 0,
+        remark: "",
+      },
 
+      /* dialog */
       violationDialog: false,
       editDialog: false,
 
-      // order status mapping
+      /* order status mapping */
       orderStatusMapping: [
         "newOrder",
         "ready",
@@ -233,9 +260,6 @@ export default {
         "cancel",
         "cancel",
       ],
-
-      value: "",
-      value1: "",
     };
   },
   watch: {
@@ -344,6 +368,30 @@ export default {
       });
     },
 
+    /* 記點 */
+    handleViolation({ caseUserId, userId, id }) {
+      const vm = this;
+      vm.violationDialog = true;
+      vm.violationTemp = {
+        ...this.violationTemp,
+        caseUserId,
+        userId,
+        orderId: id,
+      };
+    },
+
+    /* 確認記點 */
+    handleConfirmViolation() {
+      const vm = this;
+      this.$cl(vm.violationTemp);
+      orderCaseUser.violation(vm.violationTemp).then((res) => {
+        this.$cl(res);
+        vm.violationTemp.point = 0;
+        vm.violationTemp.remark = "";
+        vm.violationDialog = false;
+      });
+    },
+
     /* 篩選訂單狀態 */
     handleSort(a) {
       this.listQuery.Status = a * 1;
@@ -416,10 +464,10 @@ export default {
     },
 
     /* 檢視訂單 */
-    handleCheck(id) {
-      this.$router.push({
-        path: `/ordercaseuser/check/${id}`,
-      });
+    handleCheck({ id, userId, caseUserId }) {
+      this.$router.push(
+        `/ordercaseuser/check/${id}?userId=${userId}&caseUserId=${caseUserId}`
+      );
     },
 
     /* 換頁 */

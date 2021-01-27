@@ -22,6 +22,14 @@ export function get(params) {
   });
 }
 
+export function getDespatch(params) {
+  return request({
+    url: "/Despatchs/GetByOrderId",
+    method: "get",
+    params,
+  });
+}
+
 export function addOrUpdate(data) {
   return request({
     url: "/despatchs/addOrUpdate",

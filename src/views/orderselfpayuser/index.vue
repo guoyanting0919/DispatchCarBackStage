@@ -95,13 +95,13 @@
                   <button class="orderButton orderEdit" @click="
                       editDialog = true;
                       getOrder(order.id);
-                    " v-if="(order.status == 1 || order.status == 2 || order.status == 3) && hasButton('edit') ">
+                    " v-if="[1,2,3].includes(order.status) && hasButton('edit') ">
                     編輯訂單
                   </button>
                   <button @click="handleDespatch(order)" class="orderButton orderStatus" v-if="hasButton('dispatch')">
                     快速預約
                   </button>
-                  <button class="orderButton orderCancel" v-if="(order.status == 1 || order.status == 2 || order.status == 3) && hasButton('cancel') " @click="handleCancelOrder(order.id)">
+                  <button class="orderButton orderCancel" v-if="[1,2,3].includes(order.status) && hasButton('cancel') " @click="handleCancelOrder(order.id)">
                     取消訂單
                   </button>
                 </div>

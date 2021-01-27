@@ -226,10 +226,10 @@ export default {
   min-height: 50%;
   display: flex;
   align-items: center;
-  color: rgba(0, 0, 0, 0.45);
+  color: rgba(0, 0, 0, 0.5);
 }
 .passengerList {
-  color: rgba(0, 0, 0, 0.45);
+  color: rgba(0, 0, 0, 0.5);
   p {
     margin: 0 0 4px 0;
   }

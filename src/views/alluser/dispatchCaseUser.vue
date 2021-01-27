@@ -172,7 +172,7 @@
                 </el-col>
                 <el-col :sm="24" :md="12">
                   <el-form-item label="預約回程(回居住地址)">
-                    <el-radio-group v-model="temp.isBack">
+                    <el-radio-group v-model="temp.isBackTemp">
                       <el-radio :label="true">是</el-radio>
                       <el-radio :label="false">否</el-radio>
                     </el-radio-group>
@@ -180,10 +180,10 @@
                 </el-col>
                 <el-col :sm="24" :md="12">
                   <el-form-item label="回程乘車時間">
-                    <el-time-select :disabled="!temp.isBack" v-model="temp.reTime" :picker-options="{
-                        start: '08:30',
-                        step: '00:15',
-                        end: '18:30',
+                    <el-time-select :disabled="!temp.isBackTemp" v-model="temp.reTime" :picker-options="{
+                        start: temp.time,
+                        step: '00:10',
+                        end: '20:00',
                       }" placeholder="請選擇回程乘車時間" style="width: 100%">
                     </el-time-select>
                   </el-form-item>
@@ -323,6 +323,7 @@ export default {
         fromRemark: "",
         toRemark: "",
         isBack: false,
+        isBackTemp: false,
         canShared: true,
         carCategoryId: "",
         carCategoryName: "",
@@ -717,7 +718,9 @@ export default {
             orderCaseUser.add(vm.temp).then((res) => {
               vm.$cl(res);
               //有預約回程時
-              if (vm.temp.isBack) {
+              if (vm.temp.isBackTemp) {
+                //變更isback:FIXME:
+                vm.temp.isBack = true;
                 //起迄點背著互換
                 vm.fromAddrRemark = vm.toAddrRemark;
                 //複製temp
@@ -779,7 +782,7 @@ export default {
 
         //預約回程
         () => {
-          if (data.isBack && data.reTime === null) {
+          if (data.isBackTemp && data.reTime === null) {
             return "請確實填寫回程乘車時間";
           } else {
             return true;
@@ -823,7 +826,7 @@ export default {
           console.log(res);
           this.temp = res.result;
           vm.$set(this.temp, "transOrgs", []);
-          vm.$set(this.temp, "isBack", false);
+          vm.$set(this.temp, "isBackTemp", false);
           vm.$set(this.temp, "reTime", null);
           vm.$set(this.temp, "date", "");
           vm.$set(this.temp, "time", "");
@@ -845,8 +848,8 @@ export default {
           ].includes(this.temp.fromAddrRemark)
             ? this.temp.fromAddrRemark
             : "其他";
-          vm.toAddr = vm.temp.fromAddr;
-          vm.fromAddr = vm.temp.toAddr;
+          vm.toAddr = vm.temp.toAddr;
+          vm.fromAddr = vm.temp.fromAddr;
           vm.$nextTick(() => {
             vm.setOldMarker({ lat: vm.temp.fromLat, lon: vm.temp.fromLon });
             vm.setOldMarker({ lat: vm.temp.toLat, lon: vm.temp.toLon });

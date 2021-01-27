@@ -53,13 +53,16 @@
             <el-col :sm="12" :md="12">
               <div class="inputBox">
                 <div class="inputLable">訂車人聯絡電話</div>
-                <div class="inputValue">{{ order.noticePhone }}</div>
+                <div class="inputValue">{{ order.userPhone }}</div>
               </div>
             </el-col>
             <el-col :sm="12" :md="12">
               <div class="inputBox">
                 <div class="inputLable">預約乘車時間</div>
-                <div class="inputValue">{{ order.reserveDate }}</div>
+                <div class="inputValue">
+                  {{ order.reserveDate | globalDateFilter('yyyy-MM-DD') }}
+                  {{ order.reserveDate | globalDateFilter('HH:mm') }}
+                </div>
               </div>
             </el-col>
             <el-col :sm="12" :md="12">
@@ -107,7 +110,7 @@
                 <div class="inputLable">乘車名單</div>
                 <div class="passengerList">
                   <p v-for="item in passengerList" :key="item.key">
-                    {{ item.name }} {{ item.birth }} {{ item.phone }}
+                    {{ item.name }} {{ item.birth | globalDateFilter('yyyy-MM-DD') }} {{ item.phone }}
                   </p>
                 </div>
               </div>
@@ -227,10 +230,10 @@ export default {
   min-height: 50%;
   display: flex;
   align-items: center;
-  color: rgba(0, 0, 0, 0.45);
+  color: rgba(0, 0, 0, 0.5);
 }
 .passengerList {
-  color: rgba(0, 0, 0, 0.45);
+  color: rgba(0, 0, 0, 0.5);
   p {
     margin: 0 0 4px 0;
   }

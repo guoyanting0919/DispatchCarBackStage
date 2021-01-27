@@ -225,33 +225,32 @@ export default {
     return {
       /* 今天日期 */
       today: "",
-
+      /* 權限按鈕 */
       buttons: [],
-      //車輛類別
+      /* 車輛類別 */
       carCategorysList: [],
-
       /* 用戶資料 */
       userInfo: "",
 
-      // table相關
+      /* table相關 */
       list: [],
       listLoading: false,
       listQuery: {
-        // 查詢條件
         page: 1,
         limit: 10,
         orgId: "",
         key: undefined,
       },
       total: "",
-      multipleSelection: [], // 列表checkbox選中的值
+
+      /* 列表checkbox選中的值 */
+      multipleSelection: [],
 
       // 表單相關
       labelPosition: "top",
       passengerArr: [],
       passengerNum: 1,
       temp: {
-        // 日期
         date: "",
         time: "",
         id: "",
@@ -272,9 +271,10 @@ export default {
         carCategoryId: null,
         CarCategoryName: "",
         wheelchairType: "",
-
         remark: [{ name: "", birth: "" }],
       },
+
+      /* 表單驗證 */
       rules: {
         date: [{ required: true, message: "必填欄位", tigger: "change" }],
         time: [{ required: true, message: "必填欄位", tigger: "change" }],
@@ -365,12 +365,11 @@ export default {
     /* 獲取歷史訂單 */
     getList() {
       const vm = this;
-      vm.listQuery.key = vm.$route.params.id.split("-")[0];
-      orderSelfPayUser.load(vm.listQuery).then((res) => {
-        vm.list = res.data;
-        vm.total = res.count;
+      vm.listQuery.userId = vm.$route.params.id.split("-")[0];
+      orderSelfPayUser.loadHistory(vm.listQuery).then((res) => {
+        this.$cl(res);
+        vm.list = res.result;
         vm.listLoading = false;
-        // console.log(vm.list);
       });
     },
 
@@ -458,8 +457,6 @@ export default {
       this.temp.remark = [{ name: "", birth: "", phone: "" }];
       this.$nextTick(() => {
         this.passengerArr = [];
-        // console.log(this.passengerArr);
-        // console.log(order.remark);
         this.passengerArr = JSON.parse(order.remark);
         console.log(this.passengerArr);
       });
@@ -467,7 +464,6 @@ export default {
 
     /* 回列表 */
     handleBack() {
-      //TODO:白牌用戶頁面跳轉記得換路徑
       this.$router.go(-1);
     },
 
@@ -487,15 +483,18 @@ export default {
 
     /* 起訖點互換 */
     handleChange() {
-      let ex = this.temp.fromAddr;
-      let exFlon = this.temp.fromLon;
-      let exFlat = this.temp.fromLat;
-      this.temp.fromLon = this.temp.toLon;
-      this.temp.fromLat = this.temp.toLat;
-      this.temp.toLon = exFlon;
-      this.temp.toLat = exFlat;
-      this.temp.fromAddr = this.temp.toAddr;
-      this.temp.toAddr = ex;
+      [this.temp.fromAddr, this.temp.toAddr] = [
+        this.temp.toAddr,
+        this.temp.fromAddr,
+      ];
+      [this.temp.fromLon, this.temp.toLon] = [
+        this.temp.toLon,
+        this.temp.fromLon,
+      ];
+      [this.temp.fromLat, this.temp.toLat] = [
+        this.temp.toLat,
+        this.temp.fromLat,
+      ];
     },
 
     /* 若params有order */

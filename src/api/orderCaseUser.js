@@ -16,6 +16,22 @@ export function loadNoOrg(params) {
   });
 }
 
+export function getUser(params) {
+  return request({
+    url: "/Users/GetClient",
+    method: "get",
+    params,
+  });
+}
+
+export function getCaseUser(params) {
+  return request({
+    url: "/CaseUsers/Get",
+    method: "get",
+    params,
+  });
+}
+
 export function get(params) {
   return request({
     url: "/orderOfCaseUsers/get",
@@ -24,9 +40,41 @@ export function get(params) {
   });
 }
 
+export function getDetail(params) {
+  return request({
+    url: "/orderOfCaseUsers/GetDetail",
+    method: "get",
+    params,
+  });
+}
+
+export function getHistory(params) {
+  return request({
+    url: "/orderOfCaseUsers/GetStatusLog",
+    method: "get",
+    params,
+  });
+}
+
+export function getPay(params) {
+  return request({
+    url: "/OrderPayOfCaseUsers/GetDetail",
+    method: "get",
+    params,
+  });
+}
+
 export function receive(data) {
   return request({
     url: "/orderOfCaseUsers/updateOrgId",
+    method: "post",
+    data,
+  });
+}
+
+export function violation(data) {
+  return request({
+    url: "/orderOfCaseUsers/AddOrderViolation",
     method: "post",
     data,
   });
