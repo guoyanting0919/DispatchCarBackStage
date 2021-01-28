@@ -204,11 +204,7 @@
     </div>
   </div>
 </template>
-<script
-  async
-  defer
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkLxJzOtyQ6Oyv4e1rTlMxGSixHr0to3Q"
-></script>
+
 <script>
 import moment from "moment";
 

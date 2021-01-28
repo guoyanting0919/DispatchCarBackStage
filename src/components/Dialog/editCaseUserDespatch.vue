@@ -150,12 +150,10 @@
     </span>
   </el-dialog>
 </template>
-<script
-  async
-  defer
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkLxJzOtyQ6Oyv4e1rTlMxGSixHr0to3Q"
-></script>
+
 <script>
+/* eslint-disable */
+
 import moment from "moment";
 import * as map from "@/api/map";
 export default {
