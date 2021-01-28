@@ -166,6 +166,9 @@
 
 <script>
 import moment from "moment";
+
+import pbMixins from "@/mixins/permissionBtn.js";
+
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import permissionBtn from "@/components/PermissionBtn";
@@ -180,6 +183,7 @@ import * as categorys from "@/api/categorys";
 import * as dispatch from "@/api/dispatchs";
 export default {
   name: "orderCaseUser",
+  mixins: [pbMixins],
   components: {
     Sticky,
     Title,
@@ -201,8 +205,6 @@ export default {
   },
   data() {
     return {
-      /* 權限按鈕 */
-      buttons: [],
       /* 車輛類別 */
       carCategorysList: [],
 
@@ -301,18 +303,6 @@ export default {
     },
   },
   methods: {
-    /* 獲取本路由下所有功能按鈕 */
-    getButtons() {
-      this.$route.meta.elements.forEach((el) => {
-        this.buttons.push(el.domId);
-      });
-    },
-
-    /* 是否擁有按鈕功能權限 */
-    hasButton(domId) {
-      return this.buttons.includes(domId);
-    },
-
     /* 獲取訂單 */
     getList() {
       const vm = this;
@@ -516,7 +506,6 @@ export default {
     },
   },
   mounted() {
-    this.getButtons();
     this.getList();
     this.getCarCategorys();
   },

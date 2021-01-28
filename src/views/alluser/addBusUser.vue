@@ -3,50 +3,25 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 權限按鈕 -->
-        <el-button size="mini" @click="handleSave" type="success" plain
-          >儲存</el-button
-        >
-        <el-button
-          size="mini"
-          v-if="$route.query.fast != 'undefined'"
-          @click="rolesDialog = true"
-          type="success"
-          plain
-          >儲存並繼續新增用戶其他身份</el-button
-        >
+        <el-button size="mini" @click="handleSave" type="success" plain>儲存</el-button>
+        <el-button size="mini" v-if="$route.query.fast != 'undefined'" @click="rolesDialog = true" type="success" plain>儲存並繼續新增用戶其他身份</el-button>
       </div>
     </sticky>
 
     <div class="app-container flex-item">
       <Title title="新增幸福巴士用戶基本資料"></Title>
       <div class="formContainer bg-white customScrollBar">
-        <el-form
-          :label-position="labelPosition"
-          label-width="200px"
-          :model="temp"
-          :rules="rules"
-          ref="form"
-        >
+        <el-form :label-position="labelPosition" label-width="200px" :model="temp" :rules="rules" ref="form">
           <SubTitle title="基本資料"></SubTitle>
           <el-row :gutter="16">
             <el-col :sm="12" :md="3">
               <el-form-item label="姓名">
-                <el-input
-                  disabled
-                  placeholder="請輸入用戶姓名"
-                  v-model="basicTemp.name"
-                ></el-input>
+                <el-input disabled placeholder="請輸入用戶姓名" v-model="basicTemp.name"></el-input>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="3">
               <el-form-item label="性別">
-                <el-select
-                  disabled
-                  clearable
-                  v-model="basicTemp.sex"
-                  placeholder="請選擇性別"
-                  style="width: 100%"
-                >
+                <el-select disabled clearable v-model="basicTemp.sex" placeholder="請選擇性別" style="width: 100%">
                   <el-option :value="1" :label="'男'">男</el-option>
                   <el-option :value="0" :label="'女'">女</el-option>
                 </el-select>
@@ -54,31 +29,17 @@
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="身份證字號">
-                <el-input
-                  disabled
-                  v-model="basicTemp.uid"
-                  placeholder="請輸入用戶身分證字號"
-                ></el-input>
+                <el-input disabled v-model="basicTemp.uid" placeholder="請輸入用戶身分證字號"></el-input>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="生日">
-                <el-date-picker
-                  disabled
-                  v-model="basicTemp.birthday"
-                  type="date"
-                  placeholder="請選擇生日"
-                  style="width: 100%"
-                ></el-date-picker>
+                <el-date-picker disabled v-model="basicTemp.birthday" type="date" placeholder="請選擇生日" style="width: 100%"></el-date-picker>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="手機">
-                <el-input
-                  disabled
-                  v-model="basicTemp.phone"
-                  placeholder="請輸入手機"
-                ></el-input>
+                <el-input disabled v-model="basicTemp.phone" placeholder="請輸入手機"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -87,10 +48,7 @@
           <el-row :gutter="16">
             <el-col :sm="12" :md="6">
               <el-form-item label="卡號" prop="cardNo">
-                <el-input
-                  v-model="temp.cardNo"
-                  placeholder="請輸入卡號"
-                ></el-input>
+                <el-input v-model="temp.cardNo" placeholder="請輸入卡號"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -99,26 +57,10 @@
     </div>
 
     <!-- rolesDialog -->
-    <el-dialog
-      title="請選擇欲新增的身份"
-      :visible.sync="rolesDialog"
-      width="500px"
-    >
+    <el-dialog title="請選擇欲新增的身份" :visible.sync="rolesDialog" width="500px">
       <div class="rolesBox">
-        <el-button
-          v-if="hasButton('addCaseUser')"
-          type="primary"
-          plain
-          @click="handleRole('1')"
-          >長照身份</el-button
-        >
-        <el-button
-          v-if="hasButton('addSelfPayUser')"
-          type="primary"
-          plain
-          @click="handleRole('2')"
-          >白牌身份</el-button
-        >
+        <el-button v-if="hasButton('addCaseUser')" type="primary" plain @click="handleRole('1')">長照身份</el-button>
+        <el-button v-if="hasButton('addSelfPayUser')" type="primary" plain @click="handleRole('2')">白牌身份</el-button>
         <!-- <el-button
           v-if="hasButton('addBusUser')"
           type="primary"
@@ -170,7 +112,7 @@ export default {
   },
   methods: {
     //獲取特殊修改權限
-    getButtons() {
+    getSpecialButtons() {
       let router2 = this.$store.getters.modules;
       let a = router2.filter((r) => {
         return r.item.name == "用戶資料";
@@ -256,7 +198,7 @@ export default {
     },
   },
   mounted() {
-    this.getButtons();
+    this.getSpecialButtons();
     this.getUserBasic();
   },
 };

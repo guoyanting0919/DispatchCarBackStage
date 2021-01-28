@@ -3,100 +3,32 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 關鍵字搜尋 -->
-        <el-input
-          style="width: 200px; margin-right: 0.5rem"
-          size="mini"
-          v-model="value"
-          clearable
-          placeholder="請輸入關鍵字"
-        ></el-input>
-        <el-select
-          size="mini"
-          @change="end = end + 200"
-          v-model="value"
-          clearable
-          placeholder="可否派發"
-          style="margin-right: 0.5rem"
-        >
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
+        <el-input style="width: 200px; margin-right: 0.5rem" size="mini" v-model="value" clearable placeholder="請輸入關鍵字"></el-input>
+        <el-select size="mini" @change="end = end + 200" v-model="value" clearable placeholder="可否派發" style="margin-right: 0.5rem">
+          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
 
         <!-- 公司選擇 -->
-        <el-select
-          size="mini"
-          v-model="value"
-          clearable
-          placeholder="請選擇公司"
-        >
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
+        <el-select size="mini" v-model="value" clearable placeholder="請選擇公司">
+          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
         <!-- 權限按鈕 -->
-        <permission-btn
-          moduleName="builderTables"
-          size="mini"
-          v-on:btn-event="onBtnClicked"
-        ></permission-btn>
+        <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
       </div>
     </sticky>
     <div class="app-container flex-item">
       <Title title="司機資料"></Title>
       <div class="bg-white" style="height: calc(100% - 50px)">
-        <el-table
-          ref="mainTable"
-          height="calc(100% - 52px)"
-          :data="list"
-          v-loading="listLoading"
-          v-if="list"
-          border
-          fit
-          highlight-current-row
-          style="width: 100%"
-          @selection-change="handleSelectionChange"
-          @row-click="rowClick"
-        >
-          <el-table-column
-            type="selection"
-            width="55"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            property="userName"
-            label="姓名"
-            width="120"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            property="uid"
-            label="身分證字號"
-            min-width="140"
-            align="center"
-          >
+        <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" v-loading="listLoading" v-if="list" border fit highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" @row-click="rowClick">
+          <el-table-column type="selection" width="55" align="center"></el-table-column>
+          <el-table-column property="userName" label="姓名" width="120" align="center"></el-table-column>
+          <el-table-column property="uid" label="身分證字號" min-width="140" align="center">
             <template slot-scope="scope">
               {{ scope.row.uid | hideFilter }}
             </template>
           </el-table-column>
-          <el-table-column
-            property="phone"
-            label="手機"
-            width="250"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            property="status"
-            label="狀態"
-            width="130"
-            align="center"
-          >
+          <el-table-column property="phone" label="手機" width="250" align="center"></el-table-column>
+          <el-table-column property="status" label="狀態" width="130" align="center">
             <template slot-scope="scope">
               <div>
                 <el-tag v-if="scope.row.status" type="success">可派發</el-tag>
@@ -104,59 +36,34 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column
-            property="setting"
-            label="操作"
-            :fixed="isMobile()"
-            width="220"
-          >
+          <el-table-column property="setting" label="操作" :fixed="isMobile()" width="220">
             <template slot-scope="scope">
               <div class="buttonFlexBox">
-                <el-button
-                  size="mini"
-                  type="warning"
-                  @click="handleEdit(scope.row)"
-                  v-if="hasButton('edit')"
-                  >編輯</el-button
-                >
-                <el-button
-                  size="mini"
-                  type="success"
-                  @click="handleDetail(scope.row)"
-                  v-if="hasButton('check')"
-                  >檢視</el-button
-                >
-                <el-button
-                  size="mini"
-                  type="danger"
-                  @click="handleDelete(scope.row)"
-                  v-if="hasButton('delete')"
-                  >刪除</el-button
-                >
+                <el-button size="mini" type="warning" @click="handleEdit(scope.row)" v-if="hasButton('edit')">編輯</el-button>
+                <el-button size="mini" type="success" @click="handleDetail(scope.row)" v-if="hasButton('check')">檢視</el-button>
+                <el-button size="mini" type="danger" @click="handleDelete(scope.row)" v-if="hasButton('delete')">刪除</el-button>
               </div>
             </template>
           </el-table-column>
         </el-table>
-        <pagination
-          v-show="total > 0"
-          :total="total"
-          :page.sync="listQuery.page"
-          :limit.sync="listQuery.limit"
-          @pagination="handleCurrentChange"
-        />
+        <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handleCurrentChange" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import pbMixins from "@/mixins/permissionBtn.js";
+
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import permissionBtn from "@/components/PermissionBtn";
 import Pagination from "@/components/Pagination";
+
 import * as drivers from "@/api/drivers";
 export default {
   name: "driver",
+  mixins: [pbMixins],
   components: {
     Sticky,
     Title,
@@ -165,7 +72,6 @@ export default {
   },
   data() {
     return {
-      buttons: [],
       value: "",
       options: [
         {
@@ -210,17 +116,7 @@ export default {
         return "right";
       }
     },
-    // 獲取本路由下所有功能按鈕
-    getButtons() {
-      this.$route.meta.elements.forEach((el) => {
-        // console.log(el.domId);
-        this.buttons.push(el.domId);
-      });
-    },
-    // 是否擁有按鈕功能權限
-    hasButton(domId) {
-      return this.buttons.includes(domId);
-    },
+
     // 獲取所有司機
     getList() {
       const vm = this;
@@ -333,7 +229,6 @@ export default {
     },
   },
   mounted() {
-    this.getButtons();
     this.getList();
   },
 };

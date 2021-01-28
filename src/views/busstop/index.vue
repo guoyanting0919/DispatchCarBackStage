@@ -3,19 +3,9 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 關鍵字搜尋 -->
-        <el-input
-          style="width: 200px; margin-right: 0.5rem"
-          size="mini"
-          v-model="value"
-          clearable
-          placeholder="請輸入關鍵字"
-        ></el-input>
+        <el-input style="width: 200px; margin-right: 0.5rem" size="mini" v-model="value" clearable placeholder="請輸入關鍵字"></el-input>
         <!-- 權限按鈕 -->
-        <permission-btn
-          moduleName="builderTables"
-          size="mini"
-          v-on:btn-event="onBtnClicked"
-        ></permission-btn>
+        <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
       </div>
     </sticky>
 
@@ -23,106 +13,51 @@
       <!-- 站牌管理 -->
       <Title title="站牌管理"></Title>
       <div class="bg-white" style="height: calc(100% - 50px)">
-        <el-table
-          ref="mainTable"
-          height="calc(100% - 52px)"
-          :data="list"
-          border
-          fit
-          v-loading="listLoading"
-          highlight-current-row
-          style="width: 100%"
-          @selection-change="handleSelectionChange"
-          @row-click="rowClick"
-        >
-          <el-table-column
-            type="selection"
-            width="55"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            property="createDate"
-            label="建立日期"
-            width="200"
-            align="center"
-          >
+        <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" border fit v-loading="listLoading" highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" @row-click="rowClick">
+          <el-table-column type="selection" width="55" align="center"></el-table-column>
+          <el-table-column property="createDate" label="建立日期" width="200" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.createDate | dateFilter }}</span>
             </template>
           </el-table-column>
-          <el-table-column
-            property="stationName"
-            label="站牌名稱(中文)"
-            width="200"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            property="stationCode"
-            label="站牌名稱(英文)"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            property="lon"
-            label="經度"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            property="lat"
-            label="緯度"
-            align="center"
-          ></el-table-column>
+          <el-table-column property="stationName" label="站牌名稱(中文)" width="200" align="center"></el-table-column>
+          <el-table-column property="stationCode" label="站牌名稱(英文)" align="center"></el-table-column>
+          <el-table-column property="lon" label="經度" align="center"></el-table-column>
+          <el-table-column property="lat" label="緯度" align="center"></el-table-column>
 
-          <el-table-column
-            property="setting"
-            label="操作"
-            fixed="right"
-            width="166"
-          >
+          <el-table-column property="setting" label="操作" fixed="right" width="166">
             <template slot-scope="scope">
               <div class="buttonFlexBox">
-                <el-button
-                  size="mini"
-                  @click="handleEdit(scope.row)"
-                  type="success"
-                  v-if="hasButton('edit')"
-                  >編輯</el-button
-                >
-                <el-button
-                  size="mini"
-                  @click="handleDelete(scope.row)"
-                  type="danger"
-                  v-if="hasButton('delete')"
-                  >刪除</el-button
-                >
+                <el-button size="mini" @click="handleEdit(scope.row)" type="success" v-if="hasButton('edit')">編輯</el-button>
+                <el-button size="mini" @click="handleDelete(scope.row)" type="danger" v-if="hasButton('delete')">刪除</el-button>
               </div>
             </template>
           </el-table-column>
 
           <!-- <el-table-column property="address" label="地址"></el-table-column> -->
         </el-table>
-        <pagination
-          v-show="total > 0"
-          :total="total"
-          :page.sync="listQuery.page"
-          :limit.sync="listQuery.limit"
-          @pagination="handleCurrentChange"
-        />
+        <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handleCurrentChange" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import moment from "moment";
+
+import pbMixins from "@/mixins/permissionBtn.js";
+
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import permissionBtn from "@/components/PermissionBtn";
 import elDragDialog from "@/directive/el-dragDialog";
 import Pagination from "@/components/Pagination";
+
 import * as busStations from "@/api/busStations";
-import moment from "moment";
 
 export default {
   name: "busStop",
+  mixins: [pbMixins],
   components: {
     Sticky,
     Title,
@@ -135,7 +70,6 @@ export default {
   data() {
     return {
       value: "",
-      buttons: [],
       // 表格相關
       list: [],
       listLoading: false,
@@ -156,16 +90,6 @@ export default {
     },
   },
   methods: {
-    // 獲取本路由下所有功能按鈕
-    getButtons() {
-      this.$route.meta.elements.forEach((el) => {
-        this.buttons.push(el.domId);
-      });
-    },
-    // 是否擁有按鈕功能權限
-    hasButton(domId) {
-      return this.buttons.includes(domId);
-    },
     // 獲取巴士站牌資料
     getList() {
       const vm = this;
@@ -268,7 +192,6 @@ export default {
     },
   },
   mounted() {
-    this.getButtons();
     this.getList();
   },
 };

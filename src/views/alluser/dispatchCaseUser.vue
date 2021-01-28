@@ -256,7 +256,7 @@
 <script>
 import moment from "moment";
 
-import acMixins from "@/utils/acMixins.js";
+import acMixins from "@/mixins/autoComplete.js";
 
 import Sticky from "@/components/Sticky";
 

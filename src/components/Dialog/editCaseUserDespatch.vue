@@ -152,7 +152,7 @@
 </template>
 
 <script>
-import acMixins from "@/utils/acMixins.js";
+import acMixins from "@/mixins/autoComplete.js";
 
 import moment from "moment";
 export default {
