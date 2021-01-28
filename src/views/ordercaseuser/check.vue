@@ -12,14 +12,24 @@
           <div class="userInfo">
             <SubTitle title="訂單資訊"></SubTitle>
             <el-row :gutter="16" v-if="order">
-              <el-col :sm="12" :md="12">
+              <el-col :sm="12" :md="8">
                 <div class="inputBox">
                   <div class="inputLable">訂單編號</div>
                   <div class="inputValue">{{ order.orderNo }}</div>
                 </div>
               </el-col>
 
-              <el-col :sm="12" :md="12">
+              <el-col :sm="12" :md="8">
+                <div class="inputBox">
+                  <div class="inputLable">預約乘車時間</div>
+                  <div class="inputValue">
+                    {{ order.reserveDate | globalDateFilter('yyyy-MM-DD') }}
+                    {{ order.reserveDate | globalDateFilter('HH:mm') }}
+                  </div>
+                </div>
+              </el-col>
+
+              <el-col :sm="12" :md="8">
                 <div class="inputBox">
                   <div class="inputLable">訂單狀態</div>
                   <div class="inputValue">
@@ -29,34 +39,35 @@
                 </div>
               </el-col>
 
-              <el-col :sm="12" :md="12">
+              <el-col :sm="12" :md="8">
                 <div class="inputBox">
                   <div class="inputLable">個案姓名</div>
                   <div class="inputValue">{{ order.userName }}</div>
                 </div>
               </el-col>
 
-              <el-col :sm="12" :md="12">
+              <el-col :sm="12" :md="8">
                 <div class="inputBox">
                   <div class="inputLable">身分證字號</div>
                   <div class="inputValue">{{ order.userUID }}</div>
                 </div>
               </el-col>
 
-              <el-col :sm="12" :md="12">
+              <el-col :sm="12" :md="8">
                 <div class="inputBox">
                   <div class="inputLable">個案編號</div>
                   <div class="inputValue">{{ order.caseUserNo }}</div>
                 </div>
               </el-col>
 
-              <el-col :sm="12" :md="12">
+              <el-col :sm="24" :md="24">
+                <div class="dashLine"></div>
+              </el-col>
+
+              <el-col :sm="12" :md="8">
                 <div class="inputBox">
-                  <div class="inputLable">預約乘車時間</div>
-                  <div class="inputValue">
-                    {{ order.reserveDate | globalDateFilter('yyyy-MM-DD') }}
-                    {{ order.reserveDate | globalDateFilter('HH:mm') }}
-                  </div>
+                  <div class="inputLable">訂車人身份</div>
+                  <div class="inputValue">{{order.createdIdentity}}</div>
                 </div>
               </el-col>
 
@@ -69,15 +80,8 @@
 
               <el-col :sm="12" :md="8">
                 <div class="inputBox">
-                  <div class="inputLable">行程</div>
-                  <div class="inputValue">目前沒有</div>
-                </div>
-              </el-col>
-
-              <el-col :sm="12" :md="8">
-                <div class="inputBox">
-                  <div class="inputLable">訂車人身份</div>
-                  <div class="inputValue">{{order.createdIdentity}}</div>
+                  <div class="inputLable">陪同人數</div>
+                  <div class="inputValue">{{ order.familyWith }} 人</div>
                 </div>
               </el-col>
 
@@ -85,13 +89,6 @@
                 <div class="inputBox">
                   <div class="inputLable">共乘</div>
                   <div class="inputValue">{{ order.canShared ?'願意共乘':'不願共乘' }}</div>
-                </div>
-              </el-col>
-
-              <el-col :sm="12" :md="8">
-                <div class="inputBox">
-                  <div class="inputLable">陪同人數</div>
-                  <div class="inputValue">{{ order.familyWith }} 人</div>
                 </div>
               </el-col>
 
@@ -137,12 +134,13 @@
                 </div>
               </el-col>
 
-              <el-col :sm="12" :md="8">
+              <el-col :sm="12" :md="12">
                 <div class="inputBox">
                   <div class="inputLable">預估應收</div>
                   <div class="inputValue">${{ order.etSelfPay + order.etWithAmt }}</div>
                 </div>
               </el-col>
+
               <!-- 緊急聯絡人資訊 -->
               <el-col :sm="12" :md="6" class="colorBlock">
                 <div class="inputBox flexInputBox">
@@ -182,43 +180,43 @@
           <div class="userInfo">
             <SubTitle title="乘車資訊"></SubTitle>
             <el-row :gutter="16" v-if="order">
-              <el-col :sm="12" :md="24">
+              <el-col :sm="12" :md="12">
                 <div class="inputBox">
                   <div class="inputLable">承接車行</div>
                   <div class="inputValue">{{ order.orgName }}</div>
                 </div>
               </el-col>
 
-              <el-col :sm="12" :md="12">
+              <el-col :sm="12" :md="6">
                 <div class="inputBox">
                   <div class="inputLable">司機</div>
                   <div class="inputValue">{{despatch.driverName || '尚未排班'}} </div>
                 </div>
               </el-col>
 
-              <el-col :sm="12" :md="12">
+              <el-col :sm="12" :md="6">
                 <div class="inputBox">
                   <div class="inputLable">車輛</div>
                   <div class="inputValue">{{despatch.carNo || '尚未排班'}} </div>
                 </div>
               </el-col>
 
-              <el-col :sm="12" :md="8" class="colorBlock">
-                <div class="inputBox flexInputBox">
+              <el-col :sm="12" :md="12">
+                <div class="inputBox ">
                   <div class="inputLable">行程</div>
                   <div class="inputValue">{{order.isBack ? '回程' : '去程'}}</div>
                 </div>
               </el-col>
 
-              <el-col :sm="12" :md="8" class="colorBlock">
-                <div class="inputBox flexInputBox">
+              <el-col :sm="12" :md="6">
+                <div class="inputBox ">
                   <div class="inputLable">預估里程數</div>
                   <div class="inputValue">{{order.totalMileage / 1000}} 公里</div>
                 </div>
               </el-col>
 
-              <el-col :sm="12" :md="8" class="colorBlock">
-                <div class="inputBox flexInputBox">
+              <el-col :sm="12" :md="6">
+                <div class="inputBox ">
                   <div class="inputLable">預估行車時間</div>
                   <div class="inputValue">{{order.expectedMinute}} 分鐘</div>
                 </div>
@@ -227,21 +225,21 @@
               <el-col :sm="12" :md="24" class="colorBlock">
                 <div class="inputBox" style="height:auto;margin-bottom:1rem">
                   <div class="inputLable"><i class="iconfont icon-circle"></i>起點 ({{order.fromAddrRemark}})</div>
-                  <div class="inputValue" style="margin:0.5rem 0">{{order.fromAddr}}</div>
-                  <div class="inputValue" style="margin:0.5rem 0">緯度:{{order.fromLat}} 經度:{{order.fromLon}}</div>
+                  <div class="inputValue" style="margin:0.75rem 0">{{order.fromAddr}}</div>
+                  <div class="inputValue" style="margin:0.75rem 0">緯度:{{order.fromLat}} 經度:{{order.fromLon}}</div>
                 </div>
               </el-col>
 
               <el-col :sm="12" :md="24" class="colorBlock">
                 <div class="inputBox" style="height:auto;margin-bottom:1rem">
                   <div class="inputLable"><i class="iconfont icon-Vector10"></i>迄點 ({{order.toAddrRemark}})</div>
-                  <div class="inputValue" style="margin:0.5rem 0">{{order.toAddr}}</div>
-                  <div class="inputValue" style="margin:0.5rem 0">緯度:{{order.toLat}} 經度:{{order.toLon}}</div>
+                  <div class="inputValue" style="margin:0.75rem 0">{{order.toAddr}}</div>
+                  <div class="inputValue" style="margin:0.75rem 0">緯度:{{order.toLat}} 經度:{{order.toLon}}</div>
                 </div>
               </el-col>
 
               <el-col :sm="12" :md="24">
-                <div class="inputBox">
+                <div class="inputBox" style="margin-top:1rem">
                   <div class="inputLable">共乘訂單編號</div>
                   <div class="inputValue" style="flex-direction: column;align-items: flex-start;">
                     <p style="margin:.25rem 0" v-for="item in despatch.orderNos" :key="item">{{item}}</p>
@@ -500,6 +498,7 @@ export default {
   height: 30%;
   display: flex;
   align-items: center;
+  font-weight: 700;
   color: rgba(0, 0, 0, 0.85);
 }
 .inputValue {
@@ -527,10 +526,18 @@ export default {
 }
 .colorBlock {
   background: $--color-primary-light-9;
+  padding: 1rem;
 
   .iconfont {
     color: $--color-primary;
     margin-right: 0.25rem;
   }
+}
+
+.dashLine {
+  width: 100%;
+  height: 1px;
+  border-top: 2px dashed #aaaaaa;
+  margin-bottom: 1rem;
 }
 </style>

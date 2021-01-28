@@ -151,7 +151,7 @@ router.beforeEach((to, from, next) => {
         });
       } else {
         // 普通登錄方式
-        console.log(getToken());
+        // console.log(getToken());
         if (getToken()) {
           if (to.path === "/login") {
             // 登錄後login自動跳轉
