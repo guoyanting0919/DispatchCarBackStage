@@ -55,11 +55,14 @@
             <div class="orderCenter">
               <div class="orderCenterTitle">
                 <p class="isCarpool">
-                  <span v-if="order.canShared">可共乘</span>
-                  <span v-else>不可共乘</span>
+                  <!-- <span v-if="order.canShared">可共乘</span>
+                  <span v-else>不可共乘</span> -->
+                  <span :class="[order.canShared ? 'shared' : 'notShared']">
+                    <i class="iconfont" :class="[order.canShared ? 'icon-circle' : 'icon-delete']"></i>
+                    {{order.canShared ? '可共乘' : '不可共乘'}}
+                  </span>
                 </p>
                 <!-- <span>預估時間</span> -->
-
                 <p>陪同人數：{{ order.familyWith }}人</p>
               </div>
               <div class="orderCenterDetail">
@@ -107,7 +110,7 @@
                   <button @click="handleDespatch(order)" class="orderButton orderStatus" v-if="hasButton('dispatch')">
                     快速預約
                   </button>
-                  <button class="orderButton orderCancel" v-if="order.status == 1" @click="handleCancelOrder(order.id)">
+                  <button class="orderButton orderCancel" v-if="order.status == 1" @click="handleCancelOrder(order)">
                     取消訂單
                   </button>
                   <!-- <button class="orderButton orderCancel" v-if="order.status == 2" @click="handleCancelDispatch(order.despatchNo)">
@@ -127,7 +130,7 @@
     <EditDialog :temp="temp" :editDialogProp="editDialog" :carCategorysList="carCategorysList" @handleEdit="handleEdit" @handleClose="handleClose"></EditDialog>
 
     <!-- violation dialog -->
-    <el-dialog title="記點" :visible.sync="violationDialog" width="475px" :before-close="handleClose">
+    <el-dialog title="記點" :visible.sync="violationDialog" width="475px">
       <el-form ref="dataForm" :model="violationTemp" label-position="right" label-width="80px">
         <el-form-item size="mini" :label="'記點點數'">
           <el-input-number v-model="violationTemp.point" :min="0" :max="10"></el-input-number>
@@ -139,6 +142,22 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="violationDialog = false">取 消</el-button>
+        <el-button type="danger" @click="handleConfirmViolation">確 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- cancel dialog -->
+    <el-dialog title='取消訂單' :visible.sync="cancelDialog" width="475px">
+      <el-form ref="dataForm" :model="orderTemp" label-position="right" label-width="80px">
+        <el-form-item size="mini" :label="'記點點數'">
+          <el-input-number v-model="violationTemp.point" :min="0" :max="10"></el-input-number>
+        </el-form-item>
+        <el-form-item size="mini" :label="'記點原因'">
+          <el-input v-model="violationTemp.remark"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cancelDialog = false">取 消</el-button>
         <el-button type="danger" @click="handleConfirmViolation">確 定</el-button>
       </span>
     </el-dialog>
@@ -244,9 +263,13 @@ export default {
         remark: "",
       },
 
+      /* 取消訂單temp */
+      orderTemp: "",
+
       /* dialog */
       violationDialog: false,
       editDialog: false,
+      cancelDialog: false,
 
       /* order status mapping */
       orderStatusMapping: [
@@ -448,19 +471,27 @@ export default {
     },
 
     /* 取消訂單 */
-    handleCancelOrder(id) {
+    handleCancelOrder({ id }) {
       const vm = this;
-      let params = {
-        id,
-        cancelRemark: "SYS_ORDERCANCEL_REMARK_ADMIN",
-      };
-      orderCaseUser.cancel(params).then((res) => {
-        vm.$alertT.fire({
-          icon: "success",
-          title: res.message,
+      vm.$cl(id);
+      orderCaseUser.getDetail({ orderId: id }).then((res) => {
+        this.$cl(res);
+        vm.orderTemp = res.result;
+        vm.$nextTick(() => {
+          vm.cancelDialog = true;
         });
-        vm.getList();
       });
+      // let params = {
+      //   id,
+      //   cancelRemark: "SYS_ORDERCANCEL_REMARK_ADMIN",
+      // };
+      // orderCaseUser.cancel(params).then((res) => {
+      //   vm.$alertT.fire({
+      //     icon: "success",
+      //     title: res.message,
+      //   });
+      //   vm.getList();
+      // });
     },
 
     /* 檢視訂單 */
@@ -614,6 +645,13 @@ export default {
 .isCarpool {
   margin-right: auto;
   color: $--color-primary;
+
+  .shared {
+    color: $--color-success;
+  }
+  .notShared {
+    color: $--color-danger;
+  }
 }
 
 .wheelchairType {

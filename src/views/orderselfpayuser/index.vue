@@ -54,8 +54,10 @@
             <div class="orderCenter">
               <div class="orderCenterTitle">
                 <p class="isCarpool">
-                  <span v-if="order.canShared">可共乘</span>
-                  <span v-else>不可共乘</span>
+                  <span :class="[order.canShared ? 'shared' : 'notShared']">
+                    <i class="iconfont" :class="[order.canShared ? 'icon-circle' : 'icon-delete']"></i>
+                    {{order.canShared ? '可共乘' : '不可共乘'}}
+                  </span>
                 </p>
                 <!-- <span>預估時間</span> -->
 

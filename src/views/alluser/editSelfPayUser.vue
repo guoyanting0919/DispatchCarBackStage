@@ -3,25 +3,16 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 權限按鈕 -->
-        <el-button size="mini" @click="handleSave" type="success" plain
-          >儲存</el-button
-        >
+        <el-button size="mini" @click="handleSave" type="success" plain>儲存</el-button>
       </div>
     </sticky>
 
     <div class="app-container flex-item">
       <Title title="編輯白牌個案資料"></Title>
       <div class="formContainer bg-white customScrollBar">
-        <el-form
-          :label-position="labelPosition"
-          label-width="200px"
-          :model="temp"
-          :rules="rules"
-          ref="form"
-        >
+        <el-form :label-position="labelPosition" label-width="200px" :model="temp" :rules="rules" ref="form">
           <SubTitle title="基本資料"></SubTitle>
           <DisabledUserInfo :temp="basicTemp"></DisabledUserInfo>
-
           <SubTitle title="白牌資料"></SubTitle>
           <el-row :gutter="16">
             <el-col :sm="24" :md="24">
@@ -29,53 +20,23 @@
                 <el-row :gutter="16">
                   <el-col :sm="12" :md="6" style="margin-bottom: 1rem">
                     <el-form-item prop="county">
-                      <el-select
-                        @clear="handleClear"
-                        @change="handleClear"
-                        v-model="temp.county"
-                        clearable
-                        placeholder="請選擇居住縣市"
-                        style="width: 100%"
-                      >
-                        <el-option
-                          v-for="(conty, key, index) in taiwanCity"
-                          :key="index"
-                          :value="key"
-                          :label="key"
-                        ></el-option>
+                      <el-select @clear="handleClear" @change="handleClear" v-model="temp.county" clearable placeholder="請選擇居住縣市" style="width: 100%">
+                        <el-option v-for="(conty, key, index) in taiwanCity" :key="index" :value="key" :label="key"></el-option>
                       </el-select>
                     </el-form-item>
                   </el-col>
-                  <el-col
-                    :sm="12"
-                    :md="6"
-                    style="margin-bottom: 1rem"
-                    v-if="temp.county"
-                  >
+                  <el-col :sm="12" :md="6" style="margin-bottom: 1rem" v-if="temp.county">
                     <el-form-item prop="district">
-                      <el-select
-                        @clear="handleClear"
-                        v-model="temp.district"
-                        placeholder="請選擇居住區域"
-                        style="width: 100%"
-                      >
-                        <el-option
-                          v-for="(district, key, index) in taiwanCity[
+                      <el-select @clear="handleClear" v-model="temp.district" placeholder="請選擇居住區域" style="width: 100%">
+                        <el-option v-for="(district, key, index) in taiwanCity[
                             temp.county
-                          ]"
-                          :key="index"
-                          :value="district.value"
-                          :label="district.label"
-                        ></el-option>
+                          ]" :key="index" :value="district.value" :label="district.label"></el-option>
                       </el-select>
                     </el-form-item>
                   </el-col>
                   <el-col :sm="24" :md="12" v-if="temp.district">
                     <el-form-item prop="addr">
-                      <el-input
-                        placeholder="請輸入居住地址"
-                        v-model="temp.addr"
-                      ></el-input>
+                      <el-input placeholder="請輸入居住地址" v-model="temp.addr"></el-input>
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -93,9 +54,11 @@ import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import SubTitle from "@/components/SubTitle";
 import DisabledUserInfo from "@/components/DisabledUserInfo";
+
 import * as taiwan from "@/assets/taiwan.js";
 import * as users from "@/api/users";
 import * as selfPayUsers from "@/api/selfPayUsers";
+
 export default {
   name: "allUserAdd",
   components: {

@@ -252,11 +252,7 @@
     </el-dialog>
   </div>
 </template> 
-<script
-  async
-  defer
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkLxJzOtyQ6Oyv4e1rTlMxGSixHr0to3Q"
-></script>
+
 <script>
 import moment from "moment";
 import Sticky from "@/components/Sticky";
@@ -393,6 +389,7 @@ export default {
   },
   methods: {
     /* 初始化google map */
+    /* eslint-disable */
     initMap() {
       const vm = this;
       let dD = new google.maps.DirectionsRenderer();

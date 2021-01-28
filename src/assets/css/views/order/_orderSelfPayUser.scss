@@ -115,6 +115,13 @@
   .isCarpool {
     margin-right: auto;
     color: $--color-primary;
+
+    .shared {
+      color: $--color-success;
+    }
+    .notShared {
+      color: $--color-danger;
+    }
   }
 
   .wheelchairType {

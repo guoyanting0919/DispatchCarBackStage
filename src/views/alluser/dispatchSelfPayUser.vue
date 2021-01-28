@@ -204,18 +204,26 @@
     </div>
   </div>
 </template>
-
+<script
+  async
+  defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkLxJzOtyQ6Oyv4e1rTlMxGSixHr0to3Q"
+></script>
 <script>
 import moment from "moment";
+
+import acMixins from "@/utils/acMixins.js";
+
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
-// import Pagination from "@/components/Pagination";
 import SubTitle from "@/components/SubTitle";
+
 import * as categorys from "@/api/categorys";
 import * as user from "@/api/users";
 import * as orderSelfPayUser from "@/api/orderSelfPayUser";
 export default {
   name: "dispatchSelfPay",
+  mixins: [acMixins],
   components: {
     Sticky,
     Title,

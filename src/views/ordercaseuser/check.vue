@@ -145,28 +145,28 @@
               </el-col>
               <!-- 緊急聯絡人資訊 -->
               <el-col :sm="12" :md="6" class="colorBlock">
-                <div class="inputBox">
+                <div class="inputBox flexInputBox">
                   <div class="inputLable">緊急聯絡人</div>
                   <div class="inputValue">{{caseUser.urgentName }}</div>
                 </div>
               </el-col>
 
               <el-col :sm="12" :md="6" class="colorBlock">
-                <div class="inputBox">
+                <div class="inputBox flexInputBox">
                   <div class="inputLable">關係</div>
                   <div class="inputValue">{{caseUser.urgentRelationship }}</div>
                 </div>
               </el-col>
 
               <el-col :sm="12" :md="6" class="colorBlock">
-                <div class="inputBox">
+                <div class="inputBox flexInputBox">
                   <div class="inputLable">手機</div>
                   <div class="inputValue">{{caseUser.urgentPhone }}</div>
                 </div>
               </el-col>
 
               <el-col :sm="12" :md="6" class="colorBlock">
-                <div class="inputBox">
+                <div class="inputBox flexInputBox">
                   <div class="inputLable">市話</div>
                   <div class="inputValue">{{caseUser.urgentTel }}</div>
                 </div>
@@ -204,21 +204,21 @@
               </el-col>
 
               <el-col :sm="12" :md="8" class="colorBlock">
-                <div class="inputBox">
+                <div class="inputBox flexInputBox">
                   <div class="inputLable">行程</div>
                   <div class="inputValue">{{order.isBack ? '回程' : '去程'}}</div>
                 </div>
               </el-col>
 
               <el-col :sm="12" :md="8" class="colorBlock">
-                <div class="inputBox">
+                <div class="inputBox flexInputBox">
                   <div class="inputLable">預估里程數</div>
                   <div class="inputValue">{{order.totalMileage / 1000}} 公里</div>
                 </div>
               </el-col>
 
               <el-col :sm="12" :md="8" class="colorBlock">
-                <div class="inputBox">
+                <div class="inputBox flexInputBox">
                   <div class="inputLable">預估行車時間</div>
                   <div class="inputValue">{{order.expectedMinute}} 分鐘</div>
                 </div>
@@ -243,8 +243,8 @@
               <el-col :sm="12" :md="24">
                 <div class="inputBox">
                   <div class="inputLable">共乘訂單編號</div>
-                  <div class="inputValue">
-                    <span v-for="item in despatch.orderNos" :key="item">{{item}} </span>
+                  <div class="inputValue" style="flex-direction: column;align-items: flex-start;">
+                    <p style="margin:.25rem 0" v-for="item in despatch.orderNos" :key="item">{{item}}</p>
                   </div>
                 </div>
               </el-col>
@@ -518,6 +518,12 @@ export default {
   text-align: center;
   color: red;
   margin-bottom: 0.5rem;
+}
+.flexInputBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .colorBlock {
   background: $--color-primary-light-9;
