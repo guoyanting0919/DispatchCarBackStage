@@ -1,10 +1,11 @@
 <template>
   <div class="flex-column dispatchSelfPay">
+    <div id="map" ref="map" style='display:none'></div>
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 權限按鈕 -->
         <el-button size="mini" @click="handleReservation" type="primary" plain>預約</el-button>
-        <el-button size="mini" @click="handleChange" type="info" plain>起訖點互換</el-button>
+        <el-button size="mini" @click="handleChangeAddr" type="info" plain>起訖點互換</el-button>
         <el-button size="mini" @click="handleBack" type="success" plain>回列表</el-button>
       </div>
     </sticky>
@@ -114,8 +115,9 @@
 
             <el-col :sm="12" :md="18">
               <el-form-item label="起點" prop="fromAddr">
-                <el-input style="width: 100%" v-model="temp.fromAddr" placeholder="輸入起點">
-                </el-input>
+                <el-select filterable :default-first-option="false" remote :remote-method="remoteMethodFrom" @change="handleChange('from')" @visible-change="handleVisibleChangeFrom" ref="atc" :trigger-on-focus="false" v-model="temp.fromAddr" placeholder="請輸入起點" style="width: 100%">
+                  <el-option v-for="item in searchResultsFrom" :key="item.place_id" :value="item.place_id" :label="item.description"></el-option>
+                </el-select>
               </el-form-item>
             </el-col>
 
@@ -134,9 +136,10 @@
             </el-col>
 
             <el-col :sm="12" :md="18">
-              <el-form-item label="訖點" prop="toAddr">
-                <el-input style="width: 100%" v-model="temp.toAddr" placeholder="輸入訖點">
-                </el-input>
+              <el-form-item label="迄點" prop="toAddr">
+                <el-select filterable :default-first-option="false" remote :remote-method="remoteMethodTo" @change="handleChange('to')" @visible-change="handleVisibleChangeTo" ref="atc" :trigger-on-focus="false" v-model="temp.toAddr" placeholder="請輸入迄點" style="width: 100%">
+                  <el-option v-for="item in searchResultsTo" :key="item.place_id" :value="item.place_id" :label="item.description"></el-option>
+                </el-select>
               </el-form-item>
             </el-col>
 
@@ -164,12 +167,12 @@
         <el-table ref="mainTable" :data="list" border fit v-loading="listLoading" highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" @row-click="rowClick">
           <el-table-column property="reserveDate" label="預約日期" width="150" align="center">
             <template slot-scope="scope">
-              <span>{{ scope.row.reserveDate | dateFilter }}</span>
+              <span>{{ scope.row.reserveDate  | globalDateFilter("yyyy-MM-DD") }}</span>
             </template>
           </el-table-column>
           <el-table-column property="reserveDate" label="預約時間" width="100" align="center">
             <template slot-scope="scope">
-              <span>{{ scope.row.reserveDate | timeFilter }}</span>
+              <span>{{ scope.row.reserveDate  | globalDateFilter("HH:mm") }}</span>
             </template>
           </el-table-column>
           <el-table-column property="carCategoryName" label="車輛類型" width="200" align="center"></el-table-column>
@@ -193,13 +196,6 @@
             </template>
           </el-table-column>
         </el-table>
-        <!-- <pagination
-          v-if="total > 0"
-          :total="total"
-          :page.sync="listQuery.page"
-          :limit.sync="listQuery.limit"
-          @pagination="handleCurrentChange"
-        /> -->
       </div>
     </div>
   </div>
@@ -299,16 +295,6 @@ export default {
       },
     };
   },
-  filters: {
-    dateFilter(date) {
-      let res = moment(date).format("YYYY-MM-DD");
-      return res;
-    },
-    timeFilter(date) {
-      let res = moment(date).format("YYYY-MM-DDThh:mm").split("T")[1];
-      return res;
-    },
-  },
   watch: {
     "temp.passengerNum"(val, oldVal) {
       const vm = this;
@@ -326,9 +312,8 @@ export default {
         }
       } else {
         num = oldVal - val;
-        console.log(val, oldVal, num);
+        this.$cl(num);
         vm.passengerArr = vm.passengerArr.slice(0, val);
-        console.log(vm.passengerArr);
       }
     },
   },
@@ -428,6 +413,8 @@ export default {
             vm.temp.id = "";
             vm.temp.orgId = "";
             vm.temp.orgName = "";
+            vm.temp.fromAddr = vm.fromAddr;
+            vm.temp.toAddr = vm.toAddr;
             let date = moment(vm.temp.date).format("yyyy-MM-DD");
             vm.temp.selfPayUserId = vm.$route.params.id.split("-")[1];
             vm.temp.userId = vm.$route.params.id.split("-")[0];
@@ -436,8 +423,7 @@ export default {
               return car.dtValue === vm.temp.carCategoryId;
             })[0].name;
             vm.temp.remark = JSON.stringify(vm.passengerArr);
-            console.log(vm.temp, JSON.parse(vm.temp.remark));
-
+            this.$cl(vm.temp);
             orderSelfPayUser.add(vm.temp).then((res) => {
               vm.$alertT.fire({
                 icon: "success",
@@ -457,12 +443,14 @@ export default {
 
     /* 複製訂單 */
     handleCopy(order) {
-      this.temp = Object.assign({}, order); // copy obj
-      this.temp.remark = [{ name: "", birth: "", phone: "" }];
-      this.$nextTick(() => {
-        this.passengerArr = [];
-        this.passengerArr = JSON.parse(order.remark);
-        console.log(this.passengerArr);
+      const vm = this;
+      vm.temp = Object.assign({}, order); // copy obj
+      vm.fromAddr = order.fromAddr;
+      vm.toAddr = order.toAddr;
+      vm.temp.remark = [{ name: "", birth: "", phone: "" }];
+      vm.$nextTick(() => {
+        vm.passengerArr = [];
+        vm.passengerArr = JSON.parse(order.remark);
       });
     },
 
@@ -486,19 +474,16 @@ export default {
     },
 
     /* 起訖點互換 */
-    handleChange() {
-      [this.temp.fromAddr, this.temp.toAddr] = [
-        this.temp.toAddr,
-        this.temp.fromAddr,
+    handleChangeAddr() {
+      const vm = this;
+      [vm.toAddr, vm.fromAddr] = [vm.fromAddr, vm.toAddr];
+      [vm.searchResultsFrom, vm.searchResultsTo] = [
+        vm.searchResultsTo,
+        vm.searchResultsFrom,
       ];
-      [this.temp.fromLon, this.temp.toLon] = [
-        this.temp.toLon,
-        this.temp.fromLon,
-      ];
-      [this.temp.fromLat, this.temp.toLat] = [
-        this.temp.toLat,
-        this.temp.fromLat,
-      ];
+      [vm.temp.fromAddr, vm.temp.toAddr] = [vm.temp.toAddr, vm.temp.fromAddr];
+      [vm.temp.fromLon, vm.temp.toLon] = [vm.temp.toLon, vm.temp.fromLon];
+      [vm.temp.fromLat, vm.temp.toLat] = [vm.temp.toLat, vm.temp.fromLat];
     },
 
     /* 若params有order */

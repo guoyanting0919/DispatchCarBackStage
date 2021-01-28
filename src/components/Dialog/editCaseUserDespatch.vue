@@ -95,8 +95,8 @@
 
           <el-col :sm="12" :md="18">
             <el-form-item label="起點" prop="fromAddr">
-              <el-select filterable :default-first-option="false" remote :remote-method="remoteMethod" @change="handleChange('from')" @visible-change="handleVisibleChange" ref="atc" :trigger-on-focus="false" v-model="temp.fromAddr" placeholder="請輸入起點" style="width: 100%">
-                <el-option v-for="item in searchResults" :key="item.place_id" :value="item.place_id" :label="item.description"></el-option>
+              <el-select filterable :default-first-option="false" remote :remote-method="remoteMethodFrom" @change="handleChange('from')" @visible-change="handleVisibleChangeFrom" ref="atc" :trigger-on-focus="false" v-model="temp.fromAddr" placeholder="請輸入起點" style="width: 100%">
+                <el-option v-for="item in searchResultsFrom" :key="item.place_id" :value="item.place_id" :label="item.description"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -120,8 +120,8 @@
 
           <el-col :sm="12" :md="18">
             <el-form-item label="迄點" prop="toAddr">
-              <el-select filterable :default-first-option="false" remote :remote-method="remoteMethod" @change="handleChange('to')" @visible-change="handleVisibleChange" ref="atc" :trigger-on-focus="false" v-model="temp.toAddr" placeholder="請輸入迄點" style="width: 100%">
-                <el-option v-for="item in searchResults" :key="item.place_id" :value="item.place_id" :label="item.description"></el-option>
+              <el-select filterable :default-first-option="false" remote :remote-method="remoteMethodTo" @change="handleChange('to')" @visible-change="handleVisibleChangeTo" ref="atc" :trigger-on-focus="false" v-model="temp.toAddr" placeholder="請輸入迄點" style="width: 100%">
+                <el-option v-for="item in searchResultsTo" :key="item.place_id" :value="item.place_id" :label="item.description"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -152,15 +152,15 @@
 </template>
 
 <script>
-/* eslint-disable */
+import acMixins from "@/utils/acMixins.js";
 
 import moment from "moment";
-import * as map from "@/api/map";
 export default {
   name: "editCaseUserDespatchDialog",
+  mixins: [acMixins],
   props: {
     /* main data */
-    temp: {
+    tempObj: {
       type: Object,
       default: () => {},
       required: true,
@@ -190,19 +190,11 @@ export default {
   data() {
     return {
       editDialog: false,
+      temp: {},
       today: moment().format("yyyy-MM-DD"),
       /* 地點詳情 */
       fromAddr: "", //起點詳細地址
       toAddr: "", //迄點詳細地址
-
-      /* map */
-      map: null,
-      service: null, //auto complete service
-      searchResults: [], //auto complete options
-      sessionToken: null, //令牌
-      fromAddr: "", //起點詳細地址
-      toAddr: "", //迄點詳細地址
-      tableToggle: true,
 
       rules: {
         date: [{ required: true, message: "必填欄位", tigger: "change" }],
@@ -236,7 +228,6 @@ export default {
         time = "06:00";
       } else {
         let nowHr = moment().format("HH");
-        this.$cl(nowHr);
         let nowMin =
           (Math.floor(moment().format("hh:mm").split(":")[1] / 10) + 1) * 10;
         if (nowMin == 60) {
@@ -253,12 +244,17 @@ export default {
     editDialogProp() {
       this.editDialog = this.editDialogProp;
     },
+    tempObj() {
+      this.temp = this.tempObj;
+    },
   },
   methods: {
     /* 編輯 */
     handleEdit() {
       const vm = this;
       vm.$refs.form.validate((valid) => {
+        vm.temp.fromAddr = vm.fromAddr ? vm.fromAddr : vm.temp.fromAddr;
+        vm.temp.toAddr = vm.toAddr ? vm.toAddr : vm.temp.toAddr;
         if (valid) {
           this.$emit("handleEdit", vm.temp);
         } else {
@@ -274,84 +270,8 @@ export default {
     handleClose() {
       this.$emit("handleClose", false);
     },
-
-    /* init google map api */
-    initMapApi() {
-      const vm = this;
-      vm.map = new google.maps.Map(document.getElementById("map"), {
-        center: {
-          //原始中心點
-          lat: 25.0374865,
-          lng: 121.5647688,
-        },
-        zoom: 15,
-      });
-      vm.sessionToken = new google.maps.places.AutocompleteSessionToken();
-      vm.service = new window.google.maps.places.AutocompleteService();
-    },
-
-    /* remoteMethod  */
-    remoteMethod(query) {
-      const vm = this;
-      if (!query) return;
-      this.service.getPlacePredictions(
-        {
-          input: query,
-          sessionToken: vm.sessionToken,
-        },
-        vm.displaySuggestions
-      );
-    },
-
-    /* 用戶選擇autocomplete選項後 */
-    handleChange(direction) {
-      const vm = this;
-      if (vm.temp[`${direction}Addr`] == "") return;
-      const request = {
-        placeId: vm.temp[`${direction}Addr`],
-        fields: ["name", "formatted_address", "place_id", "geometry"],
-        sessionToken: vm.sessionToken,
-      };
-      const service = new google.maps.places.PlacesService(vm.map);
-      service.getDetails(request, (place, status) => {
-        vm.getPlaceDetail(place, direction);
-        vm.sessionToken = new google.maps.places.AutocompleteSessionToken();
-      });
-    },
-
-    /* 獲取地點詳情 */
-    getPlaceDetail(place, direction) {
-      const vm = this;
-      let params = {
-        placeId: place.place_id,
-        addrFormat: place.formatted_address,
-        addrName: place.name,
-        lon: place.geometry.location.toJSON().lng,
-        lat: place.geometry.location.toJSON().lat,
-      };
-      map.placeDetail(params).then((res) => {
-        console.log(res.result.addrFormat);
-        vm.temp[`${direction}AddrDetail`] = res.result.addrFormat;
-      });
-    },
-
-    /* 清空選項避免enter選到 */
-    handleVisibleChange() {
-      this.searchResults = [];
-    },
-
-    /* 獲取autocomplete資料 */
-    displaySuggestions(predictions, status) {
-      if (status !== window.google.maps.places.PlacesServiceStatus.OK) {
-        this.searchResults = [];
-        return;
-      }
-      this.searchResults = predictions;
-    },
   },
-  mounted() {
-    this.initMapApi();
-  },
+  mounted() {},
 };
 </script>
 

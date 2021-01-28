@@ -127,7 +127,7 @@
     </div>
 
     <!-- eidt dialog -->
-    <EditDialog :temp="temp" :editDialogProp="editDialog" :carCategorysList="carCategorysList" @handleEdit="handleEdit" @handleClose="handleClose"></EditDialog>
+    <EditDialog :tempObj="temp" :editDialogProp="editDialog" :carCategorysList="carCategorysList" @handleEdit="handleEdit" @handleClose="handleClose"></EditDialog>
 
     <!-- violation dialog -->
     <el-dialog title="記點" :visible.sync="violationDialog" width="475px">
@@ -350,8 +350,6 @@ export default {
       const vm = this;
       orderCaseUser.get({ id }).then((res) => {
         vm.temp = Object.assign({}, res.result); // copy obj
-        vm.temp.fromAddrDetail = vm.temp.fromAddr;
-        vm.temp.toAddrDetail = vm.temp.toAddr;
         let fromRemark = ["醫院診所", "洗腎中心", "復健診所", "住家"].includes(
           vm.temp.fromAddrRemark
         )
@@ -436,7 +434,6 @@ export default {
 
     /* 編輯訂單 */
     handleEdit(data) {
-      console.log(data);
       const vm = this;
       data.toAddrRemark =
         data.toAddrRemark === "其他" ? data.toRemark : data.toAddrRemark;
@@ -446,8 +443,6 @@ export default {
       data.carCategoryName = vm.carCategorysList.filter((i) => {
         return i.value === data.carCategoryId;
       })[0].label;
-      data.fromAddr = data.fromAddrDetail;
-      data.toAddr = data.toAddrDetail;
       orderCaseUser.update(data).then(() => {
         vm.editDialog = false;
         vm.$alertT.fire({

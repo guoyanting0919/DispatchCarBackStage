@@ -1,5 +1,6 @@
 <template>
   <div class="flex-column dispatch" style="height: calc(100% - 20px)">
+    <div id="map" ref="map" style="display:none"></div>
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 無權限權限按鈕 -->
@@ -139,7 +140,7 @@
 
     <!-- 燈箱 -->
     <!-- eidt dialog -->
-    <EditDialog :temp="temp" :editDialogProp="editDialog" :carCategorysList="carCategorysList" :passengerArr="passengerArr" @handleEdit="handleEdit" @handleClose="handleClose"></EditDialog>
+    <EditDialog :tempObj="temp" :editDialogProp="editDialog" :carCategorysList="carCategorysList" :passengerArr="passengerArr" @carCategoryChange='carCategoryChange' @handleEdit="handleEdit" @handleClose="handleClose"></EditDialog>
     <!-- carPool dialog -->
     <el-dialog title="共乘設定" :visible.sync="carPoolDialog" width="650px">
       <div class="carPoolDialogBody">
@@ -501,13 +502,18 @@ export default {
         limit: 20,
         TypeId: "SYS_CAR",
       };
-      categorys.getList(query).then((res) => {
-        vm.carCategorysList = res.data.filter((car) => {
+      categorys.getSimpleList(query).then((res) => {
+        vm.carCategorysList = res.result.filter((car) => {
           return (
-            car.dtValue === "SYS_CAR_GENERAL" || car.dtValue === "SYS_CAR_WEAL"
+            car.value === "SYS_CAR_GENERAL" || car.value === "SYS_CAR_WEAL"
           );
         });
       });
+    },
+
+    /* 當車輛類型改變時清空輪椅類型 */
+    carCategoryChange() {
+      this.temp.wheelchairType = "";
     },
 
     /* 獲取單筆訂單資料 */
@@ -745,16 +751,15 @@ export default {
     },
 
     /* 確認編輯訂單 */
-    handleEdit() {
+    handleEdit(data) {
       const vm = this;
-      let date = moment(vm.temp.date).format("yyyy-MM-DD");
-      vm.temp.reserveDate = `${date} ${vm.temp.time}`;
-      vm.temp.CarCategoryName = vm.carCategorysList.filter((car) => {
-        return car.dtValue === vm.temp.carCategoryId;
-      })[0].name;
-      vm.temp.remark = JSON.stringify(vm.passengerArr);
+      data.reserveDate = `${data.date} ${data.time}`;
+      data.carCategoryName = vm.carCategorysList.filter((i) => {
+        return i.value === data.carCategoryId;
+      })[0].label;
+      data.remark = JSON.stringify(vm.passengerArr);
 
-      orderSelfPayUser.update(vm.temp).then((res) => {
+      orderSelfPayUser.update(data).then((res) => {
         vm.$alertT.fire({
           icon: "success",
           title: res.message,

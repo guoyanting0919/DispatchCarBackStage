@@ -99,8 +99,9 @@
 
           <el-col :sm="12" :md="18">
             <el-form-item label="起點" prop="fromAddr">
-              <el-input style="width: 100%" v-model="temp.fromAddr" placeholder="輸入起點">
-              </el-input>
+              <el-select filterable :default-first-option="false" remote :remote-method="remoteMethodFrom" @change="handleChange('from')" @visible-change="handleVisibleChangeFrom" ref="atc" :trigger-on-focus="false" v-model="temp.fromAddr" placeholder="請輸入起點" style="width: 100%">
+                <el-option v-for="item in searchResultsFrom" :key="item.place_id" :value="item.place_id" :label="item.description"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
 
@@ -119,9 +120,10 @@
           </el-col>
 
           <el-col :sm="12" :md="18">
-            <el-form-item label="訖點" prop="toAddr">
-              <el-input style="width: 100%" v-model="temp.toAddr" placeholder="輸入訖點">
-              </el-input>
+            <el-form-item label="迄點" prop="toAddr">
+              <el-select filterable :default-first-option="false" remote :remote-method="remoteMethodTo" @change="handleChange('to')" @visible-change="handleVisibleChangeTo" ref="atc" :trigger-on-focus="false" v-model="temp.toAddr" placeholder="請輸入迄點" style="width: 100%">
+                <el-option v-for="item in searchResultsTo" :key="item.place_id" :value="item.place_id" :label="item.description"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
 
@@ -150,11 +152,14 @@
 
 <script>
 import moment from "moment";
+
+import acMixins from "@/utils/acMixins.js";
 export default {
-  name: "editBusUserDespatchDialog",
+  name: "editSelfPayUserDespatchDialog",
+  mixins: [acMixins],
   props: {
     /* main data */
-    temp: {
+    tempObj: {
       type: Object,
       default: () => {},
       required: true,
@@ -190,8 +195,12 @@ export default {
   },
   data() {
     return {
+      temp: {},
       editDialog: false,
       today: moment().format("yyyy-MM-DD"),
+      /* 地點詳情 */
+      fromAddr: "", //起點詳細地址
+      toAddr: "", //迄點詳細地址
       rules: {
         date: [{ required: true, message: "必填欄位", tigger: "change" }],
         time: [{ required: true, message: "必填欄位", tigger: "change" }],
@@ -235,6 +244,9 @@ export default {
     editDialogProp() {
       this.editDialog = this.editDialogProp;
     },
+    tempObj() {
+      this.temp = this.tempObj;
+    },
   },
   methods: {
     /* 編輯 */
@@ -243,7 +255,10 @@ export default {
       vm.$refs.form.validate((valid) => {
         if (valid) {
           if (vm.validatePassenger(vm.passengerArr)) {
-            this.$emit("handleEdit");
+            vm.temp.fromAddr = vm.fromAddr ? vm.fromAddr : vm.temp.fromAddr;
+            vm.temp.toAddr = vm.toAddr ? vm.toAddr : vm.temp.toAddr;
+            vm.$emit("handleEdit", vm.temp);
+            // this.$emit("handleEdit");
           } else {
             vm.$alertM.fire({
               icon: "error",

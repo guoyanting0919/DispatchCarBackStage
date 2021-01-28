@@ -1,5 +1,7 @@
 <template>
   <div class="flex-column orderSelfPayUser">
+    <div id="map" ref="map" style="display:none"></div>
+
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 關鍵字 -->
@@ -118,7 +120,7 @@
     </div>
 
     <!-- eidt dialog -->
-    <EditDialog :temp="temp" :editDialogProp="editDialog" :carCategorysList="carCategorysList" :passengerArr="passengerArr" @carCategoryChange='carCategoryChange' @handleEdit="handleEdit" @handleClose="handleClose"></EditDialog>
+    <EditDialog :tempObj="temp" :editDialogProp="editDialog" :carCategorysList="carCategorysList" :passengerArr="passengerArr" @carCategoryChange='carCategoryChange' @handleEdit="handleEdit" @handleClose="handleClose"></EditDialog>
   </div>
 </template>
 
@@ -327,16 +329,15 @@ export default {
     },
 
     /* 確認編輯訂單 */
-    handleEdit() {
+    handleEdit(data) {
       const vm = this;
-      let date = moment(vm.temp.date).format("yyyy-MM-DD");
-      vm.temp.reserveDate = `${date} ${vm.temp.time}`;
-      vm.temp.CarCategoryName = vm.carCategorysList.filter((car) => {
-        return car.value === vm.temp.carCategoryId;
+      data.reserveDate = `${data.date} ${data.time}`;
+      data.carCategoryName = vm.carCategorysList.filter((i) => {
+        return i.value === data.carCategoryId;
       })[0].label;
-      vm.temp.remark = JSON.stringify(vm.passengerArr);
+      data.remark = JSON.stringify(vm.passengerArr);
 
-      orderSelfPayUser.update(vm.temp).then((res) => {
+      orderSelfPayUser.update(data).then((res) => {
         vm.$alertT.fire({
           icon: "success",
           title: res.message,
