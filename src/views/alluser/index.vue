@@ -3,107 +3,39 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 關鍵字搜尋 -->
-        <el-input
-          style="width: 200px; margin-right: 0.5rem"
-          size="mini"
-          v-model="listQuery.key"
-          @keydown.native.enter="handleSearch"
-          clearable
-          placeholder="請輸入關鍵字"
-        ></el-input>
+        <el-input style="width: 200px; margin-right: 0.5rem" size="mini" v-model="listQuery.key" @keydown.native.enter="getList" clearable placeholder="請輸入關鍵字"></el-input>
         <!-- 權限按鈕 -->
-        <permission-btn
-          moduleName="builderTables"
-          size="mini"
-          v-on:btn-event="onBtnClicked"
-        ></permission-btn>
+        <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
       </div>
     </sticky>
 
     <div class="app-container flex-item">
-      <!-- 全部個案資料 -->
-      <Title title="全部個案"></Title>
+      <!-- ㄒ資料 -->
+      <Title title="全部用戶"></Title>
       <div class="bg-white" style="height: calc(100% - 50px)">
-        <el-table
-          ref="mainTable"
-          height="calc(100% - 52px)"
-          :data="list"
-          border
-          fit
-          v-loading="listLoading"
-          highlight-current-row
-          style="width: 100%"
-          @selection-change="handleSelectionChange"
-          @row-click="rowClick"
-        >
-          <!-- <el-table-column
-            type="selection"
-            width="55"
-            align="center"
-          ></el-table-column> -->
+        <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" border fit v-loading="listLoading" highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" @row-click="rowClick">
 
           <el-table-column label="預約" width="100" align="center" fixed="left">
             <template slot-scope="scope">
-              <el-button
-                size="mini"
-                @click="handleDespatch(scope.row)"
-                type="info"
-                v-if="
+              <el-button size="mini" @click="handleDespatch(scope.row)" type="info" v-if="
                   (hasButton('dispatchCaseUser') ||
                     hasButton('dispatchSelfPayUser') ||
                     hasButton('dispatchBusUser')) &&
                   scope.row.caseList.length != 0
-                "
-                >預約</el-button
-              >
+                ">預約</el-button>
             </template>
           </el-table-column>
-          <!-- <el-table-column
-            property="lock"
-            label="鎖定狀態"
-            width="100"
-            align="center"
-          >
-            <template slot-scope="scope">
-              <div>
-                <i
-                  style="color: #409167"
-                  :key="scope.row.id"
-                  v-if="isLock(scope.row.unLockDate)"
-                  class="iconfont icon-Vector21"
-                ></i>
-                <i
-                  :key="scope.row.id"
-                  style="color: #d63737"
-                  v-else
-                  class="iconfont icon-Vector31"
-                ></i>
-              </div>
-            </template>
-          </el-table-column> -->
+
           <el-table-column property="name" label="姓名" width="200">
             <template slot-scope="scope">
               <div class="buttomColum">
                 <p style="margin-right: auto">
                   {{ scope.row.name }}
                 </p>
-                <!-- 解鎖 -->
-                <el-button
-                  size="mini"
-                  class="xsBtn"
-                  @click="handleUnlock(scope.row)"
-                  type="danger"
-                  v-if="hasButton('unlock') && !isLock(scope.row.unLockDate)"
-                >
+                <el-button size="mini" class="xsBtn" @click="handleUnlock(scope.row)" type="danger" v-if="hasButton('unlock') && !isLock(scope.row.unLockDate)">
                   <i class="iconfont icon-Vector21"></i>
                 </el-button>
-                <el-button
-                  size="mini"
-                  class="xsBtn"
-                  @click="handleAddOrEdit('edit', scope.row)"
-                  type="warning"
-                  v-if="hasButton('editBasic')"
-                >
+                <el-button size="mini" class="xsBtn" @click="handleAddOrEdit('edit', scope.row)" type="warning" v-if="hasButton('editBasic')">
                   <i class="iconfont icon-edit"></i>
                 </el-button>
               </div>
@@ -112,320 +44,117 @@
           <el-table-column property="setting" label="身份" width="250px">
             <template slot-scope="scope">
               <div class="roleButtomColum">
-                <el-tag
-                  v-for="(item, idx) in scope.row.userTypes"
-                  :key="idx"
-                  type="primary"
-                >
+                <el-tag v-for="(item, idx) in scope.row.userTypes" :key="idx" type="primary">
                   {{ userRoleMap[item] }}
                 </el-tag>
-                <!-- rolesDialog = true -->
-                <el-button
-                  style="margin-left: auto"
-                  size="mini"
-                  class="xsBtn"
-                  @click="
+                <el-button style="margin-left: auto" size="mini" class="xsBtn" @click="
                     handleCheckRoles(scope.row);
                     rolesDialog = true;
-                  "
-                  type="primary"
-                  v-if="hasButton('addRole')"
-                >
+                  " type="primary" v-if="hasButton('addRole')">
                   <i class="iconfont icon-xinzeng"></i>
                 </el-button>
               </div>
             </template>
           </el-table-column>
-          <el-table-column
-            property="uid"
-            label="身分證字號"
-            min-width="160"
-            align="center"
-          >
+          <el-table-column property="uid" label="身分證字號" min-width="160" align="center">
             <template slot-scope="scope">
               {{ scope.row.uid | hideFilter }}
             </template>
           </el-table-column>
-          <!-- <el-table-column
-            property="birthday"
-            label="生日"
-            min-width="160"
-            align="center"
-          >
-            <template slot-scope="scope">
-              <span>{{ scope.row.birthday | dateFilter }}</span>
-            </template>
-          </el-table-column> -->
-          <!-- <el-table-column
-            property="sex"
-            label="性別"
-            width="100"
-            align="center"
-          >
-            <template slot-scope="scope">
-              <div>
-                <i
-                  style="color: #d63737"
-                  v-if="!scope.row.sex"
-                  class="iconfont icon-Vector5"
-                ></i>
-                <i
-                  style="color: #227294"
-                  v-else
-                  class="iconfont icon-Vector6"
-                ></i>
-              </div>
-            </template>
-          </el-table-column> -->
-          <el-table-column
-            property="phone"
-            label="手機"
-            min-width="170"
-            align="center"
-          ></el-table-column>
 
-          <el-table-column
-            property="setting"
-            label="操作"
-            :fixed="isMobile()"
-            width="400"
-          >
+          <el-table-column property="phone" label="手機" min-width="170" align="center"></el-table-column>
+
+          <el-table-column property="setting" label="操作" :fixed="isMobile()" width="400">
             <template slot-scope="scope">
               <div class="buttonFlexBox">
-                <el-select
-                  style="margin: 0 0.5rem; width: 100px"
-                  size="mini"
-                  no-data-text="該用戶尚未新增身份"
-                  v-model="roles[scope.row.id]"
-                  placeholder="選擇身份"
-                  clearable
-                >
-                  <el-option
-                    v-for="item in scope.row.userTypeOption"
-                    :key="item.caseId"
-                    :label="userRoleMap[item.userType]"
-                    :value="`${item.userType}-${item.caseId}`"
-                  >
+                <el-select style="margin: 0 0.5rem; width: 100px" size="mini" no-data-text="該用戶尚未新增身份" v-model="roles[scope.row.id]" placeholder="選擇身份" clearable>
+                  <el-option v-for="item in scope.row.userTypeOption" :key="item.caseId" :label="userRoleMap[item.userType]" :value="`${item.userType}-${item.caseId}`">
                     {{ userRoleMap[item.userType] }}
                     <span v-if="item.caseUserNo">({{ item.caseUserNo }})</span>
                   </el-option>
                 </el-select>
-                <!-- 長照派車 -->
-                <!-- <el-button
-                  size="mini"
-                  @click="dispatchCaseUser(scope.row)"
-                  type="info"
-                  v-if="
-                    hasButton('dispatchCaseUser') &&
-                    roles[scope.row.id] &&
-                    roles[scope.row.id].split('-')[0] == 'caseuser'
-                  "
-                  >預約</el-button
-                > -->
-                <!-- 白牌派車 -->
-                <!-- <el-button
-                  size="mini"
-                  @click="dispatchSelfPayUser(scope.row)"
-                  type="info"
-                  v-if="
-                    hasButton('dispatchSelfPayUser') &&
-                    roles[scope.row.id] &&
-                    roles[scope.row.id].split('-')[0] == 'selfpayuser'
-                  "
-                  >預約</el-button
-                > -->
-                <!-- 巴士派車 -->
-                <!-- <el-button
-                  size="mini"
-                  @click="dispatchBusUser(scope.row)"
-                  type="info"
-                  v-if="
-                    hasButton('dispatchBusUser') &&
-                    roles[scope.row.id] &&
-                    roles[scope.row.id].split('-')[0] == 'bususer'
-                  "
-                  >預約</el-button
-                > -->
                 <!-- 基本編輯 -->
-                <el-button
-                  size="mini"
-                  @click="handleAddOrEdit('edit', scope.row)"
-                  type="warning"
-                  v-if="hasButton('editBasic') && !roles[scope.row.id]"
-                  >編輯</el-button
-                >
+                <el-button size="mini" @click="handleAddOrEdit('edit', scope.row)" type="warning" v-if="hasButton('editBasic') && !roles[scope.row.id]">編輯</el-button>
                 <!-- 編輯長照 -->
-                <el-button
-                  size="mini"
-                  @click="handleEditCaseUser(scope.row)"
-                  type="warning"
-                  v-if="
+                <el-button size="mini" @click="handleEditCaseUser(scope.row)" type="warning" v-if="
                     hasButton('editCaseUser') &&
                     roles[scope.row.id] &&
                     roles[scope.row.id].split('-')[0] == 'caseuser'
-                  "
-                  >編輯</el-button
-                >
+                  ">編輯</el-button>
                 <!-- 編輯白牌 -->
-                <el-button
-                  size="mini"
-                  @click="handleEditSelfPayUser(scope.row)"
-                  type="warning"
-                  v-if="
+                <el-button size="mini" @click="handleEditSelfPayUser(scope.row)" type="warning" v-if="
                     hasButton('editSelfPayUser') &&
                     roles[scope.row.id] &&
                     roles[scope.row.id].split('-')[0] == 'selfpayuser'
-                  "
-                  >編輯</el-button
-                >
+                  ">編輯</el-button>
                 <!-- 編輯巴士 -->
-                <el-button
-                  size="mini"
-                  @click="handleEditBusUser(scope.row)"
-                  type="warning"
-                  v-if="
+                <el-button size="mini" @click="handleEditBusUser(scope.row)" type="warning" v-if="
                     hasButton('editBusUser') &&
                     roles[scope.row.id] &&
                     roles[scope.row.id].split('-')[0] == 'bususer'
-                  "
-                  >編輯</el-button
-                >
-                <!-- <el-button
-                  size="mini"
-                  @click="handleDetail(scope.row)"
-                  type="success"
-                  v-if="hasButton('detail')"
-                  >檢視</el-button
-                > -->
+                  ">編輯</el-button>
                 <!-- 檢視長照個案 -->
-                <el-button
-                  size="mini"
-                  @click="handleCheckCaseUser(scope.row)"
-                  type="success"
-                  v-if="
+                <el-button size="mini" @click="handleCheckCaseUser(scope.row)" type="success" v-if="
                     hasButton('checkCaseUser') &&
                     roles[scope.row.id] &&
                     roles[scope.row.id].split('-')[0] == 'caseuser'
-                  "
-                  >檢視</el-button
-                >
+                  ">檢視</el-button>
                 <!-- 檢視白牌個案 -->
-                <el-button
-                  size="mini"
-                  @click="handleCheckSelfPayUser(scope.row)"
-                  type="success"
-                  v-if="
+                <el-button size="mini" @click="handleCheckSelfPayUser(scope.row)" type="success" v-if="
                     hasButton('checkSelfPayUser') &&
                     roles[scope.row.id] &&
                     roles[scope.row.id].split('-')[0] == 'selfpayuser'
-                  "
-                  >檢視</el-button
-                >
+                  ">檢視</el-button>
                 <!-- 檢視巴士個案 -->
-                <el-button
-                  size="mini"
-                  @click="handleCheckBusUser(scope.row)"
-                  type="success"
-                  v-if="
+                <el-button size="mini" @click="handleCheckBusUser(scope.row)" type="success" v-if="
                     hasButton('checkBusUser') &&
                     roles[scope.row.id] &&
                     roles[scope.row.id].split('-')[0] == 'bususer'
-                  "
-                  >檢視</el-button
-                >
-                <el-button
-                  size="mini"
-                  @click="handleUnitB(scope.row)"
-                  type="primary"
-                  v-if="
+                  ">檢視</el-button>
+                <el-button size="mini" @click="handleUnitB(scope.row)" type="primary" v-if="
                     hasButton('unitB') &&
                     roles[scope.row.id] &&
                     roles[scope.row.id].split('-')[0] == 'caseuser'
-                  "
-                  >B單位</el-button
-                >
-                <el-button
-                  size="mini"
-                  @click="handleQuota(scope.row)"
-                  type="primary"
-                  v-if="
+                  ">B單位</el-button>
+                <el-button size="mini" @click="handleQuota(scope.row)" type="primary" v-if="
                     hasButton('quota') &&
                     roles[scope.row.id] &&
                     roles[scope.row.id].split('-')[0] == 'caseuser'
-                  "
-                  >額度</el-button
-                >
+                  ">額度</el-button>
               </div>
             </template>
           </el-table-column>
         </el-table>
-        <pagination
-          v-if="total > 0"
-          :total="total"
-          :page.sync="listQuery.page"
-          :limit.sync="listQuery.limit"
-          @pagination="handleCurrentChange"
-        />
+        <pagination v-if="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handleCurrentChange" />
       </div>
     </div>
 
     <!-- addOrUpdateDialog 新增/修改用戶基本資料-->
-    <el-dialog
-      :title="userDialogMap[userDialogTitle]"
-      :visible.sync="addOrUpdateDialog"
-      width="50%"
-      style="min-width: 375px"
-    >
-      <el-form
-        :label-position="labelPosition"
-        label-width="200px"
-        :model="userTemp"
-        :rules="userRules"
-        ref="userForm"
-      >
+    <el-dialog :title="userDialogMap[userDialogTitle]" :visible.sync="addOrUpdateDialog" width="50%" style="min-width: 375px">
+      <el-form :label-position="labelPosition" label-width="200px" :model="userTemp" :rules="userRules" ref="userForm">
         <el-row :gutter="16">
           <el-col :sm="24" :md="12">
             <el-form-item label="姓名" prop="name">
-              <el-input
-                v-model="userTemp.name"
-                placeholder="請輸入姓名"
-              ></el-input>
+              <el-input v-model="userTemp.name" placeholder="請輸入姓名"></el-input>
             </el-form-item>
           </el-col>
           <el-col :sm="24" :md="12">
             <el-form-item label="出生年月日" prop="birthday">
-              <el-date-picker
-                v-model="userTemp.birthday"
-                type="date"
-                placeholder="請選擇生日"
-                value-format="yyyy-MM-dd"
-                style="width: 100%"
-                :picker-options="{
+              <el-date-picker v-model="userTemp.birthday" type="date" placeholder="請選擇生日" value-format="yyyy-MM-dd" style="width: 100%" :picker-options="{
                   disabledDate(time) {
                     return time.getTime() > Date.now();
                   },
-                }"
-                :disabled="userDialogTitle == 'edit'"
-              ></el-date-picker>
+                }" :disabled="userDialogTitle == 'edit'"></el-date-picker>
             </el-form-item>
           </el-col>
           <el-col :sm="24" :md="12">
             <el-form-item label="身分證字號" prop="uid">
-              <el-input
-                v-model="userTemp.uid"
-                :disabled="userDialogTitle == 'edit'"
-                placeholder="請輸入身分證字號"
-              ></el-input>
+              <el-input v-model="userTemp.uid" :disabled="userDialogTitle == 'edit'" placeholder="請輸入身分證字號"></el-input>
             </el-form-item>
           </el-col>
           <el-col :sm="24" :md="12">
             <el-form-item label="性別" prop="sex">
-              <el-select
-                clearable
-                v-model="userTemp.sex"
-                placeholder="請選擇性別"
-                style="width: 100%"
-              >
+              <el-select clearable v-model="userTemp.sex" placeholder="請選擇性別" style="width: 100%">
                 <el-option :value="1" :label="'男'">男</el-option>
                 <el-option :value="0" :label="'女'">女</el-option>
               </el-select>
@@ -434,122 +163,49 @@
           <el-col :sm="24" :md="12">
             <el-form-item label="手機" prop="phone">
               <span slot="label">手機</span>
-              <el-input
-                placeholder="格式:0987654321"
-                v-model="userTemp.phone"
-              ></el-input>
+              <el-input placeholder="格式:0987654321" v-model="userTemp.phone"></el-input>
             </el-form-item>
           </el-col>
           <el-col :sm="24" :md="12">
             <el-form-item label="市話" prop="tel">
               <span slot="label">市話</span>
-              <el-input
-                placeholder="格式:0232134232"
-                v-model="userTemp.tel"
-              ></el-input>
+              <el-input placeholder="格式:0232134232" v-model="userTemp.tel"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="addOrUpdateDialog = false">取 消</el-button>
-        <el-button type="primary" @click="confirmAddOrUpdate()"
-          >確 定</el-button
-        >
+        <el-button type="primary" @click="confirmAddOrUpdate()">確 定</el-button>
       </span>
     </el-dialog>
 
     <!-- despatchDialog -->
-    <el-dialog
-      title="請選擇預約身份"
-      :visible.sync="despatchDialog"
-      width="500px"
-    >
-      <!-- <el-select
-        style="margin-right: 0.5rem"
-        size="mini"
-        no-data-text="該用戶尚未新增身份"
-        v-model="despatchRole"
-        placeholder="請選擇預約身份"
-        clearable
-      >
-        <el-option
-          v-for="item in despatchOptions.userTypeOption"
-          :key="item.caseId"
-          :label="userRoleMap[item.userType]"
-          :value="`${item.userType}-${item.caseId}`"
-        >
-          {{ userRoleMap[item.userType] }}
-          <span v-if="item.caseUserNo">({{ item.caseUserNo }})</span>
-        </el-option>
-      </el-select> -->
+    <el-dialog title="請選擇預約身份" :visible.sync="despatchDialog" width="500px">
+
       <div style="display: flex">
-        <div
-          style="margin-right: 8px"
-          v-for="item in despatchOptions.caseList"
-          :key="item.caseId"
-        >
+        <div style="margin-right: 8px" v-for="item in despatchOptions.caseList" :key="item.caseId">
           <!-- 長照派車 -->
-          <el-button
-            size="mini"
-            @click="dispatchCaseUser(item)"
-            type="info"
-            v-if="hasButton('dispatchCaseUser') && item.userType == 'caseuser'"
-            >長照預約</el-button
-          >
+          <el-button size="mini" @click="dispatchCaseUser(item)" type="info" v-if="hasButton('dispatchCaseUser') && item.userType == 'caseuser'">長照預約</el-button>
           <!-- 白牌派車 -->
-          <el-button
-            size="mini"
-            @click="dispatchSelfPayUser(item)"
-            type="info"
-            v-if="
+          <el-button size="mini" @click="dispatchSelfPayUser(item)" type="info" v-if="
               hasButton('dispatchSelfPayUser') && item.userType == 'selfpayuser'
-            "
-            >白牌預約</el-button
-          >
+            ">白牌預約</el-button>
           <!-- 巴士派車 -->
-          <el-button
-            size="mini"
-            @click="dispatchBusUser(item)"
-            type="info"
-            v-if="hasButton('dispatchBusUser') && item.userType == 'bususer'"
-            >巴士預約</el-button
-          >
+          <el-button size="mini" @click="dispatchBusUser(item)" type="info" v-if="hasButton('dispatchBusUser') && item.userType == 'bususer'">巴士預約</el-button>
         </div>
       </div>
     </el-dialog>
 
     <!-- rolesDialog -->
-    <el-dialog
-      title="請選擇欲新增的身份"
-      :visible.sync="rolesDialog"
-      width="500px"
-    >
+    <el-dialog title="請選擇欲新增的身份" :visible.sync="rolesDialog" width="500px">
       <div class="rolesBox">
         <p v-if="canUseRoles.length == 0">該用戶已擁有所有身份</p>
-        <el-button
-          v-if="hasButton('addCaseUser') && canUseRoles.includes('caseuser')"
-          type="primary"
-          plain
-          @click="handleRole('1')"
-          >長照身份</el-button
-        >
-        <el-button
-          v-if="
+        <el-button v-if="hasButton('addCaseUser') && canUseRoles.includes('caseuser')" type="primary" plain @click="handleRole('1')">長照身份</el-button>
+        <el-button v-if="
             hasButton('addSelfPayUser') && canUseRoles.includes('selfpayuser')
-          "
-          type="primary"
-          plain
-          @click="handleRole('2')"
-          >白牌身份</el-button
-        >
-        <el-button
-          v-if="hasButton('addBusUser') && canUseRoles.includes('bususer')"
-          type="primary"
-          plain
-          @click="handleRole('3')"
-          >幸福巴士身份</el-button
-        >
+          " type="primary" plain @click="handleRole('2')">白牌身份</el-button>
+        <el-button v-if="hasButton('addBusUser') && canUseRoles.includes('bususer')" type="primary" plain @click="handleRole('3')">幸福巴士身份</el-button>
       </div>
     </el-dialog>
 
@@ -573,17 +229,9 @@
         <div class="addQuota">
           <p>新增額度</p>
           <div class="flex alignCeter">
-            <el-input
-              style="width: 200px; margin-right: 1rem"
-              :disabled="!hasButton('editQuota')"
-              v-model="amt"
-            ></el-input>
-            <el-button type="primary" plain size="mini" @click="amt = 0"
-              >清空</el-button
-            >
-            <el-button type="primary" size="mini" @click="confirmQuota"
-              >確定</el-button
-            >
+            <el-input style="width: 200px; margin-right: 1rem" :disabled="!hasButton('editQuota')" v-model="amt"></el-input>
+            <el-button type="primary" plain size="mini" @click="amt = 0">清空</el-button>
+            <el-button type="primary" size="mini" @click="confirmQuota">確定</el-button>
           </div>
         </div>
         <div class="quotaHistory">
@@ -592,11 +240,7 @@
             無修改記錄
           </p>
           <template v-else>
-            <p
-              class="quotaHistoryData"
-              v-for="item in discountList"
-              :key="item.id"
-            >
+            <p class="quotaHistoryData" v-for="item in discountList" :key="item.id">
               {{ item.typeName }} ${{ item.amt }}
               {{ item.createDate | globalDateFilter("yyyy-MM-DD") }}
             </p>
@@ -606,18 +250,9 @@
     </el-dialog>
 
     <!-- unitBDialog -->
-    <el-dialog
-      :title="unitBDialogTitle"
-      :visible.sync="unitBDialog"
-      width="50%"
-    >
+    <el-dialog :title="unitBDialogTitle" :visible.sync="unitBDialog" width="50%">
       <el-checkbox-group v-model="checkedUnitBs" :min="0" :max="3">
-        <el-checkbox
-          v-for="unitB in unitBs"
-          :label="unitB.id"
-          :key="unitB.id"
-          >{{ unitB.name }}</el-checkbox
-        >
+        <el-checkbox v-for="unitB in unitBs" :label="unitB.id" :key="unitB.id">{{ unitB.name }}</el-checkbox>
       </el-checkbox-group>
       <span slot="footer" class="dialog-footer">
         <el-button @click="unitBDialog = false">取 消</el-button>
@@ -631,6 +266,8 @@
 import moment from "moment";
 import { mapGetters } from "vuex";
 
+import pbMixins from "@/mixins/permissionBtn.js";
+
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import permissionBtn from "@/components/PermissionBtn";
@@ -643,6 +280,7 @@ import * as caseUsers from "@/api/caseUsers";
 import * as caseUserDiscounts from "@/api/caseUserDiscounts";
 export default {
   name: "allUser",
+  mixins: [pbMixins],
   components: {
     Sticky,
     Title,
@@ -736,8 +374,6 @@ export default {
 
       roles: {},
       despatchRole: "",
-      // button
-      buttons: [],
 
       // dialog
       addOrUpdateDialog: false,
@@ -882,16 +518,7 @@ export default {
         return "right";
       }
     },
-    // 獲取本路由下所有功能按鈕
-    getButtons() {
-      this.$route.meta.elements.forEach((el) => {
-        this.buttons.push(el.domId);
-      });
-    },
-    // 是否擁有按鈕功能權限
-    hasButton(domId) {
-      return this.buttons.includes(domId);
-    },
+
     // 獲取用戶資料
     async getList() {
       const vm = this;
@@ -1053,25 +680,7 @@ export default {
           break;
       }
     },
-    //關鍵字搜尋
-    handleSearch() {
-      const vm = this;
-      if (vm.listQuery.key === process.env.VUE_APP_WEB_VERSION) {
-        let arr = vm.multipleSelection.map((user) => {
-          return user.id;
-        });
-        users.del(arr).then((res) => {
-          vm.listQuery.key = undefined;
-          vm.$alertT.fire({
-            icon: "success",
-            title: res.message,
-          });
-          vm.getList();
-        });
-      } else {
-        console.log("handleSearch");
-      }
-    },
+
     // 帳號解鎖
     handleUnlock(user) {
       const vm = this;
@@ -1363,8 +972,6 @@ export default {
   },
   async mounted() {
     const vm = this;
-    // console.log(vm.$route)
-    vm.getButtons();
     vm.getUnitBs();
     await vm.getList();
   },

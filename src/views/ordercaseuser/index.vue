@@ -90,7 +90,7 @@
             </div>
             <div class="orderRight">
               <div class="orderRightTitle">
-                <el-button style="padding: 0px 10px" type="danger" @click="handleViolation(order)">記點</el-button>
+                <el-button v-if="order.hasViolation" style="padding: 0px 10px" type="danger" @click="handleViolation(order)">記點</el-button>
                 <!-- <el-button style="padding: 0px 10px" type="info">修改狀態</el-button> -->
                 <p class="orderStatus">
                   <OrderStatusTag :type="orderStatusMapping[order.status - 1]" size="mini"></OrderStatusTag>
@@ -138,7 +138,6 @@
         <el-form-item size="mini" :label="'記點原因'">
           <el-input v-model="violationTemp.remark"></el-input>
         </el-form-item>
-
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="violationDialog = false">取 消</el-button>
@@ -147,18 +146,114 @@
     </el-dialog>
 
     <!-- cancel dialog -->
-    <el-dialog title='取消訂單' :visible.sync="cancelDialog" width="475px">
-      <el-form ref="dataForm" :model="orderTemp" label-position="right" label-width="80px">
-        <el-form-item size="mini" :label="'記點點數'">
-          <el-input-number v-model="violationTemp.point" :min="0" :max="10"></el-input-number>
-        </el-form-item>
-        <el-form-item size="mini" :label="'記點原因'">
-          <el-input v-model="violationTemp.remark"></el-input>
-        </el-form-item>
-      </el-form>
+    <el-dialog title='取消訂單' :visible.sync="cancelDialog" width="900px">
+      <el-row :gutter="16">
+        <el-col :sm="24" :md="12">
+          <div class="greyBox">
+            <el-row :gutter="16">
+              <el-col :sm="12">
+                <div class="greyLabel">個案姓名</div>
+                <div class="greyValue">{{cancelOrderTemp.userName}}</div>
+              </el-col>
+
+              <el-col :sm="12">
+                <div class="greyLabel">身分證字號</div>
+                <div class="greyValue">{{cancelOrderTemp.userUID}}</div>
+              </el-col>
+
+              <el-col :sm="12">
+                <div class="greyLabel">個案編號</div>
+                <div class="greyValue">{{cancelOrderTemp.caseUserNo}}</div>
+              </el-col>
+
+              <el-col :sm="12">
+                <div class="greyLabel">訂單狀態</div>
+                <div class="greyValue">
+                  <OrderStatusTag :type="orderStatusMapping[cancelOrderTemp.status - 1]" size="mini"></OrderStatusTag>
+                </div>
+              </el-col>
+
+              <el-col :sm="24">
+                <div class="greyLabel">乘車時間</div>
+                <div class="greyValue">{{cancelOrderTemp.reserveDate | dateFilter}}</div>
+              </el-col>
+
+              <el-col :sm="24">
+                <div class="greyLabel">訂單編號</div>
+                <div class="greyValue">{{cancelOrderTemp.orderNo}}</div>
+              </el-col>
+
+              <el-col :sm="24">
+                <div class="greyLabel">
+                  起點
+                  <el-tooltip class="item" effect="dark" :content="cancelOrderTemp.fromAddrRemark" placement="top-start">
+                    <i class="iconfont icon-InfoCircle"></i>
+                  </el-tooltip>
+                </div>
+                <div class="greyValue">{{cancelOrderTemp.fromAddr}}</div>
+              </el-col>
+
+              <el-col :sm="24">
+                <div class="greyLabel">
+                  迄點
+                  <el-tooltip class="item" effect="dark" :content="cancelOrderTemp.toAddrRemark" placement="top-start">
+                    <i class="iconfont icon-InfoCircle"></i>
+                  </el-tooltip>
+                </div>
+                <div class="greyValue">{{cancelOrderTemp.toAddr}}</div>
+              </el-col>
+            </el-row>
+          </div>
+
+          <div class="cancelBottom">
+            <el-row :gutter="16">
+              <el-col :sm="24">
+                <div class="greyLabel">承接車行</div>
+                <div class="greyValue">{{cancelOrderTemp.orgName}}</div>
+              </el-col>
+
+              <el-col :sm="12">
+                <div class="greyLabel">車種</div>
+                <div class="greyValue">{{cancelOrderTemp.carCategoryName}}</div>
+              </el-col>
+
+              <el-col :sm="12">
+                <div class="greyLabel">共乘</div>
+                <div class="greyValue">{{cancelOrderTemp.canShared ? '願意共乘' : '不可共乘'}}</div>
+              </el-col>
+
+              <el-col :sm="24">
+                <div class="greyLabel">建單時間</div>
+                <div class="greyValue">{{cancelOrderTemp.createDate }}</div>
+              </el-col>
+
+              <el-col :sm="24">
+                <div class="greyLabel">建單者組織</div>
+                <div class="greyValue">???</div>
+              </el-col>
+            </el-row>
+          </div>
+        </el-col>
+
+        <el-col :sm="24" :md="12">
+          <h2 class="cancelViolateTitle">目前累計違規點數 ??? 點</h2>
+          <h4 class="cancelTodo">一、若於預約時間十分鐘後，未抵達約定乘車地點，視同放棄當次服務，駕駛員回報中心並離開進行下個服務，記違規1點。</h4>
+          <h4 class="cancelTodo">二、乘車日前(48小時)未申請更改或取消服務者， 記違規1點。</h4>
+          <h4 class="cancelTodo">三、累積違規3點後，停止服務2週，懲處完畢後歸0，重新累積記點規範。</h4>
+          <el-form ref="cancelForm" :model="cancelTemp" label-position="right" label-width="80px">
+            <el-form-item size="mini" :label="'記點點數'">
+              <el-input-number v-model="cancelTemp.point" :min="0" :max="5"></el-input-number>
+            </el-form-item>
+            <el-form-item required size="mini" :label="'記點原因'">
+              <el-input type="textarea" v-model="cancelTemp.remark" :autosize="{ minRows: 6, maxRows: 6}"></el-input>
+            </el-form-item>
+          </el-form>
+        </el-col>
+
+      </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button @click="cancelDialog = false">取 消</el-button>
-        <el-button type="danger" @click="handleConfirmViolation">確 定</el-button>
+        <el-button type="danger" @click="handleConfirmCancel">確 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -266,7 +361,11 @@ export default {
       },
 
       /* 取消訂單temp */
-      orderTemp: "",
+      cancelOrderTemp: {},
+      cancelTemp: {
+        point: 0,
+        remark: "",
+      },
 
       /* dialog */
       violationDialog: false,
@@ -461,22 +560,41 @@ export default {
       vm.$cl(id);
       orderCaseUser.getDetail({ orderId: id }).then((res) => {
         this.$cl(res);
-        vm.orderTemp = res.result;
+        vm.cancelOrderTemp = res.result;
         vm.$nextTick(() => {
           vm.cancelDialog = true;
         });
       });
-      // let params = {
-      //   id,
-      //   cancelRemark: "SYS_ORDERCANCEL_REMARK_ADMIN",
-      // };
-      // orderCaseUser.cancel(params).then((res) => {
-      //   vm.$alertT.fire({
-      //     icon: "success",
-      //     title: res.message,
-      //   });
-      //   vm.getList();
-      // });
+    },
+
+    /* 確認取消訂單 */
+    handleConfirmCancel() {
+      const vm = this;
+      if (vm.cancelTemp.remark == "") {
+        vm.$alertT.fire({
+          icon: "error",
+          title: "請填寫記點原因",
+        });
+      } else {
+        let params = {
+          cancelRemark: "SYS_ORDERCANCEL_REMARK_ADMIN",
+          hasVilation: true,
+          id: vm.cancelOrderTemp.id,
+          point: vm.cancelTemp.point,
+          remark: vm.cancelTemp.remark,
+        };
+        console.log(params);
+        orderCaseUser.cancel(params).then((res) => {
+          vm.$alertT.fire({
+            icon: "success",
+            title: res.message,
+          });
+          vm.cancelTemp.point = 0;
+          vm.cancelTemp.remark = "";
+          vm.cancelDialog = false;
+          vm.getList();
+        });
+      }
     },
 
     /* 檢視訂單 */
@@ -794,5 +912,42 @@ export default {
   @include rwd($md) {
     width: 100%;
   }
+}
+
+.greyBox {
+  background: #eeeeee;
+  padding: 1rem;
+  border-radius: 0.25rem;
+}
+
+.cancelBottom {
+  padding: 1rem;
+  padding-bottom: 0;
+}
+.greyLabel {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #000000;
+  margin-right: 0.5rem;
+  margin-bottom: 1rem;
+  width: 4.5rem;
+}
+.greyValue {
+  display: inline-block;
+}
+.cancelViolateTitle {
+  color: #000000;
+  margin-bottom: 1rem;
+}
+.cancelTodo {
+  color: red;
+  padding: 0 2em;
+  font-weight: normal;
+  margin-bottom: 1rem;
+  text-indent: -2em;
+}
+.icon-InfoCircle {
+  font-size: 8px;
 }
 </style>

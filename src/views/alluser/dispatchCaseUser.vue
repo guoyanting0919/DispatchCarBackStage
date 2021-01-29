@@ -254,6 +254,7 @@
 </template> 
 
 <script>
+import { mapGetters } from "vuex";
 import moment from "moment";
 
 import acMixins from "@/mixins/autoComplete.js";
@@ -345,6 +346,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(["defaultorgid"]),
     timeStartTime() {
       let time;
       if (this.temp.date !== this.today) {
@@ -386,8 +388,19 @@ export default {
         });
     },
 
+    /* 獲取歷史訂單 */
+    loadHistory() {
+      const vm = this;
+      orderCaseUser
+        .loadHistory({ userId: vm.$route.params.id.split("-")[0] })
+        .then((res) => {
+          console.log(res);
+        });
+    },
+
     /* 獲取身份資料 */
     getRole() {
+      const vm = this;
       caseUser.get({ id: this.$route.params.id.split("-")[1] }).then((res) => {
         this.roleInfo = res.result;
 
@@ -397,7 +410,12 @@ export default {
           res.result.orgBId3,
         ];
 
-        this.roleOrgB = this.orgBList.filter((i) => useBunit.includes(i.id));
+        if (useBunit.includes(vm.defaultorgid)) {
+          this.roleOrgB = this.orgBList.filter((i) => i.id === vm.defaultorgid);
+          vm.handleOrgBSelect(vm.defaultorgid);
+        } else {
+          this.roleOrgB = this.orgBList.filter((i) => useBunit.includes(i.id));
+        }
       });
     },
 
@@ -660,6 +678,7 @@ export default {
     await this.getOrgB();
     this.getRole();
     this.getOrder();
+    this.loadHistory();
   },
 };
 </script>
