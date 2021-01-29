@@ -10,6 +10,9 @@ export default {
         lat: 25.0374865,
         lng: 121.5647688,
       },
+      fromMarker: [], //起點座標
+      toMarker: [], //迄點座標
+      polyline: null, //路線
       service: null, //auto complete service
       searchResults: [], //auto complete options
       searchResultsFrom: [], //auto complete options
@@ -21,10 +24,6 @@ export default {
     };
   },
   methods: {
-    mixinMethod() {
-      console.log("a", this.temp);
-    },
-
     /* 初始化google map */
     initMap() {
       const vm = this;
@@ -105,7 +104,7 @@ export default {
 
       const service = new google.maps.places.PlacesService(vm.map);
       service.getDetails(request, (place, status) => {
-        vm.$cl(request);
+        // vm.$cl(request);
         vm.getPlaceDetail(place, direction);
         vm.sessionToken = new google.maps.places.AutocompleteSessionToken();
       });
@@ -121,9 +120,9 @@ export default {
         lon: place.geometry.location.toJSON().lng,
         lat: place.geometry.location.toJSON().lat,
       };
-      vm.$cl(params);
+      // vm.$cl(params);
       map.placeDetail(params).then((res) => {
-        vm.$cl(res);
+        // vm.$cl(res);
         vm.temp[`${status}Lat`] = res.result.lat;
         vm.temp[`${status}Lon`] = res.result.lon;
         vm.setMarker(res.result, status);
@@ -133,6 +132,9 @@ export default {
     /* 放置marker */
     setMarker(data, direction) {
       const vm = this;
+      if (vm[`${direction}Marker`].length !== 0) {
+        vm.clearMarker(direction);
+      }
       let position = {
         lat: data.lat, // 經度
         lng: data.lon, // 緯度
@@ -140,7 +142,13 @@ export default {
       let marker = new google.maps.Marker({
         position,
         map: vm.map,
+        // icon: {
+        //   url:
+        //     "https://www.flaticon.com/svg/vstatic/svg/71/71626.svg?token=exp=1611932300~hmac=ecefd3e562183b46392aae7a6ce3d0a4",
+        //   size: new google.maps.Size(100, 100),
+        // },
       });
+      vm[`${direction}Marker`].push(marker);
       vm[`${direction}Addr`] = data.addrFormat;
       vm.map.panTo(position);
       vm.getDiscount();
@@ -152,8 +160,11 @@ export default {
     },
 
     /* 放置舊marker */
-    setOldMarker(data) {
+    setOldMarker(data, direction) {
       const vm = this;
+      if (vm[`${direction}Marker`].length !== 0) {
+        vm.clearMarker(direction);
+      }
       let position = {
         lat: data.lat, // 經度
         lng: data.lon, // 緯度
@@ -162,21 +173,37 @@ export default {
         position,
         map: vm.map,
       });
+      vm[`${direction}Marker`].push(marker);
       vm.map.panTo(position);
-      if (vm.fromAddr && vm.toAddr) {
+      if (vm.fromAddr && vm.toAddr && direction == "to") {
         //判斷起訖點是否都有值了 若有則畫出路徑
         vm.handleDrawRoute();
       }
     },
 
+    /* Sets the map on all markers in the array. */
+    clearMarker(direction) {
+      const vm = this;
+      for (let i = 0; i < vm[`${direction}Marker`].length; i++) {
+        vm[`${direction}Marker`][i].setMap(null);
+        vm[`${direction}Marker`] = [];
+      }
+    },
+
     /* 畫路徑線 */
     handleDrawRoute() {
-      let bounds = new google.maps.LatLngBounds();
       const vm = this;
+      if (vm.polyline !== null) {
+        console.log("polyline is not null");
+        vm.polyline.setMap(null);
+        vm.polyline.setMap(null);
+      }
+      let bounds = new google.maps.LatLngBounds();
       let params = {
         fromAddr: vm.fromAddr,
         toAddr: vm.toAddr,
       };
+      console.log(params, "a");
       map.route(params).then((res) => {
         let jsonData = {
           overview_polyline: {
@@ -189,7 +216,7 @@ export default {
         for (let i = 0; i < path.length; i++) {
           bounds.extend(path[i]);
         }
-        let polyline = new google.maps.Polyline({
+        vm.polyline = new google.maps.Polyline({
           path: path,
           strokeColor: "#FF0000",
           strokeOpacity: 0.8,
@@ -198,9 +225,9 @@ export default {
           fillOpacity: 0.35,
           map: vm.map,
         });
-        polyline.setMap(vm.map);
+        vm.polyline.setMap(vm.map);
         vm.map.fitBounds(bounds);
-        vm.$cl(res);
+        // vm.$cl(res);
       });
     },
 
@@ -236,7 +263,7 @@ export default {
       ) {
         try {
           orderCaseUser?.getDiscount(params).then((res) => {
-            vm.$cl(res);
+            // vm.$cl(res);
             // vm.discountData = [res.result];
             let back = JSON.parse(JSON.stringify(res.result));
 

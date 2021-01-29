@@ -142,7 +142,11 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
-                <el-col v-if="!['醫院診所','洗腎中心','復健診所','住家',''].includes(temp.fromAddrRemark)" :sm="24" :md="24">
+                <el-col v-if="
+                    !['醫院診所', '洗腎中心', '復健診所', '住家', ''].includes(
+                      temp.fromAddrRemark
+                    )
+                  " :sm="24" :md="24">
                   <el-form-item label="起點備註-其他">
                     <el-input v-model="temp.fromRemark" placeholder="請輸入起點備註"></el-input>
                   </el-form-item>
@@ -165,7 +169,11 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
-                <el-col v-if="!['醫院診所','洗腎中心','復健診所','住家',''].includes(temp.toAddrRemark)" :sm="24" :md="24">
+                <el-col v-if="
+                    !['醫院診所', '洗腎中心', '復健診所', '住家', ''].includes(
+                      temp.toAddrRemark
+                    )
+                  " :sm="24" :md="24">
                   <el-form-item label="訖點備註-其他">
                     <el-input v-model="temp.toRemark" placeholder="請輸入訖點備註"></el-input>
                   </el-form-item>
@@ -664,8 +672,11 @@ export default {
           vm.toAddr = vm.temp.toAddr;
           vm.fromAddr = vm.temp.fromAddr;
           vm.$nextTick(() => {
-            vm.setOldMarker({ lat: vm.temp.fromLat, lon: vm.temp.fromLon });
-            vm.setOldMarker({ lat: vm.temp.toLat, lon: vm.temp.toLon });
+            vm.setOldMarker(
+              { lat: vm.temp.fromLat, lon: vm.temp.fromLon },
+              "from"
+            );
+            vm.setOldMarker({ lat: vm.temp.toLat, lon: vm.temp.toLon }, "to");
           });
         });
       }

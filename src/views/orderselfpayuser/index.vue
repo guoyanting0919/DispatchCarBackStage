@@ -365,7 +365,7 @@ export default {
       this.getList();
     },
 
-    /* 取消排班 */
+    /* 取消訂單 */
     handleCancelOrder(id) {
       const vm = this;
       let params = {

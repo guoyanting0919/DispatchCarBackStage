@@ -82,7 +82,11 @@
 
                 <el-col :sm="4" :md="6">
                   <el-form-item label="生日" required>
-                    <el-date-picker style="width: 100%" v-model="item.birth" type="date" placeholder="選擇生日" value-format="yyyy-MM-dd">
+                    <el-date-picker style="width: 100%" v-model="item.birth" type="date" placeholder="選擇生日" value-format="yyyy-MM-dd" :picker-options="{
+                              disabledDate(time) {
+                                return time.getTime() > Date.now();
+                              },
+                            }">
                     </el-date-picker>
                   </el-form-item>
                 </el-col>
