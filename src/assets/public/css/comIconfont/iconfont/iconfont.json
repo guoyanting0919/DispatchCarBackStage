@@ -6,6 +6,62 @@
   "description": "新北營運端",
   "glyphs": [
     {
+      "icon_id": "1410255",
+      "name": "check-box",
+      "font_class": "check-box",
+      "unicode": "e642",
+      "unicode_decimal": 58946
+    },
+    {
+      "icon_id": "1487400",
+      "name": "time",
+      "font_class": "time",
+      "unicode": "e648",
+      "unicode_decimal": 58952
+    },
+    {
+      "icon_id": "7206039",
+      "name": "Options",
+      "font_class": "Options",
+      "unicode": "e649",
+      "unicode_decimal": 58953
+    },
+    {
+      "icon_id": "8953257",
+      "name": "text-size",
+      "font_class": "text-size",
+      "unicode": "e83b",
+      "unicode_decimal": 59451
+    },
+    {
+      "icon_id": "13519371",
+      "name": "date",
+      "font_class": "date",
+      "unicode": "e64e",
+      "unicode_decimal": 58958
+    },
+    {
+      "icon_id": "14465232",
+      "name": "text",
+      "font_class": "text",
+      "unicode": "e6b0",
+      "unicode_decimal": 59056
+    },
+    {
+      "icon_id": "16881005",
+      "name": "number",
+      "font_class": "number",
+      "unicode": "e64a",
+      "unicode_decimal": 58954
+    },
+    {
+      "icon_id": "16881013",
+      "name": "radio",
+      "font_class": "radio",
+      "unicode": "e64b",
+      "unicode_decimal": 58955
+    },
+    {
       "icon_id": "348809",
       "name": "sort-alpha-desc",
       "font_class": "sortalphadesc",

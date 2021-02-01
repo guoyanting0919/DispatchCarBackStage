@@ -37,9 +37,12 @@ import "@/assets/public/css/comIconfont/iconfont/iconfont.js";
 // all(建議放套件Css下層)
 import "../src/assets/all.scss";
 
-// 请假条表单和详情
+// 自定義流程表單
 import FrmLeaveReqAdd from "@/views/forms/userDefine/frmLeaveReq/add";
 import FrmLeaveReqDetail from "@/views/forms/userDefine/frmLeaveReq/detail";
+
+Vue.component("FrmLeaveReqAdd", FrmLeaveReqAdd);
+Vue.component("FrmLeaveReqDetail", FrmLeaveReqDetail);
 
 import vueEsign from "vue-esign";
 Vue.use(vueEsign);
@@ -94,8 +97,6 @@ Vue.prototype.$alertM = alertM;
 Vue.prototype.$layer = layer(Vue, {
   msgtime: 3,
 });
-Vue.component("FrmLeaveReqAdd", FrmLeaveReqAdd);
-Vue.component("FrmLeaveReqDetail", FrmLeaveReqDetail);
 new Vue({
   el: "#app",
   router,

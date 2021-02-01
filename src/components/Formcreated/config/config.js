@@ -1,175 +1,188 @@
-const baseUrl = process.env.BASE_API
+const baseUrl = process.env.BASE_API;
 export const basicComponents = [
   {
-    type: 'input',
-    icon: 'icon-input',
-    name: '单行文本',
+    type: "input",
+    icon: "icon-text",
+    name: "單行文本",
     options: {
-      width: '100%',
-      defaultValue: '',
+      width: "100%",
+      defaultValue: "",
       required: false,
-      dataType: 'string',
-      pattern: '',
-      placeholder: '',
-      disabled: false
-    }
+      dataType: "string",
+      pattern: "",
+      placeholder: "",
+      disabled: false,
+    },
   },
   {
-    type: 'textarea',
-    icon: 'icon-diy-com-textarea',
-    name: '多行文本',
+    type: "textarea",
+    icon: "icon-text-size",
+    name: "多行文本",
     options: {
-      width: '100%',
-      defaultValue: '',
+      width: "100%",
+      defaultValue: "",
       required: false,
       disabled: false,
-      pattern: '',
-      placeholder: ''
-    }
+      pattern: "",
+      placeholder: "",
+    },
   },
   {
-    type: 'number',
-    icon: 'icon-number',
-    name: '计数器',
+    type: "switch",
+    icon: "icon-setting",
+    name: "開關",
     options: {
-      width: '',
+      width: "100%",
+      defaultValue: true,
+      required: false,
+      disabled: false,
+      pattern: "",
+      placeholder: "",
+    },
+  },
+  {
+    type: "number",
+    icon: "icon-number",
+    name: "計數器",
+    options: {
+      width: "",
       required: false,
       defaultValue: 0,
-      min: '',
-      max: '',
+      min: "",
+      max: "",
       step: 1,
       disabled: false,
-      controlsPosition: ''
-    }
+      controlsPosition: "",
+    },
   },
   {
-    type: 'radio',
-    icon: 'icon-radio-active',
-    name: '单选框组',
+    type: "radio",
+    icon: "icon-radio",
+    name: "單選框",
     options: {
       inline: true,
-      defaultValue: '',
+      defaultValue: "",
       showLabel: false,
       options: [
         {
-          value: 'Option 1',
-          label: '选项 1'
+          value: "Option 1",
+          label: "選項 1",
         },
         {
-          value: 'Option 2',
-          label: '选项 2'
+          value: "Option 2",
+          label: "選項 2",
         },
         {
-          value: 'Option 3',
-          label: '选项 3'
-        }
+          value: "Option 3",
+          label: "選項 3",
+        },
       ],
       required: false,
-      width: '',
+      width: "",
       remote: false,
       remoteOptions: [],
       props: {
-        value: 'value',
-        label: 'label'
+        value: "value",
+        label: "label",
       },
-      remoteFunc: '',
-      disabled: false
-    }
+      remoteFunc: "",
+      disabled: false,
+    },
   },
   {
-    type: 'checkbox',
-    icon: 'icon-check-box',
-    name: '多选框组',
+    type: "checkbox",
+    icon: "icon-check-box",
+    name: "多選框",
     options: {
       inline: true,
       defaultValue: [],
       showLabel: false,
       options: [
         {
-          value: 'Option 1'
+          value: "Option 1",
         },
         {
-          value: 'Option 2'
+          value: "Option 2",
         },
         {
-          value: 'Option 3'
-        }
+          value: "Option 3",
+        },
       ],
       required: false,
-      width: '',
+      width: "",
       remote: false,
       remoteOptions: [],
       props: {
-        value: 'value',
-        label: 'label'
+        value: "value",
+        label: "label",
       },
-      remoteFunc: '',
-      disabled: false
-    }
+      remoteFunc: "",
+      disabled: false,
+    },
   },
   {
-    type: 'time',
-    icon: 'icon-time',
-    name: '时间选择器',
+    type: "time",
+    icon: "icon-time",
+    name: "時間選擇器",
     options: {
-      defaultValue: '21:19:56',
+      defaultValue: "21:19:56",
       readonly: false,
       disabled: false,
       editable: true,
       clearable: true,
-      placeholder: '',
-      startPlaceholder: '',
-      endPlaceholder: '',
+      placeholder: "",
+      startPlaceholder: "",
+      endPlaceholder: "",
       isRange: false,
       arrowControl: true,
-      format: 'HH:mm:ss',
+      format: "HH:mm:ss",
       required: false,
-      width: ''
-    }
+      width: "",
+    },
   },
   {
-    type: 'date',
-    icon: 'icon-date',
-    name: '日期选择器',
+    type: "date",
+    icon: "icon-date",
+    name: "日期選擇器",
     options: {
-      defaultValue: '',
+      defaultValue: "",
       readonly: false,
       disabled: false,
       editable: true,
       clearable: true,
-      placeholder: '',
-      startPlaceholder: '',
-      endPlaceholder: '',
-      type: 'date',
-      format: 'yyyy-MM-dd',
+      placeholder: "",
+      startPlaceholder: "",
+      endPlaceholder: "",
+      type: "date",
+      format: "yyyy-MM-dd",
       timestamp: false,
       required: false,
-      width: ''
-    }
+      width: "",
+    },
   },
   {
-    type: 'text',
-    icon: 'icon-wenzishezhi-',
-    name: '文字',
+    type: "text",
+    icon: "icon-sortalphaasc",
+    name: "文字",
     options: {
-      defaultValue: 'This is a text',
-      customClass: ''
-    }
+      defaultValue: "This is a text",
+      customClass: "",
+    },
   },
   {
-    type: 'imgupload',
-    icon: 'icon-tupian',
-    name: '图片/文件',
+    type: "imgupload",
+    icon: "icon-Cloudupload",
+    name: "上傳組件",
     options: {
       defaultValue: [],
       required: false,
       size: {
         width: 100,
-        height: 100
+        height: 100,
       },
-      width: '',
-      tokenFunc: 'funcGetToken',
-      token: '',
+      width: "",
+      tokenFunc: "funcGetToken",
+      token: "",
       // domain: 'http://pfp81ptt6.bkt.clouddn.com/',
       disabled: false,
       length: 8,
@@ -178,62 +191,63 @@ export const basicComponents = [
       isDelete: false,
       min: 0,
       isEdit: false,
-      action: `${baseUrl}/Files/Upload`
-    }
+      action: `${baseUrl}/Files/Upload`,
+    },
   },
   {
-    type: 'select',
-    icon: 'icon-select',
-    name: '下拉选择框',
+    type: "select",
+    icon: "icon-Options",
+    name: "下拉選擇框",
     options: {
-      defaultValue: '',
+      defaultValue: "",
       multiple: false,
       disabled: false,
       clearable: false,
-      placeholder: '',
+      placeholder: "",
       required: false,
       showLabel: false,
-      width: '',
+      width: "",
       options: [
         {
-          value: 'Option 1'
+          value: "Option 1",
         },
         {
-          value: 'Option 2'
-        }, {
-          value: 'Option 3'
-        }
+          value: "Option 2",
+        },
+        {
+          value: "Option 3",
+        },
       ],
       remote: false,
       filterable: false,
       remoteOptions: [],
       props: {
-        value: 'value',
-        label: 'label'
+        value: "value",
+        label: "label",
       },
-      remoteFunc: ''
-    }
+      remoteFunc: "",
+    },
   },
   {
-    type: 'grid',
-    icon: 'icon-grid-',
-    name: '栅格布局',
+    type: "grid",
+    icon: "icon-table",
+    name: "網格layout",
     columns: [
       {
         span: 12,
-        list: []
+        list: [],
       },
       {
         span: 12,
-        list: []
-      }
+        list: [],
+      },
     ],
     options: {
       gutter: 0,
-      justify: 'start',
-      align: 'top'
-    }
-  }
+      justify: "start",
+      align: "top",
+    },
+  },
   // {
   //   type: 'color',
   //   icon: 'icon-color',
@@ -279,7 +293,7 @@ export const basicComponents = [
   //     required: false
   //   }
   // }
-]
+];
 
 export const advanceComponents = [
   // {
@@ -339,27 +353,27 @@ export const advanceComponents = [
   //     remoteFunc: ''
   //   }
   // }
-]
+];
 
 export const layoutComponents = [
   {
-    type: 'grid',
-    icon: 'icon-grid-',
-    name: '栅格布局',
+    type: "grid",
+    icon: "icon-grid-",
+    name: "栅格布局",
     columns: [
       {
         span: 12,
-        list: []
+        list: [],
       },
       {
         span: 12,
-        list: []
-      }
+        list: [],
+      },
     ],
     options: {
       gutter: 0,
-      justify: 'start',
-      align: 'top'
-    }
-  }
-]
+      justify: "start",
+      align: "top",
+    },
+  },
+];

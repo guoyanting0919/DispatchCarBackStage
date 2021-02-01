@@ -55,6 +55,9 @@
             </el-col>
             <el-col :sm="24" :md="24">
               <el-form-item label="居住地">
+                <span class="wealSpan" slot="label">居住地
+                  <el-button class="wealBtn" type="info" size="mini" v-if="temp.addr" @click="handleTransfer">轉換經緯度</el-button>
+                </span>
                 <el-row :gutter="16">
                   <el-col :sm="12" :md="3" style="margin-bottom: 1rem">
                     <el-form-item prop="county">
@@ -171,8 +174,10 @@ import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import SubTitle from "@/components/SubTitle";
 import DisabledUserInfo from "@/components/DisabledUserInfo";
+
 import * as taiwan from "@/assets/taiwan.js";
 import * as users from "@/api/users";
+import * as mapss from "@/api/map";
 import * as orgs from "@/api/orgs";
 import * as caseUsers from "@/api/caseUsers";
 export default {
@@ -250,7 +255,7 @@ export default {
     };
   },
   methods: {
-    //獲取特殊修改權限
+    /* 獲取特殊修改權限 */
     getSpecialButtons() {
       let router2 = this.$store.getters.modules;
       let a = router2.filter((r) => {
@@ -264,13 +269,14 @@ export default {
       this.buttons = b[0].item.elements.map((btn) => {
         return btn.domId;
       });
-      // console.log(this.buttons);
     },
-    // 是否擁有按鈕功能權限
+
+    /* 是否擁有按鈕功能權限 */
     hasButton(domId) {
       return this.buttons.includes(domId);
     },
-    // 獲取用戶基本資料
+
+    /* 獲取用戶基本資料 */
     async getUserBasic() {
       const vm = this;
       await users
@@ -282,7 +288,8 @@ export default {
           }, 100);
         });
     },
-    // 獲取長照資料
+
+    /* 獲取長照資料 */
     getCaseUser() {
       const vm = this;
       caseUsers.get({ id: vm.$route.params.id.split("-")[1] }).then((res) => {
@@ -292,6 +299,20 @@ export default {
         // console.log(res);
       });
     },
+
+    /* 轉換經緯度 */
+    handleTransfer() {
+      const vm = this;
+      let params = {
+        _addr: `${vm.temp.county}${vm.temp.district}${vm.temp.addr}`,
+      };
+      mapss.geocode(params).then((res) => {
+        vm.$cl(res);
+        vm.temp.lat = res.result.lat;
+        vm.temp.lon = res.result.lon;
+      });
+    },
+
     /* 獲取A單位資料 */
     getUnitAs() {
       const vm = this;
@@ -299,6 +320,8 @@ export default {
         vm.unitAs = res.result;
       });
     },
+
+    /* 儲存 */
     handleSave() {
       const vm = this;
       vm.$refs.form.validate((valid) => {

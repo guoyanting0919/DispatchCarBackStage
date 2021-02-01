@@ -75,6 +75,12 @@ let routerMappingList = [
     path: "/news/index",
     title: "前台頁面管理 / 最新消息管理",
   },
+
+  /* 基礎配置 */
+  {
+    path: "/forms/index",
+    title: "基礎配置 / 表單設計",
+  },
 ];
 let elementMappingList = [
   "add",

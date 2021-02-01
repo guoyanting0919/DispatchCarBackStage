@@ -4,79 +4,48 @@
       <el-header style="padding: 0;height: 42px;">
         <sticky :className="'sub-navbar '">
           <div class="filter-container">
-            <el-button
-              v-loading="loading"
-              size="mini"
-              class="filter-item"
-              style="margin-left: 10px;"
-              @click="submitForm"
-            >保存</el-button>
+            <el-button v-loading="loading" size="mini" class="filter-item" style="margin-left: 10px;" @click="submitForm">保存</el-button>
           </div>
         </sticky>
       </el-header>
       <el-main style="padding:0;height: calc(100% - 42px);">
         <el-container style="height: 100%;">
           <el-aside style="background: #fff;">
-            <el-form
-              class="form-container"
-              :model="postForm"
-              :rules="rules"
-              ref="postForm"
-              label-position="top"
-            >
+            <el-form class="form-container" :model="postForm" :rules="rules" ref="postForm" label-position="top">
               <div class="createPost-main-container" style="margin: 0;height: 100%;">
                 <el-form-item prop="name">
                   <MDinput name="name" v-model="postForm.name" required :maxlength="100">標題</MDinput>
                 </el-form-item>
 
                 <el-form-item label="摘要" label-position="top">
-                  <el-input
-                    type="textarea"
-                    :rows="6"
-                    placeholder="請輸入內容"
-                    v-model="postForm.description"
-                  ></el-input>
+                  <el-input type="textarea" :rows="6" placeholder="請輸入內容" v-model="postForm.description"></el-input>
                   <span class="word-counter" v-show="contentShortLength">{{contentShortLength}}字</span>
                 </el-form-item>
 
                 <el-form-item label="表單類型" label-position="top">
                   <el-select v-model="postForm.frmType" placeholder style="width: 100%;">
-                    <el-option label="可拖拽動態表單" :value="2"></el-option>
                     <el-option label="動態表單" :value="0"></el-option>
                     <el-option label="自定義開發頁面" :value="1"></el-option>
+                    <el-option label="可拖拽動態表單" :value="2"></el-option>
                   </el-select>
 
-                  <el-select
-                    style="margin-top: 10px;width: 100%;"
-                    v-model="postForm.webId"
-                    v-if="postForm.frmType == 1"
-                    placeholder="請選擇系統內置的頁面"
-                  >
-                    <el-option label="請假條" value="FrmLeaveReq"></el-option>
+                  <el-select style="margin-top: 10px;width: 100%;" v-model="postForm.webId" v-if="postForm.frmType == 1" placeholder="請選擇系統內置的頁面">
+                    <el-option label="請假單" value="FrmLeaveReq"></el-option>
+                    <el-option label="車輛申請表單" value="FrmCarReq"></el-option>
                   </el-select>
                 </el-form-item>
               </div>
             </el-form>
           </el-aside>
           <el-main style="padding:0;">
-            <div
-              class="editor-container"
-              style="height: 100%;"
-              v-if="postForm.frmType === 0 || postForm.frmType === 2"
-            >
-              <FormContainer
-                ref="contentDataForm"
-                :edit-info="editInfo"
-                v-if="postForm.frmType === 2"
-              ></FormContainer>
+            <div class="editor-container" style="height: 100%;" v-if="postForm.frmType === 0 || postForm.frmType === 2">
+
+              <!-- 拖拉式自定義表單 -->
+              <FormContainer ref="contentDataForm" :edit-info="editInfo" v-if="postForm.frmType === 2"></FormContainer>
+
+              <!-- 動態表單FIXME:暫時沒用 -->
               <template v-if="postForm.frmType === 0">
-                <Ueditor
-                  ref="ue"
-                  v-bind:content="postForm.content"
-                  :formType="postForm.frmType"
-                  v-bind:fileds="postForm.fields"
-                  @ready="ueReady"
-                ></Ueditor>
+                <Ueditor ref="ue" v-bind:content="postForm.content" :formType="postForm.frmType" v-bind:fileds="postForm.fields" @ready="ueReady"></Ueditor>
               </template>
             </div>
 

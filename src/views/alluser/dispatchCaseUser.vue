@@ -24,7 +24,9 @@
           <div class="directionContainer">
             <h3 class="directionTitle">
               本日行程一覽
-              <i class="iconfont icon-down tableToggle" @click="tableToggle = !tableToggle"></i>
+              <div class="tableToggle" :class="{'close':!tableToggle}">
+                <i class="iconfont icon-down" @click="tableToggle = !tableToggle"></i>
+              </div>
             </h3>
             <div class="orderAddr">
               <i class="iconfont icon-circle"></i>
@@ -91,6 +93,7 @@
                       }" @change="getDiscount"></el-date-picker>
                   </el-form-item>
                 </el-col>
+
                 <el-col :sm="24" :md="9" v-if="temp.date">
                   <el-form-item label="乘車時間" prop="time">
                     <el-time-select @change="getDiscount" v-model="temp.time" :picker-options="{
@@ -101,6 +104,7 @@
                     </el-time-select>
                   </el-form-item>
                 </el-col>
+
                 <el-col :sm="24" :md="24">
                   <div>
                     <span class="unitBTitle">優先搭乘車行排序 (請依序點擊完成排序)</span>
@@ -114,6 +118,7 @@
                     </div>
                   </div>
                 </el-col>
+
                 <el-col :sm="24" :md="24">
                   <el-form-item label="訂車人身份" prop="createdIdentity">
                     <el-select clearable v-model="temp.createdIdentity" placeholder="請選擇訂車人身份" style="width: 100%">
@@ -124,6 +129,7 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
+
                 <el-col :sm="24" :md="18">
                   <el-form-item label="起點" prop="fromAddr">
                     <el-select filterable :default-first-option="false" remote :remote-method="remoteMethodFrom" @change="handleChange('from')" @visible-change="handleVisibleChangeFrom" ref="atc" :trigger-on-focus="false" v-model="temp.fromAddr" placeholder="請輸入起點" style="width: 100%">
@@ -131,6 +137,7 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
+
                 <el-col :sm="24" :md="6">
                   <el-form-item label="起點備註" prop="fromAddrRemark">
                     <el-select clearable v-model="temp.fromAddrRemark" placeholder="請選擇備註" style="width: 100%">
@@ -142,6 +149,7 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
+
                 <el-col v-if="
                     !['醫院診所', '洗腎中心', '復健診所', '住家', ''].includes(
                       temp.fromAddrRemark
@@ -151,6 +159,7 @@
                     <el-input v-model="temp.fromRemark" placeholder="請輸入起點備註"></el-input>
                   </el-form-item>
                 </el-col>
+
                 <el-col :sm="24" :md="18">
                   <el-form-item label="迄點" prop="toAddr">
                     <el-select filterable :default-first-option="false" remote :remote-method="remoteMethodTo" @change="handleChange('to')" @visible-change="handleVisibleChangeTo" ref="atc" :trigger-on-focus="false" v-model="temp.toAddr" placeholder="請輸入迄點" style="width: 100%">
@@ -158,6 +167,7 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
+
                 <el-col :sm="24" :md="6">
                   <el-form-item label="訖點備註" prop="toAddrRemark">
                     <el-select clearable v-model="temp.toAddrRemark" placeholder="請選擇備註" style="width: 100%">
@@ -169,6 +179,7 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
+
                 <el-col v-if="
                     !['醫院診所', '洗腎中心', '復健診所', '住家', ''].includes(
                       temp.toAddrRemark
@@ -178,6 +189,7 @@
                     <el-input v-model="temp.toRemark" placeholder="請輸入訖點備註"></el-input>
                   </el-form-item>
                 </el-col>
+
                 <el-col :sm="24" :md="12">
                   <el-form-item label="預約回程(回居住地址)">
                     <el-radio-group v-model="temp.isBackTemp">
@@ -186,6 +198,7 @@
                     </el-radio-group>
                   </el-form-item>
                 </el-col>
+
                 <el-col :sm="24" :md="12">
                   <el-form-item label="回程乘車時間">
                     <el-time-select :disabled="!temp.isBackTemp" v-model="temp.reTime" :picker-options="{
@@ -196,6 +209,7 @@
                     </el-time-select>
                   </el-form-item>
                 </el-col>
+
                 <el-col :sm="24" :md="12">
                   <el-form-item label="願意共乘">
                     <el-radio-group v-model="temp.canShared">
@@ -212,6 +226,7 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
+
                 <el-col :sm="24" :md="6">
                   <el-form-item label="輪椅" prop="wheelchairType">
                     <el-select clearable v-model="temp.wheelchairType" placeholder="請選擇輪椅" style="width: 100%">
@@ -224,6 +239,7 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
+
                 <el-col :sm="24" :md="12">
                   <el-form-item label="陪同人數" prop="familyWith">
                     <el-select clearable @change="getDiscount" v-model.number="temp.familyWith" placeholder="請選擇陪同人數" style="width: 100%">
@@ -231,11 +247,13 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
+
                 <el-col :sm="24" :md="12">
                   <el-form-item label="簡訊號碼" prop="noticePhone">
                     <el-input v-model="temp.noticePhone" placeholder="請輸入簡訊號碼"></el-input>
                   </el-form-item>
                 </el-col>
+
               </el-row>
             </el-form>
           </div>
@@ -243,6 +261,47 @@
             <el-button style="height: 40px" type="info" @click="handleSubmit">立即預約</el-button>
             <el-button style="height: 40px" type="info">新增下個地點</el-button>
           </div>
+        </div>
+
+        <!-- 歷史訂單 -->
+        <div class="bg-white historyContainer">
+          <SubTitle title="歷史訂單"></SubTitle>
+          <el-table ref="mainTable" :data="list" border fit v-loading="listLoading" highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" @row-click="rowClick">
+            <el-table-column property="reserveDate" label="預約日期" width="150" align="center">
+              <template slot-scope="scope">
+                <span>{{
+                scope.row.reserveDate | globalDateFilter("yyyy-MM-DD")
+              }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column property="reserveDate" label="預約時間" width="100" align="center">
+              <template slot-scope="scope">
+                <span>{{
+                scope.row.reserveDate | globalDateFilter("HH:mm")
+              }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column property="carCategoryName" label="車輛類型" width="200" align="center"></el-table-column>
+            <el-table-column property="noticePhone" label="聯絡電話" width="150" align="center">
+            </el-table-column>
+            <el-table-column property="canShared" label="是否共乘">
+              <template slot-scope="scope">
+                <span v-if="scope.row.canShared">是</span>
+                <span v-else>否</span>
+              </template>
+            </el-table-column>
+            <el-table-column property="passengerNum" label="搭乘人數"></el-table-column>
+            <el-table-column property="fromAddr" label="起點"></el-table-column>
+            <el-table-column property="toAddr" label="訖點"></el-table-column>
+
+            <el-table-column property="setting" label="操作" fixed="right" width="100">
+              <template slot-scope="scope">
+                <div class="buttonFlexBox">
+                  <el-button size="mini" @click="handleCopy(scope.row)" type="success">複製訂單</el-button>
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
       </div>
     </div>
@@ -268,6 +327,7 @@ import moment from "moment";
 import acMixins from "@/mixins/autoComplete.js";
 
 import Sticky from "@/components/Sticky";
+import SubTitle from "@/components/SubTitle";
 
 import * as org from "@/api/orgs";
 import * as user from "@/api/users";
@@ -278,11 +338,23 @@ export default {
   mixins: [acMixins],
   components: {
     Sticky,
+    SubTitle,
   },
   data() {
     return {
       /* 今天日期 */
       today: "",
+
+      /* 歷史訂單 */
+      list: [],
+      listLoading: false,
+      listQuery: {
+        page: 1,
+        limit: 10,
+        orgId: "",
+        key: undefined,
+      },
+      total: "",
 
       /* 全域資料 */
       userInfo: "",
@@ -396,14 +468,50 @@ export default {
         });
     },
 
+    /* 獲取長照資料 */
+    getCaseUser() {
+      const vm = this;
+      caseUser.get({ id: this.$route.params.id.split("-")[1] }).then((res) => {
+        vm.$cl(res.result);
+        let caseUserTemp = res.result;
+        let data = {
+          lat: res.result.lat,
+          lon: res.result.lon,
+        };
+        vm.setMarker(data, "from");
+        vm.temp.fromAddr = `${caseUserTemp.county}${caseUserTemp.district}${caseUserTemp.addr}`;
+        vm.temp.fromAddrRemark = "住家";
+        vm.fromAddr = `${caseUserTemp.county}${caseUserTemp.district}${caseUserTemp.addr}`;
+      });
+    },
+
     /* 獲取歷史訂單 */
-    loadHistory() {
+    getList() {
       const vm = this;
       orderCaseUser
         .loadHistory({ userId: vm.$route.params.id.split("-")[0] })
         .then((res) => {
-          console.log(res);
+          vm.list = res.result;
+          // this.$cl(vm.list);
         });
+    },
+
+    /* 複製訂單 */
+    handleCopy(order) {
+      const vm = this;
+      console.log(order);
+      vm.temp = Object.assign({}, order); // copy obj
+      vm.temp.transOrgs = [order.orgId];
+      // vm.temp.isBackTemp = false;
+      vm.$set(this.temp, "isBackTemp", false);
+      vm.$set(this.temp, "reTime", null);
+      vm.fromAddr = order.fromAddr;
+      vm.toAddr = order.toAddr;
+      vm.handleOrgBSelect(order.orgId * 1);
+      vm.$nextTick(() => {
+        vm.setOldMarker({ lat: vm.temp.fromLat, lon: vm.temp.fromLon }, "from");
+        vm.setOldMarker({ lat: vm.temp.toLat, lon: vm.temp.toLon }, "to");
+      });
     },
 
     /* 獲取身份資料 */
@@ -419,6 +527,7 @@ export default {
         ];
 
         if (useBunit.includes(vm.defaultorgid)) {
+          //若登入單位包含用戶所選B單位
           this.roleOrgB = this.orgBList.filter((i) => i.id === vm.defaultorgid);
           vm.handleOrgBSelect(vm.defaultorgid);
         } else {
@@ -436,6 +545,7 @@ export default {
 
     /* 排序B單位 */
     handleOrgBSelect(id) {
+      console.log(id);
       const vm = this;
       !vm.temp.transOrgs.includes(id)
         ? vm.temp.transOrgs.push(id)
@@ -562,7 +672,7 @@ export default {
               }
             });
           } else {
-            this.$cl("nodata");
+            this.$cl("submit error");
           }
         } else {
           console.log("submit error");
@@ -639,7 +749,7 @@ export default {
       vm.amtDialog = true;
     },
 
-    /* 若有query 有 orderId */
+    /* 若有query 有 orderId 則複製該筆order資料 反之將caseuser居住地址帶入起點*/
     getOrder() {
       const vm = this;
       if (this.$route.query.orderId) {
@@ -679,7 +789,23 @@ export default {
             vm.setOldMarker({ lat: vm.temp.toLat, lon: vm.temp.toLon }, "to");
           });
         });
+      } else {
+        vm.getCaseUser();
       }
+    },
+
+    /* 換頁 */
+    handleCurrentChange(val) {
+      this.listQuery.page = val.page;
+      this.listQuery.limit = val.limit;
+      this.getList();
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
+    rowClick(row) {
+      this.$refs.mainTable.clearSelection();
+      this.$refs.mainTable.toggleRowSelection(row);
     },
   },
   async mounted() {
@@ -687,9 +813,10 @@ export default {
     this.getUser();
     this.getCarCategorys();
     await this.getOrgB();
-    this.getRole();
+    // this.getCaseUser();
+    this.getRole(); //獲取case user B單位
     this.getOrder();
-    this.loadHistory();
+    this.getList(); //歷史訂單
   },
 };
 </script>
@@ -699,6 +826,7 @@ export default {
   height: 100%;
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
 }
 
@@ -745,7 +873,13 @@ export default {
 .tableToggle {
   position: absolute;
   right: 0.5rem;
+  top: 0.5rem;
   cursor: pointer;
+  transition: 0.5s;
+
+  &.close {
+    transform: rotate(180deg);
+  }
 }
 
 .orderAddr {
@@ -870,5 +1004,10 @@ export default {
   justify-content: center;
   background: $--color-primary;
   opacity: 0.7;
+}
+
+.historyContainer {
+  width: 100%;
+  padding: 1rem 1.5rem;
 }
 </style>

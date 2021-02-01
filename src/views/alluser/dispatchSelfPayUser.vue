@@ -167,7 +167,6 @@
       </el-row>
 
       <!-- 歷史訂單 -->
-
       <div class="bg-white dispatchContainer">
         <SubTitle title="歷史訂單"></SubTitle>
         <el-table ref="mainTable" :data="list" border fit v-loading="listLoading" highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" @row-click="rowClick">

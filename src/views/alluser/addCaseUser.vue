@@ -292,10 +292,12 @@
 
 <script>
 // import moment from "moment";
+
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import SubTitle from "@/components/SubTitle";
-import * as taiwan from "@/assets/taiwan.js";
+
+import * as taiwan from "@/assets/country.js";
 import * as users from "@/api/users";
 import * as caseUsers from "@/api/caseUsers";
 import * as orgs from "@/api/orgs";
@@ -499,7 +501,8 @@ export default {
     this.getSpecialButtons();
     this.getUnitAs();
     this.taiwanCity = taiwan.cityAndCountiesLite;
-    console.log(this.taiwanCity);
+    // console.log(this.taiwanCity);
+    this.$cl(this.taiwanCity);
   },
 };
 </script>

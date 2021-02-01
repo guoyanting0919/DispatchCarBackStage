@@ -1,24 +1,12 @@
 <template>
   <el-container class="fm2-container" style="height: 100%;">
-    <el-header style="height: auto;padding:0;border-bottom: 1px solid #ccc;">
+    <!-- 選擇表單類型 -->
+    <el-header style="height: auto;padding:0;border-bottom: 1px solid #bbbbbb;">
       <div class="components-list" style="padding-bottom: 0;">
         <template v-if="basicFields.length">
-          <draggable
-            tag="ul"
-            :list="basicComponents"
-            v-bind="{group:{ name:'people', pull:'clone',put:false},sort:false, ghostClass: 'ghost'}"
-            @end="handleMoveEnd"
-            @start="handleMoveStart"
-            :move="handleMove"
-            style="padding-bottom: 0;"
-          >
+          <draggable tag="ul" :list="basicComponents" v-bind="{group:{ name:'people', pull:'clone',put:false},sort:false, ghostClass: 'ghost'}" @end="handleMoveEnd" @start="handleMoveStart" :move="handleMove" style="padding-bottom: 0;">
             <template v-for="(item, index) in basicComponents">
-              <li
-                v-if="basicFields.indexOf(item.type)>=0"
-                class="form-edit-created-label"
-                :class="{'no-put': item.type == 'divider'}"
-                :key="index"
-              >
+              <li v-if="basicFields.indexOf(item.type)>=0" class="form-edit-created-label" :class="{'no-put': item.type == 'divider'}" :key="index">
                 <a>
                   <i class="icon iconfont" :class="item.icon"></i>
                   <span>{{item.name}}</span>
@@ -29,49 +17,25 @@
         </template>
       </div>
     </el-header>
+
     <el-main class="fm2-main">
       <el-container>
         <el-container class="center-container" direction="vertical">
           <el-main :class="{'created-empty': createdFormData.list.length == 0}">
-            <ShowForm
-              v-if="!resetJson"
-              ref="createdFormData"
-              :data="createdFormData"
-              :select.sync="formDataSelect"
-            ></ShowForm>
+            <ShowForm v-if="!resetJson" ref="createdFormData" :data="createdFormData" :select.sync="formDataSelect"></ShowForm>
           </el-main>
           <el-header class="btn-bar" style="height: 45px;">
             <slot name="action"></slot>
-            <el-button
-              v-if="clearable"
-              type="text"
-              size="mini"
-              icon="el-icon-delete"
-              @click="handleClear"
-            >清空</el-button>
-            <el-button
-              v-if="preview"
-              type="text"
-              size="mini"
-              icon="el-icon-view"
-              @click="handlePreview"
-            >預覽</el-button>
+            <el-button v-if="clearable" type="text" size="mini" icon="el-icon-delete" @click="handleClear">清空</el-button>
+            <el-button v-if="preview" type="text" size="mini" icon="el-icon-view" @click="handlePreview">預覽</el-button>
           </el-header>
         </el-container>
 
         <el-aside class="created-config-container">
           <el-container>
             <el-header height="45px" style="font-size: 0;">
-              <div
-                class="config-tab"
-                :class="{active: configTab=='created'}"
-                @click="handleConfigSelect('created')"
-              >字段屬性</div>
-              <div
-                class="config-tab"
-                :class="{active: configTab=='form'}"
-                @click="handleConfigSelect('form')"
-              >表單屬性</div>
+              <div class="config-tab" :class="{active: configTab=='created'}" @click="handleConfigSelect('created')">字段屬性</div>
+              <div class="config-tab" :class="{active: configTab=='form'}" @click="handleConfigSelect('form')">表單屬性</div>
             </el-header>
             <el-main class="config-content">
               <config v-show="configTab=='created'" :data="formDataSelect"></config>
@@ -79,22 +43,8 @@
             </el-main>
           </el-container>
         </el-aside>
-        <Model
-          :visible="previewVisible"
-          @on-close="previewVisible = false"
-          ref="formPreview"
-          width="1000px"
-          form
-        >
-          <CreatedForm
-            insite="true"
-            @on-change="handleDataChange"
-            v-if="previewVisible"
-            :data="createdFormData"
-            :value="formDataModels"
-            :remote="remoteFuncs"
-            ref="generateForm"
-          >
+        <Model :visible="previewVisible" @on-close="previewVisible = false" ref="formPreview" width="1000px" form>
+          <CreatedForm insite="true" @on-change="handleDataChange" v-if="previewVisible" :data="createdFormData" :value="formDataModels" :remote="remoteFuncs" ref="generateForm">
             <template v-slot:blank="scope">
               Width
               <el-input v-model="scope.model.blank.width" style="width: 100px"></el-input>Height
@@ -108,13 +58,7 @@
           </template>
         </Model>
 
-        <Model
-          :visible="jsonVisible"
-          @on-close="jsonVisible = false"
-          ref="jsonPreview"
-          width="800px"
-          form
-        >
+        <Model :visible="jsonVisible" @on-close="jsonVisible = false" ref="jsonPreview" width="800px" form>
           <codemirror style="height:100%;" ref="myEditor" v-model="jsonTemplate"></codemirror>
           <template slot="action">
             <el-button type="primary" class="json-btn" :data-clipboard-text="jsonCopyValue">覆製</el-button>
@@ -174,6 +118,8 @@ export default {
       type: Boolean,
       default: true,
     },
+
+    /* 表單類型 */
     basicFields: {
       type: Array,
       default: () => [

@@ -2,39 +2,15 @@
   <div class="flex-column">
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
-        <el-input
-          @keyup.enter.native="handleFilter"
-          size="mini"
-          style="width: 200px;"
-          class="filter-item"
-          :placeholder="'名稱'"
-          v-model="listQuery.key"
-        ></el-input>
+        <el-input @keyup.enter.native="handleFilter" size="mini" style="width: 200px;" class="filter-item" :placeholder="'名稱'" v-model="listQuery.key"></el-input>
         <permission-btn moduleName="forms" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
 
-        <el-checkbox
-          size="small"
-          style="margin-left:15px"
-          @change="tableKey=tableKey+1"
-          v-model="showDescription"
-        >描述</el-checkbox>
+        <el-checkbox size="small" style="margin-left:15px" @change="tableKey=tableKey+1" v-model="showDescription">描述</el-checkbox>
       </div>
     </sticky>
     <div class="app-container flex-item">
       <div class="bg-white" style="height: 100%;">
-        <el-table
-          height="100%"
-          ref="mainTable"
-          :key="tableKey"
-          :data="list"
-          v-loading="listLoading"
-          border
-          fit
-          highlight-current-row
-          style="width: 100%;"
-          @row-click="rowClick"
-          @selection-change="handleSelectionChange"
-        >
+        <el-table height="100%" ref="mainTable" :key="tableKey" :data="list" v-loading="listLoading" border fit highlight-current-row style="width: 100%;" @row-click="rowClick" @selection-change="handleSelectionChange">
           <el-table-column align="center" type="selection" width="55"></el-table-column>
 
           <el-table-column :label="'Id'" min-width="120px">
@@ -57,26 +33,14 @@
 
           <el-table-column class-name="status-col" :label="'狀態'" width="100">
             <template slot-scope="scope">
-              <span
-                :class="scope.row.disabled | statusFilter"
-              >{{statusOptions.find(u =>u.key == scope.row.disabled).display_name}}</span>
+              <span :class="scope.row.disabled | statusFilter">{{statusOptions.find(u =>u.key == scope.row.disabled).display_name}}</span>
             </template>
           </el-table-column>
 
-          <el-table-column
-            align="center"
-            :label="'操作'"
-            width="230"
-            class-name="small-padding fixed-width"
-          >
+          <el-table-column align="center" :label="'操作'" width="230" class-name="small-padding fixed-width">
             <template slot-scope="scope">
               <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">編輯</el-button>
-              <el-button
-                v-if="scope.row.disabled!=0"
-                size="mini"
-                type="danger"
-                @click="handleModifyStatus(scope.row,0)"
-              >停用</el-button>
+              <el-button v-if="scope.row.disabled!=0" size="mini" type="danger" @click="handleModifyStatus(scope.row,0)">停用</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -179,17 +143,17 @@ export default {
           icon: "form",
         },
         children: [
-          {
-            path: "add",
-            component: () => import("@/views/forms/add"),
-            name: "formAdd",
-            meta: {
-              notauth: true,
-              title: "添加表單",
-              noCache: true,
-              icon: "star",
-            },
-          },
+          // {
+          //   path: "add",
+          //   component: () => import("@/views/forms/add"),
+          //   name: "formAdd",
+          //   meta: {
+          //     notauth: true,
+          //     title: "添加表單",
+          //     noCache: true,
+          //     icon: "star",
+          //   },
+          // },
           {
             path: "edit/:id",
             component: () => import("@/views/forms/edit"),
@@ -225,7 +189,7 @@ export default {
       switch (domId) {
         case "btnAdd":
           this.saveAddFormDetails("");
-          this.$router.push("/forms/add");
+          this.$router.push("/forms/add/1");
           break;
         case "btnEdit":
           if (this.multipleSelection.length !== 1) {

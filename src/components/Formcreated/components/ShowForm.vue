@@ -1,111 +1,45 @@
 <template>
   <div class="created-form-container" style="height: 100%">
     <div v-if="data.list.length == 0" class="form-empty">
-      從頂部拖拽來添加字段
+      從頂部拖拽表單類型
     </div>
-    <el-form
-      style="height: calc(100% - 10px)"
-      :size="data.config.size"
-      label-suffix=":"
-      :label-position="data.config.labelPosition"
-      :label-width="data.config.labelWidth + 'px'"
-    >
-      <draggable
-        class
-        v-model="data.list"
-        v-bind="{
+    <el-form style="height: calc(100% - 10px)" :size="data.config.size" label-suffix=":" :label-position="data.config.labelPosition" :label-width="data.config.labelWidth + 'px'">
+      <draggable class v-model="data.list" v-bind="{
           group: 'people',
           ghostClass: 'ghost',
           animation: 200,
           handle: '.drag-form',
-        }"
-        @end="handleMoveEnd"
-        @add="handleAddFormItem"
-        style="height: 100%"
-      >
-        <transition-group
-          name="fade"
-          tag="div"
-          class="created-form-list"
-          style="min-height: calc(100% - 10px)"
-        >
+        }" @end="handleMoveEnd" @add="handleAddFormItem" style="height: 100%">
+        <transition-group name="fade" tag="div" class="created-form-list" style="min-height: calc(100% - 10px)">
           <template v-for="(element, index) in data.list">
             <template v-if="element.type == 'grid'">
-              <el-row
-                class="created-col created-view"
-                v-if="element && element.key"
-                :key="element.key"
-                type="flex"
-                :class="{ active: selectFormData.key == element.key }"
-                :gutter="element.options.gutter ? element.options.gutter : 0"
-                :justify="element.options.justify"
-                :align="element.options.align"
-                @click.native="handleSelectForm(index)"
-              >
-                <el-col
-                  v-for="(col, colIndex) in element.columns"
-                  :key="colIndex"
-                  :span="col.span ? col.span : 0"
-                >
-                  <draggable
-                    v-model="col.list"
-                    :no-transition-on-drag="true"
-                    v-bind="{
+              <el-row class="created-col created-view" v-if="element && element.key" :key="element.key" type="flex" :class="{ active: selectFormData.key == element.key }" :gutter="element.options.gutter ? element.options.gutter : 0" :justify="element.options.justify" :align="element.options.align" @click.native="handleSelectForm(index)">
+                <el-col v-for="(col, colIndex) in element.columns" :key="colIndex" :span="col.span ? col.span : 0">
+                  <draggable v-model="col.list" :no-transition-on-drag="true" v-bind="{
                       group: 'people',
                       ghostClass: 'ghost',
                       animation: 200,
                       handle: '.drag-form',
-                    }"
-                    @end="handleMoveEnd"
-                    @add="handleAddFormCol($event, element, colIndex)"
-                  >
-                    <transition-group
-                      name="fade"
-                      tag="div"
-                      class="created-col-list"
-                    >
+                    }" @end="handleMoveEnd" @add="handleAddFormCol($event, element, colIndex)">
+                    <transition-group name="fade" tag="div" class="created-col-list">
                       <template v-for="(el, i) in col.list">
-                        <ShowFormItem
-                          :key="el.key"
-                          v-if="el.key"
-                          :element="el"
-                          :select.sync="selectFormData"
-                          :index="i"
-                          :data="col"
-                        ></ShowFormItem>
+                        <ShowFormItem :key="el.key" v-if="el.key" :element="el" :select.sync="selectFormData" :index="i" :data="col"></ShowFormItem>
                       </template>
                     </transition-group>
                   </draggable>
                 </el-col>
-                <div
-                  class="created-view-action created-col-action"
-                  v-if="selectFormData.key == element.key"
-                >
-                  <i
-                    class="el-icon-delete"
-                    title="刪除"
-                    @click.stop="handleDeleteFormItem(index)"
-                  ></i>
+                <div class="created-view-action created-col-action" v-if="selectFormData.key == element.key">
+                  <i class="el-icon-delete" title="刪除" @click.stop="handleDeleteFormItem(index)"></i>
                 </div>
 
-                <div
-                  class="created-view-drag created-col-drag"
-                  v-if="selectFormData.key == element.key"
-                >
+                <div class="created-view-drag created-col-drag" v-if="selectFormData.key == element.key">
                   <i class="el-icon-sort drag-form"></i>
                 </div>
               </el-row>
             </template>
             <template v-else>
               <!-- <span :key="element.key">{{element}}></span> -->
-              <ShowFormItem
-                v-if="element && element.key"
-                :key="element.key"
-                :element="element"
-                :select.sync="selectFormData"
-                :index="index"
-                :data="data"
-              ></ShowFormItem>
+              <ShowFormItem v-if="element && element.key" :key="element.key" :element="element" :select.sync="selectFormData" :index="index" :data="data"></ShowFormItem>
             </template>
           </template>
         </transition-group>
@@ -144,7 +78,9 @@ export default {
       this.selectFormData = this.data.list[index];
     },
     handleAddFormItem(evt) {
+      console.log(evt);
       const newIndex = evt.newIndex;
+      console.log(this.data.list[newIndex]);
       // const to = evt.to
 
       // 為拖拽到容器的元素添加唯一 key
@@ -161,6 +97,7 @@ export default {
         model: this.data.list[newIndex].type + "_" + key,
         rules: [],
       });
+      console.log(this.data.list[newIndex]);
       if (
         this.data.list[newIndex].type === "radio" ||
         this.data.list[newIndex].type === "checkbox" ||
@@ -185,6 +122,7 @@ export default {
         });
       }
       this.selectFormData = this.data.list[newIndex];
+      console.log(this.data);
     },
     handleAddFormCol($event, row, colIndex) {
       const newIndex = $event.newIndex;
