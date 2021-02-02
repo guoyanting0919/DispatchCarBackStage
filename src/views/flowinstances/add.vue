@@ -1,21 +1,9 @@
 <template>
   <div>
     <sticky :className="'sub-navbar '">
-      <el-button
-        v-if="active>0"
-        size="mini"
-        style="margin-left: 10px;"
-        type="primary"
-        @click="pre"
-      >上一步</el-button>
+      <el-button v-if="active>0" size="mini" style="margin-left: 10px;" type="primary" @click="pre">上一步</el-button>
       <el-button v-if="active<1" size="mini" style="margin-left: 10px;" @click="next">下一步</el-button>
-      <el-button
-        v-loading="loading"
-        size="mini"
-        style="margin-left: 10px;"
-        type="success"
-        @click="submitForm"
-      >保存</el-button>
+      <el-button v-loading="loading" size="mini" style="margin-left: 10px;" type="success" @click="submitForm">保存</el-button>
     </sticky>
     <div class="createPost-container">
       <el-form class="form-container" :model="postObj" :rules="rules" ref="postObj">
@@ -26,18 +14,8 @@
         <!--選擇模板-->
         <div class="createPost-main-container" v-show="active==0">
           <el-form-item label=" ">
-            <el-select
-              style="width: 400px;"
-              v-model="currentSchemeId"
-              size="small"
-              placeholder="請選擇"
-            >
-              <el-option
-                v-for="item in flowschemes"
-                :key="item.id"
-                :label="item.schemeName"
-                :value="item.id"
-              ></el-option>
+            <el-select style="width: 400px;" v-model="currentSchemeId" size="small" placeholder="請選擇">
+              <el-option v-for="item in flowschemes" :key="item.id" :label="item.schemeName" :value="item.id"></el-option>
             </el-select>
           </el-form-item>
           <div class="flow-form-content">
@@ -45,26 +23,14 @@
               <component ref="frmData" v-bind:is="postObj.dbName +'Add'"></component>
             </el-card>
             <template v-else-if="postObj.frmType === 2">
-              <CreatedForm
-                insite="true"
-                ref="createdForm"
-                v-if="createdFormData.list && createdFormData.list.length > 0"
-                :data="createdFormData"
-                :value="{}"
-              ></CreatedForm>
+              <CreatedForm insite="true" ref="createdForm" v-if="createdFormData.list && createdFormData.list.length > 0" :data="createdFormData" :value="{}"></CreatedForm>
             </template>
             <form ref="frmData" v-else>
               <p v-html="frmPreview"></p>
             </form>
           </div>
           <div class="flow-form-content" style="height: 500px;">
-            <CreatedFlow
-              ref="createdFlow"
-              :form-template="currentForm"
-              :isEdit="true"
-              :isShowContent="isShowContent"
-              :scheme-content="currentScheme.schemeContent"
-            ></CreatedFlow>
+            <CreatedFlow ref="createdFlow" :form-template="currentForm" :isEdit="true" :isShowContent="isShowContent" :scheme-content="currentScheme.schemeContent"></CreatedFlow>
           </div>
         </div>
 
@@ -73,12 +39,7 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="標題" label-width="100px" prop="schemeNameRule">
-                <el-input
-                  name="name"
-                  v-model="postObj.customName"
-                  required
-                  style="max-width: 200px;"
-                ></el-input>
+                <el-input name="name" v-model="postObj.customName" required style="max-width: 200px;"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -88,33 +49,17 @@
             </el-col>
             <el-col :span="12">
               <el-form-item label-width="100px" label="發布時間:" class="postInfo-container-item">
-                <el-date-picker
-                  v-model="postObj.createDate"
-                  type="datetime"
-                  format="yyyy-MM-dd HH:mm:ss"
-                  placeholder="選擇日期時間"
-                ></el-date-picker>
+                <el-date-picker v-model="postObj.createDate" type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="選擇日期時間"></el-date-picker>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label-width="100px" label="重要性(占位):" class="postInfo-container-item">
-                <el-rate
-                  style="margin-top:8px;"
-                  :max="3"
-                  :colors="['#99A9BF', '#F7BA2A', '#FF9900']"
-                  :low-threshold="1"
-                  :high-threshold="3"
-                ></el-rate>
+                <el-rate style="margin-top:8px;" :max="3" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :low-threshold="1" :high-threshold="3"></el-rate>
               </el-form-item>
             </el-col>
             <el-col :span="24">
               <el-form-item label-width="100px" label="摘要:">
-                <el-input
-                  type="textarea"
-                  :rows="3"
-                  placeholder="請輸入內容"
-                  v-model="postObj.description"
-                ></el-input>
+                <el-input type="textarea" :rows="3" placeholder="請輸入內容" v-model="postObj.description"></el-input>
                 <span class="word-counter" v-if="contentShortLength">{{contentShortLength}}字</span>
               </el-form-item>
             </el-col>

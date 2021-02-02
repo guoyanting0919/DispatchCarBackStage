@@ -3,54 +3,33 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <el-button type="info" plain size="mini">回列表</el-button>
-        <el-button @click="handleSave" type="success" size="mini"
-          >儲存</el-button
-        >
+        <el-button @click="handleSave" type="success" size="mini">儲存</el-button>
       </div>
     </sticky>
     <div class="app-container flex-item">
       <Title title="新增司機"></Title>
       <div class="bg-white formContainer customScrollBar">
-        <el-form
-          :label-position="labelPosition"
-          label-width="200px"
-          :model="temp"
-          :rules="rules"
-          ref="form"
-        >
+        <el-form :label-position="labelPosition" label-width="200px" :model="temp" :rules="rules" ref="form">
           <SubTitle title="基本資料編輯"></SubTitle>
           <el-row :gutter="16">
             <el-col :sm="12" :md="6">
               <el-form-item label="姓名" prop="name">
-                <el-input
-                  v-model="temp.name"
-                  placeholder="請輸入姓名"
-                ></el-input>
+                <el-input v-model="temp.name" placeholder="請輸入姓名"></el-input>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="身分證字號" prop="uid">
-                <el-input
-                  v-model="temp.uid"
-                  placeholder="請輸入身分證字號"
-                ></el-input>
+                <el-input v-model="temp.uid" placeholder="請輸入身分證字號"></el-input>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="手機" prop="phone">
-                <el-input
-                  v-model="temp.phone"
-                  placeholder="請輸入手機"
-                ></el-input>
+                <el-input v-model="temp.phone" placeholder="請輸入手機"></el-input>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="性別" prop="sex">
-                <el-select
-                  v-model="temp.sex"
-                  placeholder="請選擇性別"
-                  style="width: 100%"
-                >
+                <el-select v-model="temp.sex" placeholder="請選擇性別" style="width: 100%">
                   <el-option :value="1" :label="'男'">男</el-option>
                   <el-option :value="0" :label="'女'">女</el-option>
                 </el-select>
@@ -58,11 +37,7 @@
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="可否派發" prop="status">
-                <el-select
-                  v-model="temp.status"
-                  placeholder="請選擇可否派發"
-                  style="width: 100%"
-                >
+                <el-select v-model="temp.status" placeholder="請選擇可否派發" style="width: 100%">
                   <el-option :value="1" :label="'可派發'">可派發</el-option>
                   <el-option :value="0" :label="'不可派發'">不可派發</el-option>
                 </el-select>
@@ -77,28 +52,12 @@
               <div class="expireDate">證照到期日</div>
             </div>
             <el-checkbox-group v-model="temp.driverLicenses">
-              <div
-                v-for="license in driverLicensesList"
-                :key="license.categoryId"
-                style="border-bottom: 1px solid #ddd; display: flex"
-              >
-                <el-checkbox
-                  :label="license.categoryId"
-                  name="type"
-                  style="width: 50%; text-align: center; padding: 1rem"
-                >
+              <div v-for="license in driverLicensesList" :key="license.categoryId" style="border-bottom: 1px solid #ddd; display: flex">
+                <el-checkbox :label="license.categoryId" name="type" style="width: 50%; text-align: center; padding: 1rem">
                   {{ license.categoryName }}
                 </el-checkbox>
                 <div class="expireDateBox">
-                  <el-date-picker
-                    style="width: 70%"
-                    :disabled="hasChecked(license.categoryId)"
-                    v-model="license.expireDate"
-                    value-format="yyyy-MM-dd"
-                    type="date"
-                    size="mini"
-                    placeholder="選擇日期"
-                  ></el-date-picker>
+                  <el-date-picker style="width: 70%" :disabled="hasChecked(license.categoryId)" v-model="license.expireDate" value-format="yyyy-MM-dd" type="date" size="mini" placeholder="選擇日期"></el-date-picker>
                 </div>
               </div>
             </el-checkbox-group>
@@ -111,39 +70,19 @@
               <div class="expireDate">保險到期日</div>
             </div>
             <el-checkbox-group v-model="temp.driverInsurance">
-              <div
-                v-for="insurance in driverInsurancesList"
-                :key="insurance.categoryId"
-                style="border-bottom: 1px solid #ddd; display: flex"
-              >
-                <el-checkbox
-                  :label="insurance.categoryId"
-                  style="width: 50%; text-align: center; padding: 1rem"
-                >
+              <div v-for="insurance in driverInsurancesList" :key="insurance.categoryId" style="border-bottom: 1px solid #ddd; display: flex">
+                <el-checkbox :label="insurance.categoryId" style="width: 50%; text-align: center; padding: 1rem">
                   {{ insurance.categoryName }}
                 </el-checkbox>
                 <div class="expireDateBox">
-                  <el-date-picker
-                    :disabled="hasCheckedI(insurance.categoryId)"
-                    style="width: 70%"
-                    value-format="yyyy-MM-dd"
-                    v-model="insurance.expireDate"
-                    type="date"
-                    size="mini"
-                    placeholder="選擇日期"
-                  ></el-date-picker>
+                  <el-date-picker :disabled="hasCheckedI(insurance.categoryId)" style="width: 70%" value-format="yyyy-MM-dd" v-model="insurance.expireDate" type="date" size="mini" placeholder="選擇日期"></el-date-picker>
                 </div>
               </div>
             </el-checkbox-group>
           </div>
 
           <SubTitle title="備註"></SubTitle>
-          <el-input
-            type="textarea"
-            :rows="2"
-            placeholder="請输入内容"
-            v-model="temp.remark"
-          ></el-input>
+          <el-input type="textarea" :rows="2" placeholder="請输入内容" v-model="temp.remark"></el-input>
         </el-form>
       </div>
     </div>

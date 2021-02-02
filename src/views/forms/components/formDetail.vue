@@ -32,6 +32,7 @@
                   <el-select style="margin-top: 10px;width: 100%;" v-model="postForm.webId" v-if="postForm.frmType == 1" placeholder="請選擇系統內置的頁面">
                     <el-option label="請假單" value="FrmLeaveReq"></el-option>
                     <el-option label="車輛申請表單" value="FrmCarReq"></el-option>
+                    <el-option label="司機申請表單" value="FrmDriverReq"></el-option>
                   </el-select>
                 </el-form-item>
               </div>
