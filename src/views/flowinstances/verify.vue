@@ -6,50 +6,23 @@
         <el-col :span="16">
           <el-input style="width:200px" v-model="postObj.verificationOpinion" placeholder="請輸入審核意見"></el-input>
           <verify-status v-model="postObj.verificationFinally" />
-          <el-select
-            v-model="postObj.NodeRejectType"
-            placeholder
-            v-if="postObj.verificationFinally =='3'"
-          >
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
+          <el-select v-model="postObj.NodeRejectType" placeholder v-if="postObj.verificationFinally =='3'">
+            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
           </el-select>
-          <el-select
-            v-model="postObj.NodeRejectStep"
-            placeholder
-            v-if="postObj.NodeRejectType =='2' && postObj.verificationFinally =='3'"
-          >
+          <el-select v-model="postObj.NodeRejectStep" placeholder v-if="postObj.NodeRejectType =='2' && postObj.verificationFinally =='3'">
             <el-option v-for="item in FlowNodes" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
-          <el-button
-            v-loading="loading"
-            style="margin-left: 10px;"
-            type="success"
-            @click="submitForm"
-          >提交</el-button>
+          <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">提交</el-button>
         </el-col>
       </el-row>
     </sticky>
 
     <el-card class="box-card" v-if="flowObj.frmType ==1">
-      <component
-        v-bind:is="flowObj.dbName != '' && flowObj.dbName +'Detail'"
-        :frmData="flowObj.frmData"
-      ></component>
+      <component v-bind:is="flowObj.dbName != '' && flowObj.dbName +'Detail'" :frmData="flowObj.frmData"></component>
     </el-card>
     <el-card class="box-card" v-if="flowObj.frmType == 2">
       <div style="padding-right: 25px;">
-        <CreatedForm
-          insite="true"
-          ref="createdForm"
-          v-if="createdFormData.list && createdFormData.list.length > 0"
-          :data="createdFormData"
-          :value="defaultValue"
-        ></CreatedForm>
+        <CreatedForm insite="true" ref="createdForm" v-if="createdFormData.list && createdFormData.list.length > 0" :data="createdFormData" :value="defaultValue"></CreatedForm>
       </div>
     </el-card>
     <el-card class="box-card" v-else>
@@ -57,13 +30,7 @@
     </el-card>
     <el-card class="box-card">
       <div style="height: 500px">
-        <CreatedFlow
-          ref="createdFlow"
-          :form-template="currentForm"
-          :isEdit="true"
-          :isShowContent="isShowContent"
-          :scheme-content="flowObj.schemeContent"
-        ></CreatedFlow>
+        <CreatedFlow ref="createdFlow" :form-template="currentForm" :isEdit="true" :isShowContent="isShowContent" :scheme-content="flowObj.schemeContent"></CreatedFlow>
       </div>
     </el-card>
   </div>
