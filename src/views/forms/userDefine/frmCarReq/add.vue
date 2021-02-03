@@ -12,7 +12,7 @@
           <el-col :sm="12" :md="6">
             <el-form-item label="車輛類別" prop="carCategoryId">
               <el-select v-model="temp.carCategoryId" placeholder="請選擇車輛類別" style="width: 100%">
-                <el-option v-for="category in carCategorysList" :key="category.id" :value="category.dtValue" :label="category.name"></el-option>
+                <el-option v-for="category in carCategorysList" :key="category.id" :value="category.value" :label="category.label"></el-option>
                 <!-- <el-option :value="2" :label="'不可派發'">不可派發</el-option> -->
               </el-select>
             </el-form-item>
@@ -59,7 +59,7 @@
           <el-col :sm="12" :md="6">
             <el-form-item label="司機姓名" prop="driverInfoId">
               <el-select v-model="temp.driverInfoId" placeholder="請選擇司機" style="width: 100%">
-                <el-option v-for="driver in driverList" :value="driver.id" :label="driver.userName" :key="driver.id"></el-option>
+                <el-option v-for="driver in driverList" :value="driver.id" :label="driver.name" :key="driver.id"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -226,19 +226,21 @@ export default {
   },
 
   methods: {
-    //獲取所有司機
+    /* 獲取所有司機 */
     getDrivers() {
       const vm = this;
       let query = {
         page: 1,
         limit: 999,
+        Status: -1,
       };
       drivers.load(query).then((res) => {
         console.log(res);
         vm.driverList = res.data;
       });
     },
-    //獲取所有車輛類別
+
+    /* 獲取所有車輛類型 */
     getCarCategorys() {
       const vm = this;
       let query = {
@@ -246,11 +248,16 @@ export default {
         limit: 20,
         TypeId: "SYS_CAR",
       };
-      categorys.getList(query).then((res) => {
-        vm.carCategorysList = res.data;
+      categorys.getSimpleList(query).then((res) => {
+        vm.carCategorysList = res.result.filter((car) => {
+          return (
+            car.value === "SYS_CAR_GENERAL" || car.value === "SYS_CAR_WEAL"
+          );
+        });
       });
     },
-    //獲取所有車輛證照
+
+    /* 獲取所有車輛證照 */
     getCarLicenses() {
       const vm = this;
       let query = {
@@ -258,16 +265,17 @@ export default {
         limit: 20,
         TypeId: "SYS_CAR_LICENSE",
       };
-      categorys.getList(query).then((res) => {
-        res.data.forEach((license) => {
+      categorys.getSimpleList(query).then((res) => {
+        res.result.forEach((license) => {
           let obj = {};
-          obj.categoryId = license.dtValue;
-          obj.categoryName = license.name;
+          obj.categoryId = license.value;
+          obj.categoryName = license.label;
           vm.carLicensesList.push(obj);
         });
       });
     },
-    //獲取所有車輛設備
+
+    /* 獲取所有車輛設備 */
     getCarDevices() {
       const vm = this;
       let query = {
@@ -275,16 +283,17 @@ export default {
         limit: 20,
         TypeId: "SYS_CAR_DEVICE",
       };
-      categorys.getList(query).then((res) => {
-        res.data.forEach((device) => {
+      categorys.getSimpleList(query).then((res) => {
+        res.result.forEach((device) => {
           let obj = {};
-          obj.categoryId = device.dtValue;
-          obj.categoryName = device.name;
+          obj.categoryId = device.value;
+          obj.categoryName = device.label;
           vm.carDevicesList.push(obj);
         });
       });
     },
-    //獲取所有保險項目
+
+    /* 獲取所有保險項目 */
     getCarInsurances() {
       const vm = this;
       let query = {
@@ -292,18 +301,18 @@ export default {
         limit: 20,
         TypeId: "SYS_CAR_INSURANCE",
       };
-      categorys.getList(query).then((res) => {
-        res.data.forEach((insurances) => {
+      categorys.getSimpleList(query).then((res) => {
+        res.result.forEach((insurances) => {
           let obj = {};
-          obj.categoryId = insurances.dtValue;
-          obj.categoryName = insurances.name;
+          obj.categoryId = insurances.value;
+          obj.categoryName = insurances.label;
           obj.expireDate = "";
           vm.carInsurancesList.push(obj);
         });
       });
     },
 
-    // 確認新增司機
+    /* 確認新增司機 */
     handleSave() {
       const vm = this;
       vm.temp.orgId = vm.defaultorgid;
@@ -327,39 +336,15 @@ export default {
       });
     },
 
-    // back
+    /* back */
     handleBack() {
       const vm = this;
       vm.$router.push("/car/index");
     },
 
-    // 檢查是否勾選
+    /* 檢查是否勾選 */
     hasChecked(id) {
       return !this.temp.carInsurances.includes(id);
-    },
-    handleChange(file, fileList) {
-      this.temp.files = fileList
-        .filter((u) => u.status === "success")
-        .map((u) => u.response.result[0])
-        .map((u) => {
-          return {
-            fileName: u.fileName,
-            filePath: u.filePath,
-          };
-        });
-    },
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
-    },
-    handleExceed(files, fileList) {
-      this.$message.warning(
-        `當前限制選擇 3 個文件，本次選擇了 ${files.length} 個文件，共選擇了 ${
-          files.length + fileList.length
-        } 個文件`
-      );
-    },
-    beforeRemove(file) {
-      return this.$confirm(`確定移除 ${file.name}？`);
     },
     fetchData(id) {
       forms
@@ -391,7 +376,20 @@ export default {
       ];
     },
     getData() {
-      return this.temp;
+      const vm = this;
+      vm.temp.orgId = vm.defaultorgid;
+      vm.temp.carCategoryName = vm.carCategorysList.filter((c) => {
+        return c.value == vm.temp.carCategoryId;
+      })[0]?.label;
+
+      let obj = JSON.parse(JSON.stringify(vm.temp));
+      console.log(vm.carDevicesChecked);
+      obj.carDevices = JSON.stringify(vm.carDevicesChecked);
+      obj.carInsurances = JSON.stringify(vm.carInsurancesChecked);
+      obj.carLicenses = JSON.stringify(vm.carLicensesChecked);
+
+      console.log(obj);
+      return obj;
     },
   },
   mounted() {
