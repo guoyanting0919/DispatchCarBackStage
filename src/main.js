@@ -49,7 +49,9 @@ Vue.component("FrmLeaveReqAdd", FrmLeaveReqAdd); // 請假流程
 Vue.component("FrmLeaveReqDetail", FrmLeaveReqDetail); // 請假流程
 
 import FrmCarReqAdd from "@/views/forms/userDefine/frmCarReq/add"; // 車輛申請流程
+import FrmCarReqDetail from "@/views/forms/userDefine/frmCarReq/detail"; // 車輛申請流程
 Vue.component("FrmCarReqAdd", FrmCarReqAdd); // 車輛申請流程
+Vue.component("FrmCarReqDetail", FrmCarReqDetail); // 車輛申請流程
 
 import FrmDriverReqAdd from "@/views/forms/userDefine/frmDriverReq/add"; // 司機申請流程
 import FrmDriverReqDetail from "@/views/forms/userDefine/frmDriverReq/detail"; // 司機申請流程

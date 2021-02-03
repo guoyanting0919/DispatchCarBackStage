@@ -258,6 +258,7 @@ export default {
               });
             return;
           }
+          //FIXME:
           _this.handleAdd();
         } else {
           console.log("error submit!!");

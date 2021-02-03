@@ -161,14 +161,6 @@ export default {
         });
       });
     },
-
-    // 檢查是否勾選
-    hasChecked(id) {
-      return !this.temp.driverLicenses.includes(id);
-    },
-    hasCheckedI(id) {
-      return !this.temp.driverInsurance.includes(id);
-    },
   },
   async mounted() {
     this.getDriverLicenses();

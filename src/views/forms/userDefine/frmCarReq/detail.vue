@@ -1,7 +1,8 @@
 <template>
   <el-container style="border: 1px solid #eee">
     <el-main>
-      <el-form :label-position="labelPosition" label-width="200px" :model="temp" :rules="rules" ref="form">
+      <el-form :label-position="labelPosition" label-width="200px" :model="temp" ref="form">
+        <div class="notAllowWrap"></div>
         <SubTitle title="車輛基本資料編輯"></SubTitle>
         <el-row :gutter="16">
           <el-col :sm="12" :md="6">
@@ -73,41 +74,33 @@
           </el-col>
           <el-col :sm="12" :md="6">
             <el-form-item label="出廠年月" prop="makeDate">
-              <el-date-picker v-model="temp.makeDate" type="date" placeholder="請選擇出廠年月" style="width: 100%" value-format="yyyy-MM-dd"></el-date-picker>
+              <el-date-picker v-model="temp.makeDate" type="date" value-format="yyyy-MM-dd" placeholder="請選擇出廠年月" style="width: 100%"></el-date-picker>
             </el-form-item>
           </el-col>
           <el-col :sm="12" :md="6">
             <el-form-item label="最後驗車日" prop="lastCheckDate">
-              <el-date-picker v-model="temp.lastCheckDate" type="date" placeholder="請選擇最後驗車日" value-format="yyyy-MM-dd" style="width: 100%"></el-date-picker>
+              <el-date-picker v-model="temp.lastCheckDate" type="date" value-format="yyyy-MM-dd" placeholder="請選擇最後驗車日" style="width: 100%"></el-date-picker>
             </el-form-item>
           </el-col>
-          <!-- <el-col :sm="12" :md="6">
-              <el-form-item label="車輛審核" prop="reviewStatus">
-                <el-radio-group v-model="temp.reviewStatus">
-                  <el-radio label="是"></el-radio>
-                  <el-radio label="否"></el-radio>
-                </el-radio-group>
-              </el-form-item>
-            </el-col> -->
         </el-row>
 
         <SubTitle title="服務身份"></SubTitle>
         <el-form-item label="" prop="serviceUserTypes">
-          <el-checkbox-group v-model="temp.serviceUserTypes">
+          <el-checkbox-group v-model="serviceUserTypesModal">
             <el-checkbox v-for="type in serviceUserTypesList" :key="type.categoryId" :label="type.categoryId">{{ type.categoryName }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
 
         <SubTitle title="車輛設備"></SubTitle>
         <el-form-item label="" prop="carDevices">
-          <el-checkbox-group v-model="temp.carDevices">
+          <el-checkbox-group v-model="carDevicesModal">
             <el-checkbox v-for="device in carDevicesList" :key="device.categoryId" :label="device.categoryId">{{ device.categoryName }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
 
         <SubTitle title="所需證照"></SubTitle>
         <el-form-item label="" prop="carLicenses">
-          <el-checkbox-group v-model="temp.carLicenses">
+          <el-checkbox-group v-model="carLicensesModal">
             <el-checkbox v-for="license in carLicensesList" :key="license.categoryId" :label="license.categoryId">{{ license.categoryName }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
@@ -118,13 +111,13 @@
             <div class="headerCheckBox">保險類型</div>
             <div class="expireDate">保險到期日</div>
           </div>
-          <el-checkbox-group v-model="temp.carInsurances">
+          <el-checkbox-group v-model="carInsurancesModal">
             <div v-for="insurance in carInsurancesList" :key="insurance.categoryId" style="border-bottom: 1px solid #ddd; display: flex">
               <el-checkbox :label="insurance.categoryId" style="width: 50%; text-align: center; padding: 1rem">
                 {{ insurance.categoryName }}
               </el-checkbox>
               <div class="expireDateBox">
-                <el-date-picker :disabled="hasChecked(insurance.categoryId)" style="width: 70%" v-model="insurance.expireDate" type="date" value-format="yyyy-MM-dd" size="mini" placeholder="選擇日期"></el-date-picker>
+                <el-date-picker style="width: 70%" v-model="insurance.expireDate" type="date" size="mini" placeholder="選擇日期" value-format="yyyy-MM-dd"></el-date-picker>
               </div>
             </div>
           </el-checkbox-group>
@@ -138,37 +131,20 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-
 import SubTitle from "@/components/SubTitle";
 
-import * as forms from "@/api/forms";
 import * as categorys from "@/api/categorys";
 // import * as cars from "@/api/cars";
 import * as drivers from "@/api/drivers";
-
 export default {
-  name: "frmCarReqAdd",
-  components: { SubTitle },
-  props: {
-    isEdit: {
-      type: Boolean,
-      default: false,
-    },
+  name: "frmCarDetail",
+  components: {
+    SubTitle,
   },
+  props: ["frmData"],
   data() {
-    // const validateRequire = (rule, value, callback) => {
-    //   if (value === "") {
-    //     this.$message({
-    //       message: rule.field + "為必傳項",
-    //       type: "error",
-    //     });
-    //     callback(null);
-    //   } else {
-    //     callback();
-    //   }
-    // };
     return {
+      labelPosition: "top",
       /* 司機列表 */
       driverList: [],
       /* 服務用戶身份 */
@@ -182,66 +158,27 @@ export default {
       /* 車輛保險 */
       carInsurancesList: [],
 
-      labelPosition: "top",
-      temp: {
-        id: "",
-        orgId: "",
-        driverInfoId: "",
-        carCategoryId: "",
-        carCategoryName: "",
-        carNo: "",
-        carPic: "",
-        carTop: "",
-        factoryType: "",
-        carFrom: "",
-        donationUnit: "",
-        carColor: "",
-        wheelchairNum: 0,
-        seatNum: 0,
-        makeDate: "",
-        lastCheckDate: "",
-        status: 1,
-        remark: "",
-        serviceUserTypes: [], // 服務用戶身份
-        carLicenses: [], // 車輛證照
-        carInsurances: [], // 車輛保險
-        carDevices: [], // 車輛設備
-      },
-      rules: {
-        Id: [{ required: true, message: "請輸入個案編號", trigger: "blur" }],
-        city: [
-          { required: true, message: "請輸入個案編號", trigger: "change" },
-        ],
-      },
+      /* group modal */
+      carDevicesModal: [], //設備
+      carInsurancesModal: [], //保險
+      carLicensesModal: [], //證照
     };
   },
-
   computed: {
-    ...mapGetters(["defaultorgid"]),
-    serviceUserTypesChecked() {
-      return this.serviceUserTypesList.filter((option) =>
-        this.temp.serviceUserTypes.some(
-          (checked) => checked === option.categoryId
-        )
-      );
-    },
-    carDevicesChecked() {
-      return this.carDevicesList.filter((option) =>
-        this.temp.carDevices.some((checked) => checked === option.categoryId)
-      );
-    },
-    carInsurancesChecked() {
-      return this.carInsurancesList.filter((option) =>
-        this.temp.carInsurances.some((checked) => checked === option.categoryId)
-      );
-    },
-    carLicensesChecked() {
-      return this.carLicensesList.filter((option) =>
-        this.temp.carLicenses.some((checked) => checked === option.categoryId)
-      );
+    temp: function () {
+      const vm = this;
+      let data = JSON.parse(this.frmData);
+      data.carDevices = JSON.parse(data.carDevices);
+      data.carInsurances = JSON.parse(data.carInsurances);
+      data.carLicenses = JSON.parse(data.carLicenses);
+
+      vm.carDevicesModal = data.carDevices.map((i) => i.categoryId);
+      vm.carInsurancesModal = data.carInsurances.map((i) => i.categoryId);
+      vm.carLicensesModal = data.carLicenses.map((i) => i.categoryId);
+      vm.serviceUserTypesModal = data.serviceUserTypes;
+      return data;
     },
   },
-
   methods: {
     /* 獲取所有司機 */
     getDrivers() {
@@ -344,67 +281,16 @@ export default {
           obj.expireDate = "";
           vm.carInsurancesList.push(obj);
         });
+        vm.carInsurancesList.forEach((i) => {
+          let arr = vm.temp.carInsurances.filter((d) => {
+            return d.categoryId === i.categoryId;
+          });
+          i.expireDate = arr[0]?.expireDate;
+        });
       });
     },
-
-    /* back */
-    handleBack() {
-      const vm = this;
-      vm.$router.push("/car/index");
-    },
-
-    /* 檢查是否勾選 */
-    hasChecked(id) {
-      return !this.temp.carInsurances.includes(id);
-    },
-    fetchData(id) {
-      forms
-        .get(id)
-        .then(() => {})
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-    getFormInfo() {
-      // 用於流程分支條件選擇
-      return [
-        {
-          name: "userName",
-          title: "請假人姓名",
-        },
-        {
-          name: "startDate",
-          title: "開始日期",
-        },
-        {
-          name: "endDate",
-          title: "結束日期",
-        },
-        {
-          name: "requestComment",
-          title: "請假說明",
-        },
-      ];
-    },
-    getData() {
-      const vm = this;
-      vm.temp.orgId = vm.defaultorgid;
-      vm.temp.carCategoryName = vm.carCategorysList.filter((c) => {
-        return c.value == vm.temp.carCategoryId;
-      })[0]?.label;
-      // console.log(JSON.parse(JSON.stringify(vm.temp)));
-      // console.log(vm.serviceUserTypesChecked);
-      let obj = JSON.parse(JSON.stringify(vm.temp));
-      obj.carDevices = JSON.stringify(vm.carDevicesChecked);
-      obj.carInsurances = JSON.stringify(vm.carInsurancesChecked);
-      obj.carLicenses = JSON.stringify(vm.carLicensesChecked);
-      // obj.serviceUserTypes = JSON.stringify(vm.serviceUserTypesChecked);
-
-      console.log(obj);
-      return obj;
-    },
   },
-  mounted() {
+  async mounted() {
     this.getCarCategorys();
     this.getDrivers();
     this.getCarDevices();
@@ -427,12 +313,6 @@ export default {
   height: 240px;
   background: #ffe6d1;
   margin: auto;
-  margin-top: 1.5rem;
-}
-.avatar-uploader-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 .tableContainer {
   width: 100%;
@@ -460,5 +340,13 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.notAllowWrap {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: 2;
+  cursor: not-allowed;
 }
 </style>
