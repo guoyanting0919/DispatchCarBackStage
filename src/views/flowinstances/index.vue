@@ -2,39 +2,14 @@
   <div class="flex-column">
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
-        <el-input
-          @keyup.enter.native="handleFilter"
-          size="mini"
-          prefix-icon="el-icon-search"
-          style="width: 200px;margin-bottom: 0;"
-          class="filter-item"
-          :placeholder="'名稱'"
-          v-model="listQuery.key"
-        ></el-input>
+        <el-input @keyup.enter.native="handleFilter" size="mini" prefix-icon="el-icon-search" style="width: 200px;margin-bottom: 0;" class="filter-item" :placeholder="'名稱'" v-model="listQuery.key"></el-input>
         <permission-btn moduleName="/flowinstances/index" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
 
-        <el-checkbox
-          class="filter-item"
-          style="margin-left:15px;"
-          @change="tableKey=tableKey+1"
-          v-model="showDescription"
-        >描述</el-checkbox>
+        <el-checkbox class="filter-item" style="margin-left:15px;" @change="tableKey=tableKey+1" v-model="showDescription">描述</el-checkbox>
       </div>
     </sticky>
     <div class="app-container flex-item">
-      <el-table
-        height="calc(100% - 52px)"
-        ref="mainTable"
-        :key="tableKey"
-        :data="list"
-        v-loading="listLoading"
-        border
-        fit
-        highlight-current-row
-        style="width: 100%;"
-        @row-click="rowClick"
-        @selection-change="handleSelectionChange"
-      >
+      <el-table height="calc(100% - 52px)" ref="mainTable" :key="tableKey" :data="list" v-loading="listLoading" border fit highlight-current-row style="width: 100%;" @row-click="rowClick" @selection-change="handleSelectionChange">
         <el-table-column align="center" type="selection" width="55"></el-table-column>
 
         <el-table-column :label="'實例編碼'" min-width="80px">
@@ -63,25 +38,17 @@
 
         <el-table-column class-name="status-col" :label="'狀態'" width="100">
           <template slot-scope="scope">
-            <span
-              :class="scope.row.isFinish | statusFilter"
-            >{{statusOptions.find(u =>u.key == scope.row.isFinish).display_name}}</span>
+            <span :class="scope.row.isFinish | statusFilter">{{statusOptions.find(u =>u.key == scope.row.isFinish).display_name}}</span>
           </template>
         </el-table-column>
       </el-table>
-      <pagination
-        v-show="total>0"
-        :total="total"
-        :page.sync="listQuery.page"
-        :limit.sync="listQuery.limit"
-        @pagination="handleCurrentChange"
-      />
+      <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handleCurrentChange" />
     </div>
   </div>
 </template>
 
 <script>
-import Layout from "@/views/layout/Layout";
+// import Layout from "@/views/layout/Layout";
 import * as flowinstances from "@/api/flowinstances";
 import waves from "@/directive/waves"; // 水波紋指令
 import Sticky from "@/components/Sticky";
@@ -179,57 +146,6 @@ export default {
   },
   created() {
     this.getList();
-    var addRouter = [
-      {
-        path: "/flowinstances",
-        component: Layout,
-        redirect: "noredirect",
-        name: "flowinstances",
-        meta: {
-          title: "流程中心",
-          icon: "guide",
-        },
-        children: [
-          {
-            path: "detail/:id",
-            component: () => import("@/views/flowinstances/detail"),
-            name: "flowinstanceDtl",
-            hidden: true,
-            meta: {
-              notauth: true,
-              title: "流程詳情",
-              noCache: true,
-              icon: "list",
-            },
-          },
-          {
-            path: "verify/:id",
-            component: () => import("@/views/flowinstances/verify"),
-            name: "verifyFlowinstance",
-            hidden: true,
-            meta: {
-              notauth: true,
-              title: "處理流程",
-              noCache: true,
-              icon: "list",
-            },
-          },
-
-          {
-            path: "add",
-            component: () => import("@/views/flowinstances/add"),
-            name: "instanceAdd",
-            meta: {
-              notauth: true,
-              title: "發起流程",
-              noCache: true,
-              icon: "star",
-            },
-          },
-        ],
-      },
-    ];
-    this.$router.addRoutes(addRouter);
   },
   methods: {
     ...mapActions(["updateInstancesIsRender"]),
@@ -244,7 +160,7 @@ export default {
       console.log("you click:" + domId);
       switch (domId) {
         case "btnAdd":
-          this.$router.push("/flowinstances/add");
+          this.$router.push("/flowinstances/add/1");
           break;
         case "btnDetail":
           if (this.multipleSelection.length !== 1) {

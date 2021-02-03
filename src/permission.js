@@ -81,6 +81,20 @@ let routerMappingList = [
     path: "/forms/index",
     title: "基礎配置 / 表單設計",
   },
+
+  /* 流程中心 */
+  {
+    path: "/flowinstances/index",
+    title: "流程中心 / 我的流程",
+  },
+  {
+    path: "/flowdisposed/index",
+    title: "流程中心 / 已處理流程",
+  },
+  {
+    path: "/flowwait/index",
+    title: "流程中心 / 待處理流程",
+  },
 ];
 let elementMappingList = [
   "add",
@@ -100,6 +114,7 @@ let elementMappingList = [
   "editSelfPayUser",
   "checkSelfPayUser",
   "dispatchSelfPayUser",
+  "verify",
 ];
 
 const whiteList = [
