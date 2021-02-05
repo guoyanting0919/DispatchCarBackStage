@@ -26,9 +26,10 @@
           <p style="color: red; font-size: 14px; width: 100%; text-align: center" v-if="newOrderList.length == 0">
             暫無新訂單
           </p>
-          <!-- <transition-group name="fade-transform" mode="out-in" class="newOrderContainer">
-            <OrderCard v-for="item in newOrderList" :key="item.id" :order="item" @handleReceive="handleReceive"></OrderCard>
-          </transition-group> -->
+          <transition-group name="fade-transform" mode="out-in" class="cardContainer">
+            <OrderCard v-for="item in newOrderList" :key="item.id" :order="item" @handleReceive='handleReceive' @handleTrans='handleTrans' @handleCancle='handleCancle'></OrderCard>
+            <!-- <span v-for="i in newOrderList" :key="i.id">{{i.id}}</span> -->
+          </transition-group>
         </div>
 
         <SubTitle title="調度台"></SubTitle>
@@ -244,6 +245,7 @@ import permissionBtn from "@/components/PermissionBtn";
 import Pagination from "@/components/Pagination";
 import OrderStatusTag from "@/components/OrderStatusTag";
 import EditDialog from "@/components/Dialog/editCaseUserDespatch";
+import OrderCard from "@/components/OrderCardCase";
 
 import * as orderCaseUser from "@/api/orderCaseUser";
 import * as drivers from "@/api/drivers";
@@ -261,6 +263,7 @@ export default {
     Pagination,
     OrderStatusTag,
     EditDialog,
+    OrderCard,
   },
   computed: {
     ...mapGetters(["defaultorgid"]),
@@ -412,7 +415,7 @@ export default {
     async getListNoOrg() {
       const vm = this;
       await orderCaseUser.loadNoOrg().then((res) => {
-        vm.newOrderList = res.data;
+        vm.newOrderList = res.result;
       });
     },
 
@@ -706,6 +709,38 @@ export default {
       });
     },
 
+    /* 接收訂單 */
+    handleReceive(orderId) {
+      const vm = this;
+      orderCaseUser.acceptOrder({ orderId: orderId }).then((res) => {
+        console.log(res);
+
+        vm.getList();
+        vm.getListNoOrg();
+      });
+    },
+
+    /* 轉單 */
+    handleTrans(orderId) {
+      const vm = this;
+      orderCaseUser.transOrder({ orderId: orderId }).then((res) => {
+        console.log(res);
+        vm.getList();
+        vm.getListNoOrg();
+      });
+    },
+
+    /* 取消 */
+    handleCancle(orderId) {
+      const vm = this;
+      //FIXME:
+      orderCaseUser.cancel({ id: orderId }).then((res) => {
+        console.log(res);
+        vm.getList();
+        vm.getListNoOrg();
+      });
+    },
+
     /* 共乘 */
     handleSetCarPool() {
       const vm = this;
@@ -987,7 +1022,7 @@ export default {
     this.getCarList();
     this.getCarCategorys();
     this.getCaseUserList();
-    // await this.getListNoOrg();
+    await this.getListNoOrg();
     this.getList();
   },
 };
@@ -1035,5 +1070,11 @@ export default {
 
 .dataInner {
   margin: 1rem 0;
+}
+.cardContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
 }
 </style>

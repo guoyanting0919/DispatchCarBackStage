@@ -6,13 +6,7 @@
       <p v-if="order.canShared">可共乘</p>
       <p v-else>不可共乘</p>
       <p>{{ order.passengerNum }}人搭乘</p>
-      <el-button
-        @click="handleReceive(order.id)"
-        size="mini"
-        type="success"
-        style="padding: 3px 8px; margin-left: auto"
-        >接收</el-button
-      >
+      <el-button @click="handleReceive(order.id)" size="mini" type="success" style="padding: 3px 8px; margin-left: auto">接收</el-button>
     </div>
     <div class="orderCardMain">
       <div class="orderInfo">
@@ -37,7 +31,7 @@
 <script>
 import moment from "moment";
 export default {
-  name: "OrderCard",
+  name: "OrderCardSelfPay",
   props: {
     order: {
       type: Object,

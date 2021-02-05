@@ -213,7 +213,7 @@ import permissionBtn from "@/components/PermissionBtn";
 import SubTitle from "@/components/SubTitle";
 import Pagination from "@/components/Pagination";
 import OrderStatusTag from "@/components/OrderStatusTag";
-import OrderCard from "@/components/OrderCard";
+import OrderCard from "@/components/OrderCardSelfPay";
 import EditDialog from "@/components/Dialog/editSelfPayUserDespatch";
 
 import * as orderSelfPayUser from "@/api/orderSelfPayUser";

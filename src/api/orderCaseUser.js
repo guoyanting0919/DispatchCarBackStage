@@ -16,6 +16,30 @@ export function LoadNoOrg(params) {
   });
 }
 
+export function acceptOrder(params) {
+  return request({
+    url: "/orderOfCaseUsers/acceptOrder",
+    method: "get",
+    params,
+  });
+}
+
+export function transOrder(data) {
+  return request({
+    url: "/orderOfCaseUsers/TurnNextOrg",
+    method: "post",
+    data,
+  });
+}
+
+export function cancel(data) {
+  return request({
+    url: "/orderOfCaseUsers/CancelOrder",
+    method: "post",
+    data,
+  });
+}
+
 export function loadHistory(params) {
   return request({
     url: "/orderOfCaseUsers/LoadHistory",
@@ -125,14 +149,6 @@ export function loadDespatch(params) {
     url: "/orderOfCaseUsers/loadwithdespatch",
     method: "get",
     params,
-  });
-}
-
-export function cancel(data) {
-  return request({
-    url: "/orderOfCaseUsers/CancelOrder",
-    method: "post",
-    data,
   });
 }
 
