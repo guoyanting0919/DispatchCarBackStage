@@ -14,7 +14,24 @@
     <!-- 長照調度台 -->
     <div class="app-container flex-item">
       <Title title="長照調度台"></Title>
-      <div class="bg-white" style="height: calc(100% - 50px)">
+
+      <div class="bg-white" style="height: calc(100% - 50px); padding: 0 16px;overflow:auto">
+        <!-- 新訂單 -->
+        <SubTitle title="新訂單">
+          <template v-slot:btn>
+            <i class="iconfont icon-mouse toogleBtn"></i>
+          </template>
+        </SubTitle>
+        <div class="bg-white newOrderContainer">
+          <p style="color: red; font-size: 14px; width: 100%; text-align: center" v-if="newOrderList.length == 0">
+            暫無新訂單
+          </p>
+          <!-- <transition-group name="fade-transform" mode="out-in" class="newOrderContainer">
+            <OrderCard v-for="item in newOrderList" :key="item.id" :order="item" @handleReceive="handleReceive"></OrderCard>
+          </transition-group> -->
+        </div>
+
+        <SubTitle title="調度台"></SubTitle>
         <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" border fit v-loading="listLoading" highlight-current-row @selection-change="handleSelectionChange" style="width: 100%">
           <el-table-column type="selection" width="55" align="center"></el-table-column>
 
@@ -221,6 +238,7 @@
 import { mapGetters } from "vuex";
 
 import Sticky from "@/components/Sticky";
+import SubTitle from "@/components/SubTitle";
 import Title from "@/components/ConsoleTableTitle";
 import permissionBtn from "@/components/PermissionBtn";
 import Pagination from "@/components/Pagination";
@@ -237,6 +255,7 @@ export default {
   name: "dispatch",
   components: {
     Sticky,
+    SubTitle,
     Title,
     permissionBtn,
     Pagination,
@@ -386,6 +405,14 @@ export default {
         });
         vm.total = res.count;
         vm.listLoading = false;
+      });
+    },
+
+    /* 獲取無組織訂單 */
+    async getListNoOrg() {
+      const vm = this;
+      await orderCaseUser.loadNoOrg().then((res) => {
+        vm.newOrderList = res.data;
       });
     },
 
@@ -960,6 +987,7 @@ export default {
     this.getCarList();
     this.getCarCategorys();
     this.getCaseUserList();
+    // await this.getListNoOrg();
     this.getList();
   },
 };

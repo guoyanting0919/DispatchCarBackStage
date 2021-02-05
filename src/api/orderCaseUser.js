@@ -8,6 +8,14 @@ export function load(params) {
   });
 }
 
+export function LoadNoOrg(params) {
+  return request({
+    url: "/orderOfCaseUsers/loadNoOrg",
+    method: "get",
+    params,
+  });
+}
+
 export function loadHistory(params) {
   return request({
     url: "/orderOfCaseUsers/LoadHistory",

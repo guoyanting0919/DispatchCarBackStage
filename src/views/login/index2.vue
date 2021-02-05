@@ -13,7 +13,7 @@
       <!-- adminLogin -->
       <div class="adminLogin" v-if="isForget == 1">
         <h2 class="adminLoginTitle" @click="loginBy('Doraemon','Doraemon')">管理者Login</h2>
-        <h5 class="adminLoginDescrip">
+        <h5 class="adminLoginDescrip" @click="loginBy('CartoonsA','CartoonsA')">
           為了保障您的帳號安全，建議您最少於三個月變更一次密碼
         </h5>
       </div>

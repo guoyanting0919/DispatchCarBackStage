@@ -345,6 +345,9 @@ export default {
       /* 今天日期 */
       today: "",
 
+      /* user unit b */
+      useBunit: [],
+
       /* 歷史訂單 */
       list: [],
       listLoading: false,
@@ -446,6 +449,11 @@ export default {
       }
       return time;
     },
+    /* 判斷當前登入橫霧是否為orgB且判斷是否為快速預約訂單 */
+    isOrgB() {
+      const vm = this;
+      return vm.useBunit.includes(vm.defaultorgid);
+    },
   },
   filters: {
     distanceFilter(val) {
@@ -520,18 +528,20 @@ export default {
       caseUser.get({ id: this.$route.params.id.split("-")[1] }).then((res) => {
         this.roleInfo = res.result;
 
-        let useBunit = [
+        vm.useBunit = [
           res.result.orgBId1,
           res.result.orgBId2,
           res.result.orgBId3,
         ];
 
-        if (useBunit.includes(vm.defaultorgid)) {
-          //若登入單位包含用戶所選B單位
+        if (vm.useBunit.includes(vm.defaultorgid)) {
+          //若登入單位包含用戶所選B單位(B單位訂車)
           this.roleOrgB = this.orgBList.filter((i) => i.id === vm.defaultorgid);
           vm.handleOrgBSelect(vm.defaultorgid);
         } else {
-          this.roleOrgB = this.orgBList.filter((i) => useBunit.includes(i.id));
+          this.roleOrgB = this.orgBList.filter((i) =>
+            vm.useBunit.includes(i.id)
+          );
         }
       });
     },
@@ -644,6 +654,7 @@ export default {
               vm.temp.fromAddrRemark === "其他"
                 ? vm.temp.fromRemark
                 : vm.temp.fromAddrRemark;
+            vm.temp.orgId = vm.isOrgB ? vm.defaultorgid : "";
             vm.$cl(vm.temp);
             orderCaseUser.add(vm.temp).then((res) => {
               vm.$cl(res);
@@ -664,10 +675,8 @@ export default {
                 vm.$cl(backTemp);
                 orderCaseUser.add(backTemp).then(() => {
                   this.$router.go(-1);
-                  // vm.$router.push(`/${route}/index`);
                 });
               } else {
-                // vm.$router.push(`/${route}/index`);
                 this.$router.go(-1);
               }
             });

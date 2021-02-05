@@ -13,9 +13,8 @@
 
     <!-- 白牌車調度台 -->
     <div style="padding-bottom: 0px" class="app-container flex-item">
-      <Title title="白牌車調度台">
+      <Title title="白牌車調度台"></Title>
 
-      </Title>
       <div class="bg-white formContainer" style="height: calc(100% - 50px); padding: 0 16px">
         <!-- 新訂單 -->
         <SubTitle title="新訂單">
