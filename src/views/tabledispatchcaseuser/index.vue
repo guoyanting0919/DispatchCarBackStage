@@ -712,7 +712,7 @@ export default {
     /* 接收訂單 */
     handleReceive(orderId) {
       const vm = this;
-      orderCaseUser.acceptOrder({ orderId: orderId }).then((res) => {
+      orderCaseUser.acceptOrder({ id: orderId }).then((res) => {
         console.log(res);
 
         vm.getList();
@@ -723,7 +723,7 @@ export default {
     /* 轉單 */
     handleTrans(orderId) {
       const vm = this;
-      orderCaseUser.transOrder({ orderId: orderId }).then((res) => {
+      orderCaseUser.transOrder({ id: orderId }).then((res) => {
         console.log(res);
         vm.getList();
         vm.getListNoOrg();
@@ -734,11 +734,16 @@ export default {
     handleCancle(orderId) {
       const vm = this;
       //FIXME:
-      orderCaseUser.cancel({ id: orderId }).then((res) => {
-        console.log(res);
-        vm.getList();
-        vm.getListNoOrg();
-      });
+      orderCaseUser
+        .cancel({
+          id: orderId,
+          cancelRemark: "SYS_ORDERCANCEL_REMARK_CLIENT_NOORG",
+        })
+        .then((res) => {
+          console.log(res);
+          vm.getList();
+          vm.getListNoOrg();
+        });
     },
 
     /* 共乘 */

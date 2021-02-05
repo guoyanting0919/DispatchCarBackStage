@@ -16,11 +16,11 @@ export function LoadNoOrg(params) {
   });
 }
 
-export function acceptOrder(params) {
+export function acceptOrder(data) {
   return request({
     url: "/orderOfCaseUsers/acceptOrder",
-    method: "get",
-    params,
+    method: "post",
+    data,
   });
 }
 
