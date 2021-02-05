@@ -15,23 +15,28 @@
     <div class="app-container flex-item">
       <Title title="長照調度台"></Title>
       <div class="bg-white" style="height: calc(100% - 50px)">
-        <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" border fit v-loading="listLoading" highlight-current-row @selection-change="handleSelectionChange" :span-method="objectSpanMethod" style="width: 100%">
+        <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" border fit v-loading="listLoading" highlight-current-row @selection-change="handleSelectionChange" style="width: 100%">
           <el-table-column type="selection" width="55" align="center"></el-table-column>
 
           <el-table-column align="center" property="userName" label="姓名" width="120">
+            <template slot-scope="scope" v-if="scope.row.data">
+              <p class="dataInner" v-for="item in scope.row.data" :key="item.id">{{item.name}}</p>
+            </template>
           </el-table-column>
 
           <el-table-column align="center" property="status" label="訂單狀態" width="100">
             <template slot-scope="scope">
-              <OrderStatusTag :type="orderStatusMapping[scope.row.status - 1]"></OrderStatusTag>
+              <p class="dataInner" v-for="item in scope.row.data" :key="item.id">
+                <OrderStatusTag :type="orderStatusMapping[item.status - 1]"></OrderStatusTag>
+              </p>
             </template>
           </el-table-column>
 
           <el-table-column property="driver" label="司機" width="200" align="center">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.driverInfoId" filterable size="mini" placeholder="選擇司機" :disabled="scope.row.status != 1">
-                <el-option v-for="driver in driverList" :key="driver.id" :label="driver.userName" :value="driver.id">
-                  {{ driver.userName }} / {{ driver.phone }}
+              <el-select v-model="scope.row.driverInfoId" filterable size="mini" placeholder="選擇司機" :disabled="scope.row.data[0].status != 1">
+                <el-option v-for="driver in driverList" :key="driver.id" :label="driver.name" :value="driver.id">
+                  {{ driver.name }} / {{ driver.phone }}
                 </el-option>
               </el-select>
             </template>
@@ -39,8 +44,8 @@
 
           <el-table-column property="car" label="車輛" width="200" align="center">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.carId" filterable size="mini" placeholder="選擇車輛" :disabled="scope.row.status != 1">
-                <el-option v-for="car in dispatchCarFilter(carList, scope.row)" :key="car.id" :label="car.carNo" :value="car.id">
+              <el-select v-model="scope.row.carId" filterable size="mini" placeholder="選擇車輛" :disabled="scope.row.data[0].status != 1">
+                <el-option v-for="car in dispatchCarFilter(carList, scope.row.data[0])" :key="car.id" :label="car.carNo" :value="car.id">
                   {{ car.carCategoryName || "一般車" }} / {{ car.seatNum }}人座
                   /
                   {{ car.carNo }}
@@ -49,74 +54,76 @@
             </template>
           </el-table-column>
 
-          <el-table-column align="center" property="reserveDate" label="預約乘車時間" width="130">
+          <el-table-column align="center" property="reserveDate" label="預約乘車時間" width="150">
             <template slot-scope="scope">
-              <span>
-                {{ scope.row.reserveDate | reserveFilter }}
-              </span>
+              <p class="dataInner" v-for="item in scope.row.data" :key="item.id">
+                {{item.reserveDate | globalDateFilter("yyyy-MM-DD")}}
+                {{item.reserveDate | globalDateFilter("HH:mm")}}
+              </p>
             </template>
           </el-table-column>
 
           <el-table-column align="center" property="expectedMinute" label="預估時間" width="120">
             <template slot-scope="scope">
-              <span>
-                {{ scope.row.expectedMinute | minFilter }}
-              </span>
+              <p class="dataInner" v-for="item in scope.row.data" :key="item.id">{{item.expectedMinute}}分</p>
             </template>
           </el-table-column>
 
           <el-table-column property="totalAmt" label="預估總額" width="100" align="center">
-            <template slot-scope="scope">
-              <span> ${{ scope.row.totalAmt }} </span>
+            <template slot-scope="scope" v-if="scope.row.data">
+              <p class="dataInner" v-for="item in scope.row.data" :key="item.id">$ {{item.totalAmt}}</p>
             </template>
           </el-table-column>
 
-          <el-table-column align="center" property="carCategoryName" label="車種" width="150">
-            <template slot-scope="scope">
-              <div style="text-align: left">
-                <p>{{ scope.row.carCategoryName }}</p>
-                <p>{{ scope.row.wheelchairType }}</p>
-              </div>
+          <el-table-column align="center" property="carCategoryName" label="車種" width="200">
+            <template slot-scope="scope" v-if="scope.row.data">
+              <p class="dataInner" v-for="item in scope.row.data" :key="item.id">{{item.carCategoryName}}/{{item.wheelchairType}}</p>
             </template>
           </el-table-column>
 
           <el-table-column property="name" label="起迄點" width="300">
-            <template slot-scope="scope">
-              <div class="orderAddr">
-                <i class="iconfont icon-circle"></i>
-                <i class="iconfont icon-Vector10"></i>
-                <p class="startAddr">
-                  {{ scope.row.fromAddr }}
-                </p>
-                <p class="endAddr">{{ scope.row.toAddr }}</p>
-              </div>
+            <template slot-scope="scope" v-if="scope.row.data">
+              <p class="textNoWrap" v-for="item in scope.row.data" :key="item.id"> <i class="iconfont icon-circle"></i>{{item.fromAddr}}<br /> <i class="iconfont icon-Vector10"></i>{{item.toAddr}}</p>
             </template>
           </el-table-column>
 
           <el-table-column property="familyWith" label="陪同人數" width="100" align="center">
+            <template slot-scope="scope" v-if="scope.row.data">
+              <p class="dataInner" v-for="item in scope.row.data" :key="item.id">{{item.familyWith}}</p>
+            </template>
           </el-table-column>
 
           <el-table-column property="canShared" label="共乘" width="100" align="center">
             <template slot-scope="scope">
-              <p v-if="scope.row.canShared">是</p>
-              <p v-else>否</p>
+              {{scope.row.canShared ? '是' :'否'}}
+            </template>
+          </el-table-column>
+
+          <el-table-column property="canShared" label="編輯訂單" width="100" align="center">
+            <template slot-scope="scope">
+              <p class="dataInner" v-for="item in scope.row.data" :key="item.id">
+                <el-button type="success" size="mini" v-if="scope.row.data[0].status <= 3" @click="getOrder(item)">
+                  編輯訂單
+                </el-button>
+              </p>
             </template>
           </el-table-column>
 
           <el-table-column align="center" :label="'操作'" fixed="right" width="300">
             <template slot-scope="scope">
               <div class="buttonFlexBox">
-                <el-button type="info" size="mini" v-if="scope.row.status == 1" @click="handleRoster(scope.row)">排班</el-button>
-                <el-button type="success" size="mini" v-if="scope.row.status == 1" @click="
-                    editDialog = true;
-                    getOrder(scope.row);
-                  ">編輯訂單</el-button>
-                <el-button type="warning" size="mini" v-if="scope.row.status !== 1 && scope.row.status !== 9" @click="
-                    changeDialog = true;
-                    handleChangeDC(scope.row);
-                  ">變更司機車輛</el-button>
-                <el-button size="mini" type="danger" v-if="scope.row.status !== 1 && scope.row.status !== 9" @click="handleCancelDispatch(scope.row.despatchNo)">取消排班</el-button>
-                <el-button size="mini" type="danger" v-if="scope.row.status == 1" @click="handleCancelOrder(scope.row.id)">取消訂單</el-button>
+                <el-button type="info" size="mini" v-if="scope.row.data[0].status == 1" @click="handleRoster(scope.row)">
+                  排班
+                </el-button>
+                <el-button type="warning" size="mini" v-if="scope.row.data[0].status ==2" @click="handleChangeDC(scope.row);">
+                  變更司機車輛
+                </el-button>
+                <el-button size="mini" type="danger" v-if="scope.row.data[0].status == 2" @click="handleCancelDispatch(scope.row.despatchNo)">
+                  取消排班
+                </el-button>
+                <el-button size="mini" type="danger" v-if="scope.row.status == 1" @click="handleCancelOrder(scope.row.id)">
+                  取消訂單
+                </el-button>
               </div>
             </template>
           </el-table-column>
@@ -125,8 +132,7 @@
       </div>
     </div>
 
-    <!-- 燈箱 -->
-
+    <!-- Dialog -->
     <!-- eidt dialog -->
     <EditDialog :tempObj="temp" :editDialogProp="editDialog" :carCategorysList="carCategorysList" @handleEdit="handleEdit" @handleClose="handleClose"></EditDialog>
 
@@ -138,7 +144,9 @@
             <el-col :sm="12" :md="12">
               <el-form-item label="司機">
                 <el-select v-model="orderTemp.driverInfoId" filterable placeholder="選擇司機" style="width: 100%">
-                  <el-option v-for="driver in driverList" :key="driver.id" :label="`${driver.userName} / ${driver.phone}`" :value="driver.id"></el-option>
+                  <el-option v-for="driver in driverList" :key="driver.id" :label="driver.name" :value="driver.id">
+                    {{ driver.name }} / {{ driver.phone }}
+                  </el-option>
                 </el-select>
               </el-form-item>
             </el-col>
@@ -146,7 +154,7 @@
             <el-col :sm="12" :md="12">
               <el-form-item label="車輛">
                 <el-select v-model="orderTemp.carId" filterable placeholder="選擇車輛" style="width: 100%">
-                  <el-option v-for="car in carList" :disabled="checkCarType(orderTemp, car)" :key="car.id" :label="`${car.carCategoryName || '一般車'} / ${
+                  <el-option v-for="car in changeCarFilter()" :key="car.id" :label="`${car.carCategoryName || '一般車'} / ${
                       car.seatNum
                     }人座 / ${car.carNo}`" :value="car.id"></el-option>
                 </el-select>
@@ -183,7 +191,8 @@
             <el-col :sm="12" :md="24">
               <el-form-item label="選擇司機">
                 <el-select style="width: 100%" v-model="carPoolTemp.driverInfoId" placeholder="請選擇司機">
-                  <el-option v-for="driver in driverList" :key="driver.id" :label="`${driver.userName} / ${driver.phone}`" :value="driver.id">
+                  <el-option v-for="driver in driverList" :key="driver.id" :label="driver.name" :value="driver.id">
+                    {{ driver.name }} / {{ driver.phone }}
                   </el-option>
                 </el-select>
               </el-form-item>
@@ -325,6 +334,9 @@ export default {
         "cancel",
       ],
 
+      /* changeOrder */
+      changeOrder: [],
+
       /* dialog */
       editDialog: false,
       changeDialog: false,
@@ -369,55 +381,12 @@ export default {
       vm.listLoading = true;
       orderCaseUser.loadDespatch(vm.listQuery).then((res) => {
         vm.list = res.data.map((d) => {
-          vm.spanArr = [];
           d.despatchNo = d.despatchNo ? d.despatchNo : d.orderNo;
           return d;
         });
-
         vm.total = res.count;
-        vm.getSpanArr(vm.list);
         vm.listLoading = false;
       });
-    },
-
-    /* 合併row array */
-    getSpanArr(data) {
-      const vm = this;
-      for (let i = 0; i < data.length; i++) {
-        if (i === 0) {
-          vm.spanArr.push(1);
-          vm.pos = 0;
-        } else {
-          // 判斷當前元素與上一個元素是否相同
-          if (data[i].despatchNo === data[i - 1].despatchNo) {
-            vm.spanArr[vm.pos] += 1;
-            vm.spanArr.push(0);
-          } else {
-            vm.spanArr.push(1);
-            vm.pos = i;
-          }
-        }
-      }
-    },
-
-    /* 合併共乘欄位 */
-    objectSpanMethod({ rowIndex, columnIndex }) {
-      if (
-        columnIndex === 0 ||
-        columnIndex === 3 ||
-        columnIndex === 4 ||
-        columnIndex === 11 ||
-        columnIndex === 12
-      ) {
-        const _row = this.spanArr[rowIndex];
-        const _col = _row > 0 ? 1 : 0;
-        // alert(_row);
-        // alert(_col);
-        return {
-          rowspan: _row,
-          colspan: _col,
-        };
-      }
     },
 
     /* 獲取所有司機 */
@@ -465,7 +434,6 @@ export default {
       const vm = this;
       vm.listLoading = true;
       caseUsers.load({ limit: 9999, page: 1 }).then((res) => {
-        console.log(res.data);
         vm.caseUserList = res.data;
       });
     },
@@ -536,6 +504,7 @@ export default {
 
     /* 排班車輛檢核 */
     dispatchCarFilter(data = [], rowData) {
+      // return data;
       return data.filter((item) => {
         return [
           () => {
@@ -585,7 +554,76 @@ export default {
     /* 共乘車輛檢核 */
     isShareCarFilter() {
       let data = this.carList;
-      let checkedRowsData = this.multipleSelection;
+      let checkedRowsData = [];
+      this.multipleSelection.forEach((option) => {
+        option.data.forEach((data) => {
+          checkedRowsData.push(data);
+        });
+      });
+      return data.filter((item) => {
+        return [
+          () => {
+            // 若 車輛 為 不可派發 (status === 0) ，則不能選
+            if (item.status === 0) {
+              return false;
+            }
+            // 若 車輛 為 可派發 (status !== 0) ，則可以選
+            else {
+              return true;
+            }
+          },
+          () => {
+            // 若 有某一張定單 車種 不等於 一般車，那只能是 福祉車
+            if (checkedRowsData.some((el) => el.carCategoryName !== "一般車")) {
+              return item.carCategoryName !== "一般車";
+            }
+            // 若 有某一張定單 車種 等於 一般車，那可以是 一般車、福祉車
+            else {
+              return true; // 車種只有 一般車、福祉車 所以都通過
+            }
+          },
+          () => {
+            return (
+              item.wheelchairNum >=
+              checkedRowsData.reduce(
+                (accumulator, currentValue) =>
+                  accumulator +
+                  (["無", "普通輪椅(可收折)"].includes(
+                    currentValue.wheelchairType
+                  )
+                    ? 0
+                    : 1),
+                0
+              )
+            );
+          },
+          () => {
+            // 座椅數量 必須大於 所有訂單 (一般車訂單的陪同人數 + 1、福祉車訂單的陪同人數) 陪同人數 加總
+            return (
+              item.seatNum >=
+              checkedRowsData.reduce(
+                (accumulator, currentValue) =>
+                  accumulator +
+                  (currentValue.carCategoryName === "一般車"
+                    ? currentValue.familyWith + 1
+                    : currentValue.familyWith),
+                0
+              )
+            );
+          },
+        ].every((it) => it());
+      });
+    },
+
+    /* 變更司機車輛檢核 */
+    changeCarFilter() {
+      let data = this.carList;
+      let checkedRowsData = this.changeOrder;
+      // this.changeOrder.forEach((option) => {
+      //   option.data.forEach((data) => {
+      //     checkedRowsData.push(data);
+      //   });
+      // });
       return data.filter((item) => {
         return [
           () => {
@@ -652,19 +690,19 @@ export default {
         return;
       }
       let data = {
-        id: vm.multipleSelection.map((i) => {
+        orderNosOrDespatchNos: vm.multipleSelection.map((i) => {
           return i.despatchNo;
         }),
         driverInfoId: vm.carPoolTemp.driverInfoId,
         carId: vm.carPoolTemp.carId,
         driverInfoName: vm.driverList.filter((d) => {
           return d.id == vm.carPoolTemp.driverInfoId;
-        })[0].userName,
+        })[0].name,
         carNo: vm.carList.filter((c) => {
           return c.id == vm.carPoolTemp.carId;
         })[0].carNo,
       };
-      dispatchs.addOrUpdate(data).then((res) => {
+      dispatchs.addOrUpdateShare(data).then((res) => {
         vm.$alertT.fire({
           icon: "success",
           title: res.message,
@@ -674,9 +712,34 @@ export default {
       });
     },
 
+    /* 確認變更司機車輛 */
+    handleConfirmChange() {
+      const vm = this;
+      let data = {
+        orderNosOrDespatchNos: [vm.orderTemp.despatchNo],
+        driverInfoId: vm.orderTemp.driverInfoId,
+        carId: vm.orderTemp.carId,
+        driverInfoName: vm.driverList.filter((d) => {
+          return d.id == vm.orderTemp.driverInfoId;
+        })[0].name,
+        carNo: vm.carList.filter((c) => {
+          return c.id == vm.orderTemp.carId;
+        })[0].carNo,
+      };
+      dispatchs.addOrUpdateShare(data).then((res) => {
+        vm.$alertT.fire({
+          icon: "success",
+          title: res.message,
+        });
+        vm.changeDialog = false;
+        vm.getList();
+      });
+    },
+
     /* 排班 */
     handleRoster(order) {
       const vm = this;
+      vm.$cl(order);
       if (order.driverInfoId == null || order.carId == null) {
         vm.$alertM.fire({
           icon: "error",
@@ -685,17 +748,18 @@ export default {
         return;
       }
       let data = {
-        id: [order.despatchNo],
+        orderNosOrDespatchNos: [order.despatchNo],
         driverInfoId: order.driverInfoId,
         carId: order.carId,
         driverInfoName: vm.driverList.filter((d) => {
           return d.id == order.driverInfoId;
-        })[0].userName,
+        })[0].name,
         carNo: vm.carList.filter((c) => {
           return c.id == order.carId;
         })[0].carNo,
       };
-      dispatchs.addOrUpdate(data).then((res) => {
+      this.$cl(data);
+      dispatchs.addOrUpdateShare(data).then((res) => {
         vm.$alertT.fire({
           icon: "success",
           title: res.message,
@@ -707,33 +771,37 @@ export default {
     /* 批量排班 */
     handleBatch(items) {
       const vm = this;
-      // 確認司機車輛都已勾選
+      console.log(items);
       let flag = true;
       items.forEach((i) => {
-        if (i.driverInfoId == null || i.carId == null) {
+        if (
+          i.driverInfoId == null ||
+          i.carId == null ||
+          i.data[0].status != 1
+        ) {
           flag = false;
         }
       });
       if (!flag) {
         vm.$alertM.fire({
           icon: "error",
-          title: `請確認已勾選訂單都已確實選擇司機車輛`,
+          title: `請確認已勾選訂單都已確實選擇司機車輛且皆為新訂單`,
         });
       } else {
         //批次送出排班API
         for (let index = 0; index < items.length; index++) {
           let data = {
-            id: [items[index].despatchNo],
+            orderNosOrDespatchNos: [items[index].despatchNo],
             driverInfoId: items[index].driverInfoId,
             carId: items[index].carId,
             driverInfoName: vm.driverList.filter((d) => {
               return d.id == items[index].driverInfoId;
-            })[0].userName,
+            })[0].name,
             carNo: vm.carList.filter((c) => {
               return c.id == items[index].carId;
             })[0].carNo,
           };
-          dispatchs.addOrUpdate(data).then((res) => {
+          dispatchs.addOrUpdateShare(data).then((res) => {
             vm.$alertT.fire({
               icon: "success",
               title: res.message,
@@ -802,13 +870,49 @@ export default {
     },
 
     /* 獲取單筆訂單資料 */
-    getOrder(order) {
+    getOrder({ id }) {
       const vm = this;
-      vm.temp = Object.assign({}, order);
-      vm.temp.fromAddrDetail = vm.temp.fromAddr;
-      vm.temp.toAddrDetail = vm.temp.toAddr;
-      this.$set(vm.temp, "date", order.reserveDate.split(" ")[0]);
-      this.$set(vm.temp, "time", order.reserveDate.split(" ")[1].slice(0, 5));
+      vm.editDialog = true;
+      orderCaseUser.get({ id }).then((res) => {
+        console.log(res);
+        vm.temp = Object.assign({}, res.result); // copy obj
+        let fromRemark = ["醫院診所", "洗腎中心", "復健診所", "住家"].includes(
+          vm.temp.fromAddrRemark
+        )
+          ? ""
+          : vm.temp.fromAddrRemark;
+        this.$set(vm.temp, "fromRemark", fromRemark);
+
+        let toRemark = ["醫院診所", "洗腎中心", "復健診所", "住家"].includes(
+          vm.temp.toAddrRemark
+        )
+          ? ""
+          : vm.temp.toAddrRemark;
+        this.$set(vm.temp, "toRemark", toRemark);
+
+        vm.temp.toAddrRemark = [
+          "醫院診所",
+          "洗腎中心",
+          "復健診所",
+          "住家",
+        ].includes(vm.temp.toAddrRemark)
+          ? vm.temp.toAddrRemark
+          : "其他";
+        vm.temp.fromAddrRemark = [
+          "醫院診所",
+          "洗腎中心",
+          "復健診所",
+          "住家",
+        ].includes(vm.temp.fromAddrRemark)
+          ? vm.temp.fromAddrRemark
+          : "其他";
+        this.$set(vm.temp, "date", res.result.reserveDate.split(" ")[0]);
+        this.$set(
+          vm.temp,
+          "time",
+          res.result.reserveDate.split(" ")[1].slice(0, 5)
+        );
+      });
     },
 
     /* 預約訂車 */
@@ -833,31 +937,10 @@ export default {
     /* 變更司機車輛 */
     handleChangeDC(order) {
       const vm = this;
+      vm.changeOrder = order.data;
       vm.orderTemp = Object.assign({}, order); // copy obj
-    },
-
-    /* 確認變更司機車輛 */
-    handleConfirmChange() {
-      const vm = this;
-
-      let data = {
-        id: [vm.orderTemp.despatchNo],
-        driverInfoId: vm.orderTemp.driverInfoId,
-        carId: vm.orderTemp.carId,
-        driverInfoName: vm.driverList.filter((d) => {
-          return d.id == vm.orderTemp.driverInfoId;
-        })[0].userName,
-        carNo: vm.carList.filter((c) => {
-          return c.id == vm.orderTemp.carId;
-        })[0].carNo,
-      };
-      dispatchs.addOrUpdate(data).then((res) => {
-        vm.$alertT.fire({
-          icon: "success",
-          title: res.message,
-        });
-        vm.changeDialog = false;
-        vm.getList();
+      vm.$nextTick(() => {
+        vm.changeDialog = true;
       });
     },
 
@@ -920,5 +1003,9 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.dataInner {
+  margin: 1rem 0;
 }
 </style>

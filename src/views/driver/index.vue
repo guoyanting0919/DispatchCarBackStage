@@ -21,13 +21,23 @@
       <div class="bg-white" style="height: calc(100% - 50px)">
         <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" v-loading="listLoading" v-if="list" border fit highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" @row-click="rowClick">
           <el-table-column type="selection" width="55" align="center"></el-table-column>
-          <el-table-column property="userName" label="姓名" width="120" align="center"></el-table-column>
+
+          <el-table-column property="account" label="帳號" min-width="140" align="center">
+            <template slot-scope="scope">
+              {{ scope.row.account | hideFilter }}
+            </template>
+          </el-table-column>
+
+          <el-table-column property="name" label="姓名" width="120" align="center"></el-table-column>
+
           <el-table-column property="uid" label="身分證字號" min-width="140" align="center">
             <template slot-scope="scope">
               {{ scope.row.uid | hideFilter }}
             </template>
           </el-table-column>
+
           <el-table-column property="phone" label="手機" width="250" align="center"></el-table-column>
+
           <el-table-column property="status" label="狀態" width="130" align="center">
             <template slot-scope="scope">
               <div>
@@ -36,6 +46,7 @@
               </div>
             </template>
           </el-table-column>
+
           <el-table-column property="setting" label="操作" :fixed="isMobile()" width="220">
             <template slot-scope="scope">
               <div class="buttonFlexBox">
@@ -45,6 +56,7 @@
               </div>
             </template>
           </el-table-column>
+
         </el-table>
         <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handleCurrentChange" />
       </div>

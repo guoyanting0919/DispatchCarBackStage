@@ -92,8 +92,8 @@
         </el-row>
 
         <SubTitle title="服務身份"></SubTitle>
-        <el-form-item label="" prop="serviceUserTypes">
-          <el-checkbox-group v-model="temp.serviceUserTypes">
+        <el-form-item label="" prop="carServiceUserTypes">
+          <el-checkbox-group v-model="temp.carServiceUserTypes">
             <el-checkbox v-for="type in serviceUserTypesList" :key="type.categoryId" :label="type.categoryId">{{ type.categoryName }}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
@@ -202,7 +202,7 @@ export default {
         lastCheckDate: "",
         status: 1,
         remark: "",
-        serviceUserTypes: [], // 服務用戶身份
+        carServiceUserTypes: [], // 服務用戶身份
         carLicenses: [], // 車輛證照
         carInsurances: [], // 車輛保險
         carDevices: [], // 車輛設備
@@ -220,7 +220,7 @@ export default {
     ...mapGetters(["defaultorgid"]),
     serviceUserTypesChecked() {
       return this.serviceUserTypesList.filter((option) =>
-        this.temp.serviceUserTypes.some(
+        this.temp.carServiceUserTypes.some(
           (checked) => checked === option.categoryId
         )
       );
@@ -398,7 +398,7 @@ export default {
       obj.carDevices = JSON.stringify(vm.carDevicesChecked);
       obj.carInsurances = JSON.stringify(vm.carInsurancesChecked);
       obj.carLicenses = JSON.stringify(vm.carLicensesChecked);
-      // obj.serviceUserTypes = JSON.stringify(vm.serviceUserTypesChecked);
+      obj.carServiceUserTypes = JSON.stringify(vm.temp.carServiceUserTypes);
 
       console.log(obj);
       return obj;

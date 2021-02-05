@@ -38,6 +38,14 @@ export function addOrUpdate(data) {
   });
 }
 
+export function addOrUpdateShare(data) {
+  return request({
+    url: "/despatchs/SharedOrDespatch",
+    method: "post",
+    data,
+  });
+}
+
 export function cancel(data) {
   return request({
     url: "/despatchs/cancelDespatch",

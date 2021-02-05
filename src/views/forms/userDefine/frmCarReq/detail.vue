@@ -175,7 +175,7 @@ export default {
       vm.carDevicesModal = data.carDevices.map((i) => i.categoryId);
       vm.carInsurancesModal = data.carInsurances.map((i) => i.categoryId);
       vm.carLicensesModal = data.carLicenses.map((i) => i.categoryId);
-      vm.serviceUserTypesModal = data.serviceUserTypes;
+      vm.serviceUserTypesModal = JSON.parse(data.carServiceUserTypes);
       return data;
     },
   },

@@ -6,13 +6,13 @@
         <h1 class="cityTitle" @click="loginBy('System', '123456')">
           尖石鄉公所
         </h1>
-        <h5 class="cityDescrip" @click="loginBy('BBBBBB','BBBBBB')">
+        <h5 class="cityDescrip" @click="loginBy('CrayonChanShin','CrayonChanShin')">
           長照交通接送統一預約服務及管理系統
         </h5>
       </div>
       <!-- adminLogin -->
       <div class="adminLogin" v-if="isForget == 1">
-        <h2 class="adminLoginTitle">管理者Login</h2>
+        <h2 class="adminLoginTitle" @click="loginBy('Doraemon','Doraemon')">管理者Login</h2>
         <h5 class="adminLoginDescrip">
           為了保障您的帳號安全，建議您最少於三個月變更一次密碼
         </h5>
