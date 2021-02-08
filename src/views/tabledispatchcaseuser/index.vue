@@ -19,21 +19,26 @@
         <!-- 新訂單 -->
         <SubTitle title="新訂單">
           <template v-slot:btn>
-            <i class="iconfont icon-mouse toogleBtn"></i>
+            <i @click="handelToggle" class="iconfont icon-mouse toogleBtn"></i>
           </template>
         </SubTitle>
-        <div class="bg-white newOrderContainer">
+
+        <div class="bg-white newOrderContainer" v-if="toggle">
           <p style="color: red; font-size: 14px; width: 100%; text-align: center" v-if="newOrderList.length == 0">
             暫無新訂單
           </p>
           <transition-group name="fade-transform" mode="out-in" class="cardContainer">
             <OrderCard v-for="item in newOrderList" :key="item.id" :order="item" @handleReceive='handleReceive' @handleTrans='handleTrans' @handleCancle='handleCancle'></OrderCard>
-            <!-- <span v-for="i in newOrderList" :key="i.id">{{i.id}}</span> -->
           </transition-group>
         </div>
 
         <SubTitle title="調度台"></SubTitle>
-        <el-table ref="mainTable" :data="list" border fit v-loading="listLoading" highlight-current-row @selection-change="handleSelectionChange" style="width: 100%">
+        <!-- 條件篩選 -->
+        <el-date-picker value-format="yyyy-MM-dd" @change="getList" placeholder="選擇日期" size="mini" style="width: 200px; margin: 0 " v-model="listQuery.StartDate" type="date">
+        </el-date-picker>
+
+        <!-- 列表 -->
+        <el-table ref="mainTable" :data="list" border fit v-loading="listLoading" highlight-current-row @selection-change="handleSelectionChange" style="width: 100% ;margin-top:8px">
           <el-table-column type="selection" width="55" align="center"></el-table-column>
 
           <el-table-column align="center" property="userName" label="姓名" width="140">
@@ -239,6 +244,7 @@
 </template> 
 
 <script>
+import moment from "moment";
 import { mapGetters } from "vuex";
 
 import Sticky from "@/components/Sticky";
@@ -297,7 +303,7 @@ export default {
       /* 車輛類別 */
       carCategorysList: [],
 
-      tableToggle: true,
+      toggle: true,
 
       /* table */
       list: [],
@@ -307,6 +313,8 @@ export default {
         page: 1,
         limit: 10,
         key: undefined,
+        StartDate: null,
+        EndDate: null,
       },
       multipleSelection: [],
       spanArr: [],
@@ -410,6 +418,7 @@ export default {
     getList() {
       const vm = this;
       vm.listLoading = true;
+      vm.listQuery.EndDate = vm.listQuery.StartDate;
       orderCaseUser.loadDespatch(vm.listQuery).then((res) => {
         vm.list = res.data.map((d) => {
           d.despatchNo = d.despatchNo ? d.despatchNo : d.orderNo;
@@ -1123,6 +1132,12 @@ export default {
       });
     },
 
+    /* 隱藏/顯示新訂單 */
+    handelToggle() {
+      const vm = this;
+      vm.toggle = !vm.toggle;
+    },
+
     // 換頁
     handleCurrentChange(val) {
       this.listQuery.page = val.page;
@@ -1135,6 +1150,7 @@ export default {
     },
   },
   async mounted() {
+    this.listQuery.StartDate = moment(new Date()).format("yyyy-MM-DD");
     this.getDriverList();
     this.getCarList();
     this.getCarCategorys();

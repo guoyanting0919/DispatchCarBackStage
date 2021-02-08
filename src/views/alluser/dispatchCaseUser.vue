@@ -119,7 +119,7 @@
                   </div>
                 </el-col>
 
-                <el-col :sm="24" :md="24">
+                <!-- <el-col :sm="24" :md="24">
                   <el-form-item label="訂車人身份" prop="createdIdentity">
                     <el-select clearable v-model="temp.createdIdentity" placeholder="請選擇訂車人身份" style="width: 100%">
                       <el-option value="本人" label="本人">本人</el-option>
@@ -128,7 +128,7 @@
                       <el-option value="B單位" label="B單位">B單位</el-option>
                     </el-select>
                   </el-form-item>
-                </el-col>
+                </el-col> -->
 
                 <el-col :sm="24" :md="18">
                   <el-form-item label="起點" prop="fromAddr">
@@ -383,7 +383,7 @@ export default {
         orgId: "",
         reserveDate: "",
         transOrgs: [],
-        createdIdentity: "",
+        // createdIdentity: "",
         fromAddr: "",
         fromAddrRemark: "",
         toAddr: "",
@@ -393,7 +393,7 @@ export default {
         toRemark: "",
         isBack: false,
         isBackTemp: false,
-        canShared: true,
+        canShared: false,
         carCategoryId: "",
         carCategoryName: "",
         wheelchairType: "",
@@ -403,9 +403,9 @@ export default {
       rules: {
         date: [{ required: true, message: "必填欄位", tigger: "change" }],
         time: [{ required: true, message: "必填欄位", tigger: "change" }],
-        createdIdentity: [
-          { required: true, message: "必填欄位", tigger: "change" },
-        ],
+        // createdIdentity: [
+        //   { required: true, message: "必填欄位", tigger: "change" },
+        // ],
         fromAddr: [{ required: true, message: "必填欄位", tigger: "change" }],
         fromAddrRemark: [
           { required: true, message: "必填欄位", tigger: "change" },
