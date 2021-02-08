@@ -33,10 +33,10 @@
         </div>
 
         <SubTitle title="調度台"></SubTitle>
-        <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" border fit v-loading="listLoading" highlight-current-row @selection-change="handleSelectionChange" style="width: 100%">
+        <el-table ref="mainTable" :data="list" border fit v-loading="listLoading" highlight-current-row @selection-change="handleSelectionChange" style="width: 100%">
           <el-table-column type="selection" width="55" align="center"></el-table-column>
 
-          <el-table-column align="center" property="userName" label="姓名" width="120">
+          <el-table-column align="center" property="userName" label="姓名" width="140">
             <template slot-scope="scope" v-if="scope.row.data">
               <p class="dataInner" v-for="item in scope.row.data" :key="item.id">{{item.name}}</p>
             </template>
@@ -52,7 +52,7 @@
 
           <el-table-column property="driver" label="司機" width="200" align="center">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.driverInfoId" filterable size="mini" placeholder="選擇司機" :disabled="scope.row.data[0].status != 1">
+              <el-select @change="handleDriverChange(scope.row)" v-model="scope.row.driverInfoId" filterable size="mini" placeholder="選擇司機" :disabled="scope.row.data[0].status != 1">
                 <el-option v-for="driver in driverList" :key="driver.id" :label="driver.name" :value="driver.id">
                   {{ driver.name }} / {{ driver.phone }}
                 </el-option>
@@ -62,11 +62,11 @@
 
           <el-table-column property="car" label="車輛" width="200" align="center">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.carId" filterable size="mini" placeholder="選擇車輛" :disabled="scope.row.data[0].status != 1">
+              <el-select @change="handleCarChange(scope.row)" v-model="scope.row.carId" filterable size="mini" placeholder="選擇車輛" :disabled="scope.row.data[0].status != 1">
                 <el-option v-for="car in dispatchCarFilter(carList, scope.row.data[0])" :key="car.id" :label="car.carNo" :value="car.id">
                   {{ car.carCategoryName || "一般車" }} / {{ car.seatNum }}人座
                   /
-                  {{ car.carNo }}
+                  {{ car.carNo }} / {{car.driverName}}
                 </el-option>
               </el-select>
             </template>
@@ -117,19 +117,22 @@
             </template>
           </el-table-column>
 
-          <el-table-column property="canShared" label="編輯訂單" width="100" align="center">
+          <!-- <el-table-column property="canShared" label="編輯訂單" width="100" align="center">
             <template slot-scope="scope">
-              <p class="dataInner" v-for="item in scope.row.data" :key="item.id">
-                <el-button type="success" size="mini" v-if="scope.row.data[0].status <= 3" @click="getOrder(item)">
-                  編輯訂單
-                </el-button>
-              </p>
+            
             </template>
-          </el-table-column>
+          </el-table-column> -->
 
           <el-table-column align="center" :label="'操作'" fixed="right" width="300">
             <template slot-scope="scope">
               <div class="buttonFlexBox">
+                <div style="margin-right:10px">
+                  <p class="dataInner" v-for="item in scope.row.data" :key="item.id">
+                    <el-button type="success" size="mini" v-if="scope.row.data[0].status <= 3" @click="getOrder(item)">
+                      編輯訂單
+                    </el-button>
+                  </p>
+                </div>
                 <el-button type="info" size="mini" v-if="scope.row.data[0].status == 1" @click="handleRoster(scope.row)">
                   排班
                 </el-button>
@@ -208,7 +211,7 @@
           <el-row :gutter="16">
             <el-col :sm="12" :md="24">
               <el-form-item label="選擇司機">
-                <el-select style="width: 100%" v-model="carPoolTemp.driverInfoId" placeholder="請選擇司機">
+                <el-select @change="handleDriverChange(carPoolTemp,false,isShareCarFilter())" style="width: 100%" v-model="carPoolTemp.driverInfoId" placeholder="請選擇司機">
                   <el-option v-for="driver in driverList" :key="driver.id" :label="driver.name" :value="driver.id">
                     {{ driver.name }} / {{ driver.phone }}
                   </el-option>
@@ -218,8 +221,8 @@
 
             <el-col :sm="12" :md="24">
               <el-form-item label="選擇車輛">
-                <el-select style="width: 100%" v-model="carPoolTemp.carId" placeholder="請選擇車輛">
-                  <el-option v-for="car in isShareCarFilter()" :key="car.id" :label="`${car.carCategoryName} / ${car.seatNum}人座 / ${car.carNo}`" :value="car.id">
+                <el-select @change="handleCarChange(carPoolTemp,false)" style="width: 100%" v-model="carPoolTemp.carId" placeholder="請選擇車輛">
+                  <el-option v-for="car in isShareCarFilter()" :key="car.id" :label="`${car.carCategoryName} / ${car.seatNum}人座 / ${car.carNo} / ${car.driverName}`" :value="car.id">
                   </el-option>
                 </el-select>
               </el-form-item>
@@ -332,7 +335,13 @@ export default {
       },
 
       /* orderTemp */
-      orderTemp: {},
+      orderTemp: {
+        carId: null,
+        carNo: "",
+        driverInfoId: null,
+        driverInfoName: "",
+        id: [],
+      },
 
       /* 共乘 car pool temp */
       carPoolTemp: {
@@ -800,6 +809,109 @@ export default {
         });
         vm.changeDialog = false;
         vm.getList();
+      });
+    },
+
+    /* 變更車輛 */
+    handleCarChange(row, isTable = true) {
+      const vm = this;
+      if (!row.driverInfoId) {
+        let car = vm.carList.filter((c) => c.id === row.carId)[0];
+        row.driverInfoId = vm.driverList.filter(
+          (d) => d.name === car.driverName
+        )[0].id;
+      }
+      if (isTable) {
+        vm.$nextTick(() => {
+          vm.checkCarDriver(row);
+        });
+      }
+    },
+
+    /* 變更司機 */
+    handleDriverChange(row, isTable = true, carData = []) {
+      const vm = this;
+      if (isTable) {
+        if (!row.carId) {
+          let driver = vm.driverList.filter((d) => d.id === row.driverInfoId)[0]
+            ?.name;
+          let cars = vm.carList.filter((c) => c.driverName === driver);
+          let canUseCars = vm.changeDriverFilter(cars, row);
+          row.carId = canUseCars[0]?.id;
+        }
+      } else {
+        if (!row.carId) {
+          let driver = vm.driverList.filter((d) => d.id === row.driverInfoId)[0]
+            ?.name;
+          let cars = carData.filter((c) => c.driverName === driver);
+          row.carId = cars[0]?.id;
+        }
+      }
+      if (isTable) {
+        vm.$nextTick(() => {
+          vm.checkCarDriver(row);
+        });
+      }
+    },
+
+    /* 司機車輛若有值則打勾 */
+    checkCarDriver(row) {
+      const vm = this;
+      let checkRow = vm.multipleSelection.map((item) => item.despatchNo);
+      if (row.carId && row.driverInfoId) {
+        if (!checkRow.includes(row.despatchNo))
+          vm.$refs.mainTable.toggleRowSelection(row);
+      } else {
+        if (checkRow.includes(row.despatchNo))
+          vm.$refs.mainTable.toggleRowSelection(row);
+      }
+    },
+
+    /* 變更司機時車輛篩選 */
+    changeDriverFilter(cars = [], data = {}) {
+      // console.log(cars, data);
+      return cars.filter((item) => {
+        return [
+          () => {
+            if (item.status === 0) {
+              return false;
+            } else {
+              return true;
+            }
+          },
+          () => {
+            // 若 有某一張定單 車種 不等於 一般車，那只能是 福祉車
+            if (data?.data[0].carCategoryName !== "一般車") {
+              return item.carCategoryName !== "一般車";
+            }
+            // 若 有某一張定單 車種 等於 一般車，那可以是 一般車、福祉車
+            else {
+              return true; // 車種只有 一般車、福祉車 所以都通過
+            }
+          },
+          () => {
+            // 若 這一張訂單輪椅類型 不等於 ( "無" 或 "普通輪椅(可收折)" )，那 輪椅數量 要大於等於 1
+            if (
+              !["無", "普通輪椅(可收折)"].includes(data?.data[0].wheelchairType)
+            ) {
+              return item.wheelchairNum >= 1;
+            }
+            // 若 這一張訂單輪椅類型 等於 ( "無" 或 "普通輪椅(可收折)" )，那 輪椅數量 要大於等於 0
+            else {
+              return item.wheelchairNum >= 0;
+            }
+          },
+          () => {
+            // 若 這一張訂單車種 等於 一般車，則 座位數量 必須 大於等於 訂單的陪同人數 + 1
+            if (data?.data[0].carCategoryName === "一般車") {
+              return item.seatNum >= data?.data[0].familyWith + 1;
+            }
+            // 若 這一張訂單車種 不等於 一般車，則 座位數量 必須 大於等於 訂單的陪同人數
+            else {
+              return item.seatNum >= data?.data[0].familyWith;
+            }
+          },
+        ].every((it) => it());
       });
     },
 

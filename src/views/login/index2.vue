@@ -3,17 +3,17 @@
     <div class="loginContainer">
       <!-- loginTitle -->
       <div class="loginTitle">
-        <h1 class="cityTitle" @click="loginBy('System', '123456')">
+        <h1 class="cityTitle" @click="superLogin=!superLogin">
           尖石鄉公所
         </h1>
-        <h5 class="cityDescrip" @click="loginBy('CrayonChanShin','CrayonChanShin')">
+        <h5 class="cityDescrip">
           長照交通接送統一預約服務及管理系統
         </h5>
       </div>
       <!-- adminLogin -->
       <div class="adminLogin" v-if="isForget == 1">
-        <h2 class="adminLoginTitle" @click="loginBy('Doraemon','Doraemon')">管理者Login</h2>
-        <h5 class="adminLoginDescrip" @click="loginBy('CartoonsA','CartoonsA')">
+        <h2 class="adminLoginTitle">管理者Login</h2>
+        <h5 class="adminLoginDescrip">
           為了保障您的帳號安全，建議您最少於三個月變更一次密碼
         </h5>
       </div>
@@ -105,6 +105,13 @@
         <el-table-column property="date" label="公告日期" width="120"></el-table-column>
       </el-table>
     </el-dialog>
+
+    <!-- super login container -->
+    <transition name="fade">
+      <div v-if="superLogin" class="superLoginContainer">
+        <div @click="loginBy(item.account,item.password)" v-for="item in accountData" :key="item.account" class="superLoginAccount">{{ item.name }}</div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -113,6 +120,35 @@ export default {
   name: "Login",
   data() {
     return {
+      /* account data */
+      superLogin: false,
+      accountData: [
+        {
+          name: "最高權限管理員",
+          account: "System",
+          password: "123456",
+        },
+        {
+          name: "中邦管理員",
+          account: "CBSD_ADMIN",
+          password: "CBSD_ADMIN",
+        },
+        {
+          name: "卡通A單位",
+          account: "CartoonsA",
+          password: "CartoonsA",
+        },
+        {
+          name: "蠟筆小新車行",
+          account: "CrayonChanShin",
+          password: "CrayonChanShin",
+        },
+        {
+          name: "多拉A夢車行",
+          account: "Doraemon",
+          password: "Doraemon",
+        },
+      ],
       // announcement
       dialogAnnVisible: false,
       annCategory: "行車公告",
@@ -339,4 +375,34 @@ export default {
 };
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.superLoginContainer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: transparent;
+  height: 50px;
+  display: flex;
+  padding: 0.25rem 2rem;
+  align-items: center;
+  transition: 0.5s;
+}
+
+.superLoginAccount {
+  transition: 0.5s;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  color: #dddddd;
+  letter-spacing: 0.15rem;
+  border: 1px dashed #dddddd;
+  border-radius: 0.5rem;
+  margin-right: 0.75rem;
+
+  &:hover {
+    box-shadow: 0 0 8px $--color-primary;
+    text-shadow: 0 0 4px $--color-primary;
+    border: 1px solid $--color-primary;
+    transform: translateY(-4px);
+  }
+}
+</style>
