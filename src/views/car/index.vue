@@ -31,11 +31,9 @@
           <el-table-column property="factoryType" label="廠牌型號" width="170" align="center"></el-table-column>
           <el-table-column property="wheelchairNum" label="輪椅數量" min-width="170" align="center"></el-table-column>
           <el-table-column property="seatNum" label="座椅數量" min-width="170" align="center"></el-table-column>
-          <el-table-column property="driverInfoId" label="司機姓名" min-width="170" align="center">
+          <el-table-column property="driverName" label="司機姓名" min-width="170" align="center">
             <template slot-scope="scope">
-              <span>{{
-                scope.row.driverInfoId | driverFilter(driverList)
-              }}</span>
+              <span>{{scope.row.driverName }}</span>
             </template>
           </el-table-column>
           <el-table-column property="status" label="狀態" width="130" align="center">
