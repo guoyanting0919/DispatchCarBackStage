@@ -1,5 +1,6 @@
 <template>
   <div class="flex-column dispatch" style="height: calc(100% - 20px)">
+    <BatchLoader @handleClose="handleCloseLoader" :isShow="batchLoaderShow" :totalDataCount="totalDataCount" :currentDataIndex="currentDataIndex" :errorDataArray="errorDataArray" />
     <div id="map" ref="map" style="width: 0%; height: 0%"></div>
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
@@ -255,6 +256,7 @@ import Pagination from "@/components/Pagination";
 import OrderStatusTag from "@/components/OrderStatusTag";
 import EditDialog from "@/components/Dialog/editCaseUserDespatch";
 import OrderCard from "@/components/OrderCardCase";
+import BatchLoader from "@/components/BatchLoader";
 
 import * as orderCaseUser from "@/api/orderCaseUser";
 import * as drivers from "@/api/drivers";
@@ -273,6 +275,7 @@ export default {
     OrderStatusTag,
     EditDialog,
     OrderCard,
+    BatchLoader,
   },
   computed: {
     ...mapGetters(["defaultorgid"]),
@@ -302,6 +305,12 @@ export default {
       newOrderList: [],
       /* 車輛類別 */
       carCategorysList: [],
+
+      /* batch loader */
+      batchLoaderShow: false,
+      totalDataCount: 0,
+      currentDataIndex: 0,
+      errorDataArray: [],
 
       toggle: true,
 
@@ -957,9 +966,8 @@ export default {
     },
 
     /* 批量排班 */
-    handleBatch(items) {
+    async handleBatch(items) {
       const vm = this;
-      console.log(items);
       let flag = true;
       items.forEach((i) => {
         if (
@@ -976,8 +984,13 @@ export default {
           title: `請確認已勾選訂單都已確實選擇司機車輛且皆為新訂單`,
         });
       } else {
+        vm.currentDataIndex = 0;
+        vm.errorDataArray = [];
         //批次送出排班API
+        vm.batchLoaderShow = true;
+        vm.totalDataCount = items.length;
         for (let index = 0; index < items.length; index++) {
+          await vm.delay(500);
           let data = {
             orderNosOrDespatchNos: [items[index].despatchNo],
             driverInfoId: items[index].driverInfoId,
@@ -990,10 +1003,12 @@ export default {
             })[0].carNo,
           };
           dispatchs.addOrUpdateShare(data).then((res) => {
-            vm.$alertT.fire({
-              icon: "success",
-              title: res.message,
-            });
+            vm.currentDataIndex = index + 1;
+            data.index = vm.currentDataIndex;
+            data.code = res.code;
+            data.errorRemark = res.message || "";
+            vm.errorDataArray.push(data);
+            console.log(vm.errorDataArray);
             if (index == items.length - 1) {
               vm.getList();
             }
@@ -1002,6 +1017,14 @@ export default {
       }
     },
 
+    /* 延遲 */
+    delay(time) {
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          resolve();
+        }, time);
+      });
+    },
     /* 取消排班 */
     handleCancelDispatch(id) {
       const vm = this;
@@ -1138,6 +1161,11 @@ export default {
       vm.toggle = !vm.toggle;
     },
 
+    /* 關閉loader */
+    handleCloseLoader() {
+      this.batchLoaderShow = false;
+    },
+
     // 換頁
     handleCurrentChange(val) {
       this.listQuery.page = val.page;
@@ -1151,6 +1179,7 @@ export default {
   },
   async mounted() {
     this.listQuery.StartDate = moment(new Date()).format("yyyy-MM-DD");
+    this.listQuery.StartDate = "2021-02-09";
     this.getDriverList();
     this.getCarList();
     this.getCarCategorys();

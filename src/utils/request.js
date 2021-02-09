@@ -97,12 +97,14 @@ service.interceptors.response.use(
           });
         });
       } else {
-        Vue.prototype.$alertM.fire({
+        Vue.prototype.$alertT.fire({
           icon: "error",
           title: res.message,
         });
       }
-      return Promise.reject(res.message);
+      //FIXME:
+      // return Promise.reject(res.message);
+      return response.data;
     } else {
       // api回傳成功
       return response.data;
