@@ -3,8 +3,8 @@
     <div class="loginContainer">
       <!-- loginTitle -->
       <div class="loginTitle">
-        <h1 class="cityTitle" @click="superLogin=!superLogin">
-          尖石鄉公所
+        <h1 class="cityTitle" @click="superLogin=false">
+          瑪家鄉公所
         </h1>
         <h5 class="cityDescrip">
           長照交通接送統一預約服務及管理系統
