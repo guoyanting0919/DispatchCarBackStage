@@ -760,7 +760,6 @@ export default {
     /* 取消 */
     handleCancle(orderId) {
       const vm = this;
-      //FIXME:
       orderCaseUser
         .cancel({
           id: orderId,
@@ -1179,7 +1178,8 @@ export default {
   },
   async mounted() {
     this.listQuery.StartDate = moment(new Date()).format("yyyy-MM-DD");
-    this.listQuery.StartDate = "2021-02-09";
+    //FIXME:
+    // this.listQuery.StartDate = "2021-02-09";
     this.getDriverList();
     this.getCarList();
     this.getCarCategorys();
