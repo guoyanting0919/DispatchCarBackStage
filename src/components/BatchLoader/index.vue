@@ -154,7 +154,7 @@ export default {
   height: 100vh;
   background: #000000;
   opacity: 0.876;
-  z-index: 2000;
+  z-index: 2500;
   display: flex;
   align-items: center;
   justify-content: center;

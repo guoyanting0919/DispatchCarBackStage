@@ -8,6 +8,22 @@ export function load(params) {
   });
 }
 
+export function acceptOrder(params) {
+  return request({
+    url: "/orderOfSelfPayUsers/acceptOrder",
+    method: "get",
+    params,
+  });
+}
+
+export function LoadWithDespatch(params) {
+  return request({
+    url: "/orderOfSelfPayUsers/LoadWithDespatch",
+    method: "get",
+    params,
+  });
+}
+
 export function loadHistory(params) {
   return request({
     url: "/orderOfSelfPayUsers/loadHistory",

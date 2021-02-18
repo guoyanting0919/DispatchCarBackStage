@@ -676,11 +676,6 @@ export default {
     changeCarFilter() {
       let data = this.carList;
       let checkedRowsData = this.changeOrder;
-      // this.changeOrder.forEach((option) => {
-      //   option.data.forEach((data) => {
-      //     checkedRowsData.push(data);
-      //   });
-      // });
       return data.filter((item) => {
         return [
           () => {
@@ -770,39 +765,6 @@ export default {
           vm.getList();
           vm.getListNoOrg();
         });
-    },
-
-    /* 共乘 */
-    handleSetCarPool() {
-      const vm = this;
-      if (vm.carPoolTemp.driverInfoId == null || vm.carPoolTemp.carId == null) {
-        vm.$alertM.fire({
-          icon: "error",
-          title: `請確實選擇司機及車輛`,
-        });
-        return;
-      }
-      let data = {
-        orderNosOrDespatchNos: vm.multipleSelection.map((i) => {
-          return i.despatchNo;
-        }),
-        driverInfoId: vm.carPoolTemp.driverInfoId,
-        carId: vm.carPoolTemp.carId,
-        driverInfoName: vm.driverList.filter((d) => {
-          return d.id == vm.carPoolTemp.driverInfoId;
-        })[0].name,
-        carNo: vm.carList.filter((c) => {
-          return c.id == vm.carPoolTemp.carId;
-        })[0].carNo,
-      };
-      dispatchs.addOrUpdateShare(data).then((res) => {
-        vm.$alertT.fire({
-          icon: "success",
-          title: res.message,
-        });
-        vm.carPoolDialog = false;
-        vm.getList();
-      });
     },
 
     /* 確認變更司機車輛 */
@@ -935,7 +897,6 @@ export default {
     /* 排班 */
     handleRoster(order) {
       const vm = this;
-      vm.$cl(order);
       if (order.driverInfoId == null || order.carId == null) {
         vm.$alertM.fire({
           icon: "error",
@@ -954,7 +915,6 @@ export default {
           return c.id == order.carId;
         })[0].carNo,
       };
-      this.$cl(data);
       dispatchs.addOrUpdateShare(data).then((res) => {
         vm.$alertT.fire({
           icon: "success",
@@ -1024,6 +984,7 @@ export default {
         }, time);
       });
     },
+
     /* 取消排班 */
     handleCancelDispatch(id) {
       const vm = this;
