@@ -4,9 +4,6 @@
     <div id="map" ref="map" style="width: 0%; height: 0%"></div>
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
-        <!-- 非權限按鈕 -->
-        <el-input style="width: 200px; margin-right: 0.5rem" size="mini" v-model="value" clearable placeholder="請輸入關鍵字"></el-input>
-
         <!-- 權限按鈕 -->
         <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
       </div>
@@ -37,6 +34,8 @@
         <!-- 條件篩選 -->
         <el-date-picker value-format="yyyy-MM-dd" @change="getList" placeholder="選擇日期" size="mini" style="width: 200px; margin: 0 " v-model="listQuery.StartDate" type="date">
         </el-date-picker>
+
+        <el-input style="width: 200px; margin-left: 0.5rem" size="mini" v-model="listQuery.key" clearable placeholder="請輸入關鍵字"></el-input>
 
         <!-- 列表 -->
         <el-table ref="mainTable" :data="list" border fit v-loading="listLoading" highlight-current-row @selection-change="handleSelectionChange" style="width: 100% ;margin-top:8px">

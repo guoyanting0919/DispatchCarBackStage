@@ -2,64 +2,26 @@
   <div class="flex-column">
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
-        <el-input
-          @keyup.enter.native="handleFilter"
-          prefix-icon="el-icon-search"
-          size="small"
-          style="width: 200px; margin-bottom: 0;"
-          class="filter-item"
-          :placeholder="'關鍵字'"
-          v-model="listQuery.key"
-        ></el-input>
+        <el-input @keyup.enter.native="handleFilter" prefix-icon="el-icon-search" size="small" style="width: 200px; margin-bottom: 0;" class="filter-item" :placeholder="'關鍵字'" v-model="listQuery.key"></el-input>
 
-        <permission-btn
-          moduleName="rolemanager"
-          size="mini"
-          v-on:btn-event="onBtnClicked"
-        ></permission-btn>
+        <permission-btn moduleName="rolemanager" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
 
-        <el-checkbox
-          size="small"
-          style="margin-left:15px;"
-          @change="tableKey = tableKey + 1"
-          v-model="showDescription"
-          >Id/描述</el-checkbox
-        >
+        <el-checkbox size="small" style="margin-left:15px;" @change="tableKey = tableKey + 1" v-model="showDescription">Id/描述</el-checkbox>
       </div>
     </sticky>
     <div class="app-container flex-item">
-      <Title title="角色管理"></Title>
+      <Title title="權限管理"></Title>
       <div class="bg-white" style="height:calc(100% - 50px)">
-        <el-table
-          ref="mainTable"
-          :key="tableKey"
-          :data="list"
-          v-loading="listLoading"
-          border
-          fit
-          highlight-current-row
-          style="width: 100%;"
-          height="calc(100% - 52px)"
-          @row-click="rowClick"
-          @selection-change="handleSelectionChange"
-        >
-          <el-table-column
-            align="center"
-            type="selection"
-            width="55"
-          ></el-table-column>
+        <el-table ref="mainTable" :key="tableKey" :data="list" v-loading="listLoading" border fit highlight-current-row style="width: 100%;" height="calc(100% - 52px)" @row-click="rowClick" @selection-change="handleSelectionChange">
+          <el-table-column align="center" type="selection" width="55"></el-table-column>
 
-          <el-table-column
-            :label="'Id'"
-            v-if="showDescription"
-            min-width="120px"
-          >
+          <el-table-column :label="'Id'" v-if="showDescription" min-width="120px">
             <template slot-scope="scope">
               <span>{{ scope.row.id }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column min-width="50px" :label="'角色名稱'">
+          <el-table-column min-width="50px" :label="'權限種類'">
             <template slot-scope="scope">
               <span>{{ scope.row.name }}</span>
             </template>
@@ -67,11 +29,7 @@
 
           <el-table-column min-width="300px" :label="'用戶列表'">
             <template slot-scope="scope" v-if="list.length > 0">
-              <role-users
-                ref="roleUser"
-                :role-id="scope.row.id"
-                :selectUsers.sync="roleUsers.list[scope.$index]"
-              ></role-users>
+              <role-users ref="roleUser" :role-id="scope.row.id" :selectUsers.sync="roleUsers.list[scope.$index]"></role-users>
             </template>
           </el-table-column>
 
@@ -86,153 +44,52 @@
             </template>
           </el-table-column>
 
-          <el-table-column
-            align="center"
-            :label="'操作'"
-            width="230"
-            class-name="small-padding fixed-width"
-          >
+          <el-table-column align="center" :label="'操作'" width="230" class-name="small-padding fixed-width">
             <template slot-scope="scope">
-              <el-button
-                type="primary"
-                size="mini"
-                @click="handleUpdate(scope.row)"
-                >編輯</el-button
-              >
-              <el-button
-                v-if="scope.row.status == 0"
-                size="mini"
-                type="danger"
-                @click="handleModifyStatus(scope.row, 1)"
-                >停用</el-button
-              >
+              <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">編輯</el-button>
+              <el-button v-if="scope.row.status == 0" size="mini" type="danger" @click="handleModifyStatus(scope.row, 1)">停用</el-button>
             </template>
           </el-table-column>
         </el-table>
-        <pagination
-          v-show="total > 0"
-          :total="total"
-          :page.sync="listQuery.page"
-          :limit.sync="listQuery.limit"
-          @pagination="handleCurrentChange"
-        />
+        <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handleCurrentChange" />
       </div>
 
-      <el-dialog
-        width="500px"
-        v-el-drag-dialog
-        class="dialog-mini"
-        :title="textMap[dialogStatus]"
-        :visible.sync="dialogFormVisible"
-      >
-        <el-form
-          :rules="rules"
-          ref="dataForm"
-          :model="temp"
-          label-position="right"
-          label-width="100px"
-        >
-          <el-form-item
-            size="small"
-            :label="'Id'"
-            prop="id"
-            v-show="dialogStatus == 'update'"
-          >
-            <el-input
-              v-model="temp.id"
-              :disabled="true"
-              placeholder="系統自動處理"
-            ></el-input>
+      <el-dialog width="500px" v-el-drag-dialog class="dialog-mini" :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+        <el-form :rules="rules" ref="dataForm" :model="temp" label-position="right" label-width="100px">
+          <el-form-item size="small" :label="'Id'" prop="id" v-show="dialogStatus == 'update'">
+            <el-input v-model="temp.id" :disabled="true" placeholder="系統自動處理"></el-input>
           </el-form-item>
-          <el-form-item size="small" :label="'角色名稱'" prop="name">
+          <el-form-item size="small" :label="'權限種類'" prop="name">
             <el-input v-model="temp.name"></el-input>
           </el-form-item>
           <el-form-item size="small" :label="'狀態'">
-            <el-select
-              class="filter-item"
-              v-model="temp.status"
-              placeholder="Please select"
-            >
-              <el-option
-                v-for="item in statusOptions"
-                :key="item.key"
-                :label="item.display_name"
-                :value="item.key"
-              ></el-option>
+            <el-select class="filter-item" v-model="temp.status" placeholder="Please select">
+              <el-option v-for="item in statusOptions" :key="item.key" :label="item.display_name" :value="item.key"></el-option>
             </el-select>
           </el-form-item>
         </el-form>
         <div slot="footer">
-          <el-button size="small" @click="dialogFormVisible = false"
-            >取消</el-button
-          >
-          <el-button
-            size="small"
-            v-if="dialogStatus == 'create'"
-            type="primary"
-            @click="createData"
-            >確認</el-button
-          >
-          <el-button size="small" v-else type="primary" @click="updateData"
-            >確認</el-button
-          >
+          <el-button size="small" @click="dialogFormVisible = false">取消</el-button>
+          <el-button size="small" v-if="dialogStatus == 'create'" type="primary" @click="createData">確認</el-button>
+          <el-button size="small" v-else type="primary" @click="updateData">確認</el-button>
         </div>
       </el-dialog>
       <!--只有這麼寫dialog，才能正常觸發ESC關閉-->
-      <el-dialog
-        class="dialog-mini"
-        ref="accessModulesDlg"
-        :title="accessTitle"
-        :visible.sync="dialogAccessModules"
-      >
-        <access-modules
-          ref="accessModules"
-          v-if="dialogAccessModules"
-          :role-id="multipleSelection[0].id"
-          @change-title="changeTitle"
-          @close="dialogAccessModules = false"
-        ></access-modules>
+      <el-dialog class="dialog-mini" ref="accessModulesDlg" :title="accessTitle" :visible.sync="dialogAccessModules">
+        <access-modules ref="accessModules" v-if="dialogAccessModules" :role-id="multipleSelection[0].id" @change-title="changeTitle" @close="dialogAccessModules = false"></access-modules>
       </el-dialog>
 
-      <el-dialog
-        class="dialog-mini"
-        v-el-drag-dialog
-        :title="'為角色分配資源'"
-        :visible.sync="dialogAccessResource"
-      >
-        <access-resource
-          ref="accessResource"
-          v-if="dialogAccessResource"
-          :role-id="multipleSelection[0].id"
-          @close="dialogAccessResource = false"
-        ></access-resource>
+      <el-dialog class="dialog-mini" v-el-drag-dialog :title="'為角色分配資源'" :visible.sync="dialogAccessResource">
+        <access-resource ref="accessResource" v-if="dialogAccessResource" :role-id="multipleSelection[0].id" @close="dialogAccessResource = false"></access-resource>
       </el-dialog>
       <!-- 添加角色用戶 -->
-      <el-dialog
-        class="dialog-mini user-dialog"
-        v-el-drag-dialog
-        :title="'添加角色用戶'"
-        :visible.sync="roleUsers.dialogUserResource"
-      >
-        <selectUsersCom
-          ref="selectUser"
-          v-if="roleUsers.dialogUserResource"
-          :hiddenFooter="true"
-          :loginKey="'loginUser'"
-          :selectUsers.sync="
+      <el-dialog class="dialog-mini user-dialog" v-el-drag-dialog :title="'添加單位權限'" :visible.sync="roleUsers.dialogUserResource">
+        <selectUsersCom ref="selectUser" v-if="roleUsers.dialogUserResource" :hiddenFooter="true" :loginKey="'loginUser'" :selectUsers.sync="
             roleUsers.rowIndex > -1 && roleUsers.list[roleUsers.rowIndex]
-          "
-        ></selectUsersCom>
+          "></selectUsersCom>
         <div style="text-align:right;" slot="footer">
-          <el-button
-            size="small"
-            type="cancel"
-            @click="roleUsers.dialogUserResource = false"
-            >取消</el-button
-          >
-          <el-button size="small" type="primary" @click="handleSaveUsers"
-            >確定</el-button
-          >
+          <el-button size="small" type="cancel" @click="roleUsers.dialogUserResource = false">取消</el-button>
+          <el-button size="small" type="primary" @click="handleSaveUsers">確定</el-button>
         </div>
       </el-dialog>
     </div>
@@ -333,7 +190,7 @@ export default {
         selectUsers: [],
         list: [],
       },
-      accessTitle: "為角色分配左側欄權限",
+      accessTitle: "權限設定",
     };
   },
   filters: {
@@ -367,7 +224,7 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    onBtnClicked: function(domId) {
+    onBtnClicked: function (domId) {
       console.log(domId);
       switch (domId) {
         case "btnAdd":

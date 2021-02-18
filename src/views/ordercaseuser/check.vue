@@ -88,7 +88,7 @@
               <el-col :sm="12" :md="8">
                 <div class="inputBox">
                   <div class="inputLable">共乘</div>
-                  <div class="inputValue">{{ order.canShared ?'願意共乘':'不願共乘' }}</div>
+                  <div class="inputValue">{{ order.canShared ?'可共乘':'不可共乘' }}</div>
                 </div>
               </el-col>
 

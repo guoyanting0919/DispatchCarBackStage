@@ -3,7 +3,7 @@
     <div class="loginContainer">
       <!-- loginTitle -->
       <div class="loginTitle">
-        <h1 class="cityTitle" @click="superLogin=false">
+        <h1 class="cityTitle" @click="handleSuperLogin">
           瑪家鄉公所
         </h1>
         <h5 class="cityDescrip">
@@ -229,6 +229,7 @@ export default {
       this.accountInput = str;
       this.handleLogin();
     },
+
     handleLogin() {
       const vm = this;
 
@@ -247,6 +248,12 @@ export default {
         .catch(() => {
           vm.btnLoading = false;
         });
+    },
+
+    /* 超級登入 */
+    handleSuperLogin() {
+      console.log(process.env.NODE_ENV);
+      if (process.env.NODE_ENV === "development") this.superLogin = true;
     },
 
     // 傳送驗證碼

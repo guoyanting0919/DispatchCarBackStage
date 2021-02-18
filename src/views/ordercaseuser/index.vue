@@ -91,7 +91,6 @@
             <div class="orderRight">
               <div class="orderRightTitle">
                 <el-button v-if="order.hasViolation" style="padding: 0px 10px" type="danger" @click="handleViolation(order)">記點</el-button>
-                <!-- <el-button style="padding: 0px 10px" type="info">修改狀態</el-button> -->
                 <p class="orderStatus">
                   <OrderStatusTag :type="orderStatusMapping[order.status - 1]" size="mini"></OrderStatusTag>
                 </p>

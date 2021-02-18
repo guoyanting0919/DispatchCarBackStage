@@ -2,73 +2,26 @@
   <div style="height: 100%" class="select-users-wrap">
     <div class="flex-row" style="height: 100%">
       <div class="part-box" v-if="loginKey === 'loginUser' && !orgId">
-        <el-card
-          shadow="never"
-          class="body-small custom-card"
-          style="height: 100%"
-        >
+        <el-card shadow="never" class="body-small custom-card" style="height: 100%">
           <div slot="header" class="clearfix">
-            <el-button type="text" style="padding: 0 11px" @click="getAllUsers"
-              >全部用戶>></el-button
-            >
+            <el-button type="text" style="padding: 0 11px" @click="getAllUsers">全部用戶>></el-button>
           </div>
 
-          <el-tree
-            :data="orgsTree"
-            :expand-on-click-node="false"
-            default-expand-all
-            @node-click="handleNodeClick"
-          ></el-tree>
+          <el-tree :data="orgsTree" :expand-on-click-node="false" default-expand-all @node-click="handleNodeClick"></el-tree>
         </el-card>
       </div>
       <div class="flex-item table-box">
-        <div
-          class="flex-row"
-          style="align-items: center"
-          v-if="loginKey === 'loginUser'"
-          @keyup.13="handleSearchUser"
-        >
-          <el-input
-            size="mini"
-            style="margin: 10px; width: 200px"
-            placeholder="請輸入內容"
-            v-model="searchKey"
-          >
+        <div class="flex-row" style="align-items: center" v-if="loginKey === 'loginUser'" @keyup.13="handleSearchUser">
+          <el-input size="mini" style="margin: 10px; width: 200px" placeholder="請輸入內容" v-model="searchKey">
             <i slot="prefix" class="el-input__icon el-icon-search"></i>
           </el-input>
-          <el-button
-            type="primary"
-            icon="el-icon-search"
-            size="mini"
-            @click="handleSearchUser"
-            >查詢</el-button
-          >
-          <div
-            style="text-align: right; padding: 5px 10px"
-            :title="names"
-            v-if="names"
-            class="flex-item ellipsis"
-          >
+          <el-button type="primary" icon="el-icon-search" size="mini" @click="handleSearchUser">查詢</el-button>
+          <div style="text-align: right; padding: 5px 10px" :title="names" v-if="names" class="flex-item ellipsis">
             選中用戶：{{ names }}
           </div>
         </div>
-        <el-table
-          ref="multipleTable"
-          height="calc(100% - 52px - 36px)"
-          v-if="loginKey === 'loginUser'"
-          :data="tableData.datas"
-          tooltip-effect="dark"
-          v-loading="tableData.loading"
-          style="width: 100%; border-top: 1px solid #e4e4e4"
-          @row-click="rowClick"
-          @select="handleSelectionUser"
-          @select-all="handleSelectionUser"
-        >
-          <el-table-column
-            align="center"
-            type="selection"
-            width="55"
-          ></el-table-column>
+        <el-table ref="multipleTable" height="calc(100% - 52px - 36px)" v-if="loginKey === 'loginUser'" :data="tableData.datas" tooltip-effect="dark" v-loading="tableData.loading" style="width: 100%; border-top: 1px solid #e4e4e4" @row-click="rowClick" @select="handleSelectionUser" @select-all="handleSelectionUser">
+          <el-table-column align="center" type="selection" width="55"></el-table-column>
 
           <el-table-column align="center" min-width="80px" :label="'帳號'">
             <template slot-scope="scope">
@@ -82,18 +35,13 @@
             </template>
           </el-table-column>
 
-          <el-table-column align="center" :label="'所屬部門'">
+          <el-table-column align="center" :label="'管理單位'">
             <template slot-scope="scope">
               <span>{{ scope.row.organizations }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column
-            align="center"
-            class-name="status-col"
-            :label="'狀態'"
-            width="100"
-          >
+          <el-table-column align="center" class-name="status-col" :label="'狀態'" width="100">
             <template slot-scope="scope">
               <span :class="scope.row.status | userStatusFilter">
                 {{
@@ -104,24 +52,8 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-table
-          ref="multipleTable"
-          height="calc(100%)"
-          v-else
-          :data="tableData.datas"
-          tooltip-effect="dark"
-          v-loading="tableData.loading"
-          border
-          style="width: 100%"
-          @row-click="rowClick"
-          @select="handleSelectionUser"
-          @select-all="handleSelectionUser"
-        >
-          <el-table-column
-            align="center"
-            type="selection"
-            width="55"
-          ></el-table-column>
+        <el-table ref="multipleTable" height="calc(100%)" v-else :data="tableData.datas" tooltip-effect="dark" v-loading="tableData.loading" border style="width: 100%" @row-click="rowClick" @select="handleSelectionUser" @select-all="handleSelectionUser">
+          <el-table-column align="center" type="selection" width="55"></el-table-column>
 
           <el-table-column align="center" min-width="50px" :label="'角色名稱'">
             <template slot-scope="scope">
@@ -135,12 +67,7 @@
             </template>
           </el-table-column>-->
 
-          <el-table-column
-            align="center"
-            class-name="status-col"
-            :label="'狀態'"
-            width="100"
-          >
+          <el-table-column align="center" class-name="status-col" :label="'狀態'" width="100">
             <template slot-scope="scope">
               <span :class="scope.row.status | userStatusFilter">
                 {{
@@ -151,24 +78,12 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination
-          :background="false"
-          v-if="loginKey === 'loginUser'"
-          layout="prev, pager, next"
-          :total="tableData.total"
-          :page-size="tableData.listQuery.limit"
-          @current-change="handlePageSearch"
-          style="margin-top: 3px; text-align: right"
-        ></el-pagination>
+        <el-pagination :background="false" v-if="loginKey === 'loginUser'" layout="prev, pager, next" :total="tableData.total" :page-size="tableData.listQuery.limit" @current-change="handlePageSearch" style="margin-top: 3px; text-align: right"></el-pagination>
       </div>
     </div>
     <div style="text-align: right; margin-top: 10px" v-if="!hiddenFooter">
-      <el-button size="small" type="cancel" @click="handleClose"
-        >取消</el-button
-      >
-      <el-button size="small" type="primary" @click="handleSaveUsers"
-        >確定</el-button
-      >
+      <el-button size="small" type="cancel" @click="handleClose">取消</el-button>
+      <el-button size="small" type="primary" @click="handleSaveUsers">確定</el-button>
     </div>
   </div>
 </template>

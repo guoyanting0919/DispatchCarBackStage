@@ -276,7 +276,7 @@ export default {
         toLon: 0,
         toLat: 0,
         passengerNum: 0,
-        canShared: true,
+        canShared: false,
         status: 1,
         carCategoryId: null,
         CarCategoryName: "",

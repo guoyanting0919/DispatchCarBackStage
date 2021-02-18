@@ -14,26 +14,28 @@
       <Title title="長照個案"></Title>
       <div class="bg-white" style="height: calc(100% - 50px)">
         <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" border fit v-loading="listLoading" highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" @row-click="rowClick">
-          <!-- <el-table-column
-            type="selection"
-            width="55"
-            align="center"
-          ></el-table-column> -->
           <el-table-column property="name" label="用戶姓名" width="200" align="center"></el-table-column>
-          <el-table-column property="sex" label="性別" width="150" align="center">
+
+          <el-table-column property="uid" label="身分證字號" width="200" align="center">
             <template slot-scope="scope">
-              <div>
-                <i style="color: #d63737" v-if="!scope.row.sex" class="iconfont icon-Vector5"></i>
-                <i style="color: #227294" v-else class="iconfont icon-Vector6"></i>
-              </div>
+              {{ scope.row.uid | hideFilter }}
             </template>
           </el-table-column>
-          <el-table-column property="caseUserNo" label="個案編號" align="center"></el-table-column>
+
+          <el-table-column property="caseUserNo" width="200" label="個案編號" align="center"></el-table-column>
+
           <el-table-column property="phone" label="手機" width="200" align="center">
             <template slot-scope="scope">
-              {{ scope.row.phone | phoneFilter }}
+              {{ scope.row.phone  }}
             </template>
           </el-table-column>
+
+          <el-table-column property="tel" label="市話" width="200" align="center">
+            <template slot-scope="scope">
+              {{ scope.row.tel }}
+            </template>
+          </el-table-column>
+
           <el-table-column property="setting" label="操作" fixed="right" width="350">
             <template slot-scope="scope">
               <div class="buttonFlexBox">

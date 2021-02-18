@@ -110,11 +110,11 @@
               </template>
             </el-table-column>
 
-            <el-table-column property="totalAmt" label="預估總額" width="100" align="center">
+            <!-- <el-table-column property="totalAmt" label="預估總額" width="100" align="center">
               <template slot-scope="scope" v-if="scope.row.data">
                 <p class="dataInner" v-for="item in scope.row.data" :key="item.id">$ {{item.totalAmt}}</p>
               </template>
-            </el-table-column>
+            </el-table-column> -->
 
             <el-table-column align="center" property="carCategoryName" label="車種" width="200">
               <template slot-scope="scope" v-if="scope.row.data">

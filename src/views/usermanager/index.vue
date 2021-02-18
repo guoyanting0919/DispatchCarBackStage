@@ -2,29 +2,11 @@
   <div class="flex-column">
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
-        <el-input
-          @keyup.enter.native="handleFilter"
-          prefix-icon="el-icon-search"
-          size="small"
-          style="width: 200px; margin-bottom: 0"
-          class="filter-item"
-          :placeholder="'關鍵字'"
-          v-model="listQuery.key"
-        ></el-input>
+        <el-input @keyup.enter.native="handleFilter" prefix-icon="el-icon-search" size="small" style="width: 200px; margin-bottom: 0" class="filter-item" :placeholder="'關鍵字'" v-model="listQuery.key"></el-input>
 
-        <permission-btn
-          moduleName="usermanager"
-          size="mini"
-          v-on:btn-event="onBtnClicked"
-        ></permission-btn>
+        <permission-btn moduleName="usermanager" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
 
-        <el-checkbox
-          size="mini"
-          style="margin-left: 15px"
-          @change="tableKey = tableKey + 1"
-          v-model="showDescription"
-          >Id/描述</el-checkbox
-        >
+        <el-checkbox size="mini" style="margin-left: 15px" @change="tableKey = tableKey + 1" v-model="showDescription">Id/描述</el-checkbox>
       </div>
     </sticky>
     <div class="app-container flex-item">
@@ -33,49 +15,18 @@
         <el-col :span="6" class="fh ls-border">
           <el-card shadow="never" class="body-small fh" style="overflow: auto">
             <div slot="header" class="clearfix">
-              <el-button
-                type="text"
-                style="padding: 0 11px"
-                @click="getAllUsers"
-                >全部用戶>></el-button
-              >
+              <el-button type="text" style="padding: 0 11px" @click="getAllUsers">全部單位>></el-button>
             </div>
 
-            <el-tree
-              :data="orgsTree"
-              :expand-on-click-node="false"
-              default-expand-all
-              :props="defaultProps"
-              @node-click="handleNodeClick"
-            ></el-tree>
+            <el-tree :data="orgsTree" :expand-on-click-node="false" default-expand-all :props="defaultProps" @node-click="handleNodeClick"></el-tree>
           </el-card>
         </el-col>
         <el-col :span="18" class="fh">
           <div class="bg-white fh">
-            <el-table
-              ref="mainTable"
-              :key="tableKey"
-              :data="list"
-              v-loading="listLoading"
-              border
-              fit
-              highlight-current-row
-              style="width: 100%"
-              height="calc(100% - 52px)"
-              @row-click="rowClick"
-              @selection-change="handleSelectionChange"
-            >
-              <el-table-column
-                align="center"
-                type="selection"
-                width="55"
-              ></el-table-column>
+            <el-table ref="mainTable" :key="tableKey" :data="list" v-loading="listLoading" border fit highlight-current-row style="width: 100%" height="calc(100% - 52px)" @row-click="rowClick" @selection-change="handleSelectionChange">
+              <el-table-column align="center" type="selection" width="55"></el-table-column>
 
-              <el-table-column
-                :label="'Id'"
-                v-if="showDescription"
-                min-width="120px"
-              >
+              <el-table-column :label="'Id'" v-if="showDescription" min-width="120px">
                 <template slot-scope="scope">
                   <span>{{ scope.row.id }}</span>
                 </template>
@@ -95,26 +46,18 @@
                 </template>
               </el-table-column>
 
-              <el-table-column width="120px" :label="'所屬部門'">
+              <el-table-column width="120px" :label="'管理單位'">
                 <template slot-scope="scope">
                   <span>{{ scope.row.organizations }}</span>
                 </template>
               </el-table-column>
-              <el-table-column
-                min-width="150px"
-                v-if="showDescription"
-                :label="'描述'"
-              >
+              <el-table-column min-width="150px" v-if="showDescription" :label="'描述'">
                 <template slot-scope="scope">
                   <span style="color: red">{{ scope.row.description }}</span>
                 </template>
               </el-table-column>
 
-              <el-table-column
-                class-name="status-col"
-                :label="'狀態'"
-                width="100"
-              >
+              <el-table-column class-name="status-col" :label="'狀態'" width="100">
                 <template slot-scope="scope">
                   <span :class="scope.row.status | statusFilter">
                     {{
@@ -125,26 +68,10 @@
                 </template>
               </el-table-column>
 
-              <el-table-column
-                align="center"
-                :label="'操作'"
-                width="230"
-                class-name="small-padding fixed-width"
-              >
+              <el-table-column align="center" :label="'操作'" width="230" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
-                  <el-button
-                    type="primary"
-                    size="mini"
-                    @click="handleUpdate(scope.row)"
-                    >編輯</el-button
-                  >
-                  <el-button
-                    v-if="scope.row.status == 1"
-                    size="mini"
-                    type="danger"
-                    @click="handleModifyStatus(scope.row, 0)"
-                    >停用</el-button
-                  >
+                  <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">編輯</el-button>
+                  <el-button v-if="scope.row.status == 1" size="mini" type="danger" @click="handleModifyStatus(scope.row, 0)">停用</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -155,43 +82,15 @@
               :total="total">
             </el-pagination>
             </div>-->
-            <pagination
-              v-show="total > 0"
-              :total="total"
-              :page.sync="listQuery.page"
-              :limit.sync="listQuery.limit"
-              @pagination="handleCurrentChange"
-            />
+            <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handleCurrentChange" />
           </div>
         </el-col>
       </el-row>
 
-      <el-dialog
-        class="dialog-mini"
-        width="500px"
-        v-el-drag-dialog
-        :title="textMap[dialogStatus]"
-        :visible.sync="dialogFormVisible"
-      >
-        <el-form
-          :rules="rules"
-          ref="dataForm"
-          :model="temp"
-          label-position="right"
-          label-width="100px"
-        >
-          <el-form-item
-            size="small"
-            :label="'Id'"
-            prop="id"
-            v-show="dialogStatus == 'update'"
-          >
-            <el-input
-              v-model="temp.id"
-              :disabled="true"
-              size="small"
-              placeholder="系統自動處理"
-            ></el-input>
+      <el-dialog class="dialog-mini" width="500px" v-el-drag-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+        <el-form :rules="rules" ref="dataForm" :model="temp" label-position="right" label-width="100px">
+          <el-form-item size="small" :label="'Id'" prop="id" v-show="dialogStatus == 'update'">
+            <el-input v-model="temp.id" :disabled="true" size="small" placeholder="系統自動處理"></el-input>
           </el-form-item>
           <el-form-item size="small" :label="'姓名'">
             <el-input v-model="temp.name"></el-input>
@@ -200,101 +99,49 @@
             <el-input v-model="temp.account"></el-input>
           </el-form-item>
           <el-form-item size="small" :label="'密碼'">
-            <el-input
-              v-model="temp.password"
-              :placeholder="
+            <el-input v-model="temp.password" :placeholder="
                 dialogStatus == 'update'
                   ? '如果為空則不修改密碼'
                   : '如果為空則默認與帳號相同'
-              "
-            ></el-input>
+              "></el-input>
+          </el-form-item>
+          <el-form-item size="small" :label="'電話'" prop="phone">
+            <el-input v-model="temp.phone"></el-input>
+          </el-form-item>
+          <el-form-item size="small" :label="'身分證字號'" prop="uid">
+            <el-input v-model="temp.uid"></el-input>
           </el-form-item>
           <!-- <el-form-item size="small" :label="'單位代碼'">
             <el-input v-model="temp.BizCode"></el-input>
           </el-form-item>-->
           <el-form-item size="small" :label="'狀態'">
-            <el-select
-              class="filter-item"
-              v-model="temp.status"
-              placeholder="Please select"
-            >
-              <el-option
-                v-for="item in statusOptions"
-                :key="item.key"
-                :label="item.display_name"
-                :value="item.key"
-              ></el-option>
+            <el-select class="filter-item" v-model="temp.status" placeholder="Please select">
+              <el-option v-for="item in statusOptions" :key="item.key" :label="item.display_name" :value="item.key"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item size="small" :label="'所屬機構'">
-            <treeselect
-              v-if="dialogFormVisible"
-              :options="orgsTree"
-              :autoSelectDescendants="true"
-              :default-expand-level="3"
-              :multiple="true"
-              :flat="true"
-              :open-on-click="true"
-              :open-on-focus="true"
-              :clear-on-select="true"
-              v-model="selectOrgs"
-            ></treeselect>
+          <el-form-item size="small" :label="'所屬單位'">
+            <treeselect v-if="dialogFormVisible" :options="orgsTree" :autoSelectDescendants="true" :default-expand-level="3" :multiple="true" :flat="true" :open-on-click="true" :open-on-focus="true" :clear-on-select="true" v-model="selectOrgs"></treeselect>
           </el-form-item>
           <el-form-item size="small" :label="'描述'">
-            <el-input
-              type="textarea"
-              :autosize="{ minRows: 2, maxRows: 4 }"
-              placeholder="Please input"
-              v-model="temp.description"
-            ></el-input>
+            <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" placeholder="Please input" v-model="temp.description"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer">
-          <el-button size="mini" @click="dialogFormVisible = false"
-            >取消</el-button
-          >
-          <el-button
-            size="mini"
-            v-if="dialogStatus == 'create'"
-            type="primary"
-            @click="createData"
-            >確認</el-button
-          >
-          <el-button size="mini" v-else type="primary" @click="updateData"
-            >確認</el-button
-          >
+          <el-button size="mini" @click="dialogFormVisible = false">取消</el-button>
+          <el-button size="mini" v-if="dialogStatus == 'create'" type="primary" @click="createData">確認</el-button>
+          <el-button size="mini" v-else type="primary" @click="updateData">確認</el-button>
         </div>
       </el-dialog>
 
-      <el-dialog
-        width="516px"
-        class="dialog-mini body-small"
-        v-el-drag-dialog
-        :title="'分配角色'"
-        :visible.sync="dialogRoleVisible"
-      >
-        <el-form
-          ref="rolesForm"
-          size="small"
-          v-if="dialogRoleVisible"
-          label-position="left"
-        >
+      <el-dialog width="516px" class="dialog-mini body-small" v-el-drag-dialog :title="'分配角色'" :visible.sync="dialogRoleVisible">
+        <el-form ref="rolesForm" size="small" v-if="dialogRoleVisible" label-position="left">
           <el-form-item>
-            <select-roles
-              :roles="selectRoles"
-              :isUnLoadGroupList="true"
-              :userNames="selectRoleNames"
-              v-on:roles-change="rolesChange"
-            ></select-roles>
+            <select-roles :roles="selectRoles" :isUnLoadGroupList="true" :userNames="selectRoleNames" v-on:roles-change="rolesChange"></select-roles>
           </el-form-item>
         </el-form>
         <div slot="footer">
-          <el-button size="mini" @click="dialogRoleVisible = false"
-            >取消</el-button
-          >
-          <el-button size="mini" type="primary" @click="acceRole"
-            >確認</el-button
-          >
+          <el-button size="mini" @click="dialogRoleVisible = false">取消</el-button>
+          <el-button size="mini" type="primary" @click="acceRole">確認</el-button>
         </div>
       </el-dialog>
     </div>
@@ -374,6 +221,8 @@ export default {
         account: "",
         name: "",
         password: "",
+        phone: "",
+        uid: "",
         // BizCode: "",
         status: 0,
       },
@@ -389,6 +238,20 @@ export default {
           {
             required: true,
             message: "帳號不能為空",
+            trigger: "blur",
+          },
+        ],
+        phone: [
+          {
+            required: true,
+            message: "電話不能為空",
+            trigger: "blur",
+          },
+        ],
+        uid: [
+          {
+            required: true,
+            message: "身分證字號不能為空",
             trigger: "blur",
           },
         ],

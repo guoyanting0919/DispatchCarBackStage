@@ -3,224 +3,79 @@
     <div class="rule-groups flex-item flex-column">
       <div class="rule-head flex-row">
         <div class="flex-item">
-          <el-select
-            class="sellect-operation"
-            size="mini"
-            v-model="ruleForm.Operation"
-          >
-            <el-option
-              v-for="item in operations"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
+          <el-select class="sellect-operation" size="mini" v-model="ruleForm.Operation">
+            <el-option v-for="item in operations" :key="item.value" :label="item.label" :value="item.value"></el-option>
           </el-select>
         </div>
-        <el-button
-          size="mini"
-          class="VM"
-          type="danger"
-          icon="el-icon-delete"
-          v-if="isDelete"
-          @click="deleteGroupRule(parentForm)"
-          >刪除分組</el-button
-        >
-        <el-button
-          size="mini"
-          class="VM"
-          type="primary"
-          icon="el-icon-plus"
-          @click="addGroupRule(ruleForm)"
-          >添加分組</el-button
-        >
+        <el-button size="mini" class="VM" type="danger" icon="el-icon-delete" v-if="isDelete" @click="deleteGroupRule(parentForm)">刪除分組</el-button>
+        <el-button size="mini" class="VM" type="primary" icon="el-icon-plus" @click="addGroupRule(ruleForm)">添加分組</el-button>
       </div>
       <div class="rule-form flex-item">
         <template v-for="(rule, ruleIndex) in ruleForm.Filters">
           <el-form :key="createKey(rule.Key)">
-            <el-form-item
-              style="display: inline-block;margin-bottom: 0;margin-right: 5px;"
-            >
-              <el-select
-                size="mini"
-                v-model="rule.Key"
-                @change="handleChangeKey(rule)"
-              >
-                <el-option
-                  v-for="item in propertyData"
-                  :key="item.key"
-                  :label="item.description"
-                  :value="item.key"
-                ></el-option>
+            <el-form-item style="display: inline-block;margin-bottom: 0;margin-right: 5px;">
+              <el-select size="mini" v-model="rule.Key" @change="handleChangeKey(rule)">
+                <el-option v-for="item in propertyData" :key="item.key" :label="item.description" :value="item.key"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item
-              style="display: inline-block;width:110px;margin-bottom: 0;margin-right: 5px;"
-            >
+            <el-form-item style="display: inline-block;width:110px;margin-bottom: 0;margin-right: 5px;">
               <el-select size="mini" v-model="rule.Contrast">
-                <el-option
-                  v-for="item in contrasts"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
+                <el-option v-for="item in contrasts" :key="item.value" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item
-              v-if="handleShowMore(rule.Key)"
-              style="display: inline-block;margin-bottom: 0;width:260px;margin-right: 5px;"
-            >
-              <el-input
-                :readonly="
+            <el-form-item v-if="handleShowMore(rule.Key)" style="display: inline-block;margin-bottom: 0;width:260px;margin-right: 5px;">
+              <el-input :readonly="
                   ['CreateUserId', 'CreateUserName'].indexOf(rule.Key) >= 0
                     ? false
                     : true
-                "
-                size="mini"
-                style="text-overflow: ellipsis;padding-right: 30px;"
-                v-model="rule.Text"
-              ></el-input>
-              <span
-                style="position: absolute;right: 0;top:6px;bottom:7px;line-height: 28px;display:inline-block;background: #fff;border: 1px solid #DCDFE6;padding: 0 10px;border-radius: 0 4px 4px 0;cursor:pointer;"
-                @click="handleSelectUser(ruleForm, ruleIndex)"
-              >
+                " size="mini" style="text-overflow: ellipsis;padding-right: 30px;" v-model="rule.Text"></el-input>
+              <span style="position: absolute;right: 0;top:6px;bottom:7px;line-height: 28px;display:inline-block;background: #fff;border: 1px solid #DCDFE6;padding: 0 10px;border-radius: 0 4px 4px 0;cursor:pointer;" @click="handleSelectUser(ruleForm, ruleIndex)">
                 <i class="el-icon-more"></i>
               </span>
             </el-form-item>
-            <el-form-item
-              v-else
-              style="display: inline-block;margin-bottom: 0;width:260px;margin-right: 5px;"
-            >
-              <el-popover
-                ref="popover4"
-                placement="bottom"
-                width="250"
-                trigger="focus"
-              >
-                <el-input
-                  slot="reference"
-                  size="mini"
-                  v-model="rule.Value"
-                ></el-input>
+            <el-form-item v-else style="display: inline-block;margin-bottom: 0;width:260px;margin-right: 5px;">
+              <el-popover ref="popover4" placement="bottom" width="250" trigger="focus">
+                <el-input slot="reference" size="mini" v-model="rule.Value"></el-input>
                 <div>
-                  <el-tag
-                    size="mini"
-                    style="margin: 0 10px 10px 0;cursor: pointer;"
-                    @click="handleSelectCurrentName(item.key, rule, ruleIndex)"
-                    v-for="(item, index) in keys"
-                    :key="index"
-                    >{{ item.currentName }}</el-tag
-                  >
+                  <el-tag size="mini" style="margin: 0 10px 10px 0;cursor: pointer;" @click="handleSelectCurrentName(item.key, rule, ruleIndex)" v-for="(item, index) in keys" :key="index">{{ item.currentName }}</el-tag>
                 </div>
               </el-popover>
             </el-form-item>
-            <el-button
-              type="danger"
-              size="mini"
-              icon="el-icon-delete"
-              v-if="ruleForm.Filters.length > 1"
-              @click="deleteRule(ruleForm, ruleIndex)"
-            ></el-button>
-            <el-button
-              type="primary"
-              size="mini"
-              icon="el-icon-plus"
-              v-if="ruleIndex === ruleForm.Filters.length - 1"
-              @click="addRule(ruleForm)"
-            ></el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete" v-if="ruleForm.Filters.length > 1" @click="deleteRule(ruleForm, ruleIndex)"></el-button>
+            <el-button type="primary" size="mini" icon="el-icon-plus" v-if="ruleIndex === ruleForm.Filters.length - 1" @click="addRule(ruleForm)"></el-button>
           </el-form>
         </template>
         <template v-if="ruleForm.Children && ruleForm.Children.length > 0">
-          <rule-item
-            :level="index"
-            v-for="(child, index) in ruleForm.Children"
-            :propertyDatas="propertyDatas"
-            :key="index"
-            :ruleForm="child"
-            :parentForm="ruleForm"
-          ></rule-item>
+          <rule-item :level="index" v-for="(child, index) in ruleForm.Children" :propertyDatas="propertyDatas" :key="index" :ruleForm="child" :parentForm="ruleForm"></rule-item>
         </template>
       </div>
     </div>
 
     <!-- 選擇角色/用戶 -->
-    <el-dialog
-      :destroy-on-close="true"
-      class="dialog-mini custom-dialog user-dialog"
-      width="850px"
-      :title="loginKey === '{loginUser}' ? '選擇用戶' : '選擇角色'"
-      :visible.sync="selectDialog"
-    >
+    <el-dialog :destroy-on-close="true" class="dialog-mini custom-dialog user-dialog" width="850px" :title="loginKey === '{loginUser}' ? '選擇用戶' : '選擇角色'" :visible.sync="selectDialog">
       <div v-if="selectDialog" class="flex-row" style="height: 100%;">
         <div class="part-box" v-if="loginKey === '{loginUser}'">
-          <el-card
-            shadow="never"
-            class="body-small custom-card"
-            style="height: 100%;"
-          >
+          <el-card shadow="never" class="body-small custom-card" style="height: 100%;">
             <div slot="header" class="clearfix">
-              <el-button
-                type="text"
-                style="padding: 0 11px"
-                @click="getAllUsers"
-                >全部用戶>></el-button
-              >
+              <el-button type="text" style="padding: 0 11px" @click="getAllUsers">全部用戶>></el-button>
             </div>
 
-            <el-tree
-              :data="orgsTree"
-              :expand-on-click-node="false"
-              default-expand-all
-              @node-click="handleNodeClick"
-            ></el-tree>
+            <el-tree :data="orgsTree" :expand-on-click-node="false" default-expand-all @node-click="handleNodeClick"></el-tree>
           </el-card>
         </div>
         <div class="flex-item table-box">
-          <div
-            class="flex-row"
-            style="align-items: center;"
-            v-if="loginKey === '{loginUser}'"
-            @keyup.13="handleSearchUser"
-          >
-            <el-input
-              size="mini"
-              style="margin: 10px;width: 200px;"
-              placeholder="請輸入內容"
-              v-model="searchKey"
-            >
+          <div class="flex-row" style="align-items: center;" v-if="loginKey === '{loginUser}'" @keyup.13="handleSearchUser">
+            <el-input size="mini" style="margin: 10px;width: 200px;" placeholder="請輸入內容" v-model="searchKey">
               <i slot="prefix" class="el-input__icon el-icon-search"></i>
             </el-input>
-            <el-button
-              type="primary"
-              icon="el-icon-search"
-              size="mini"
-              @click="handleSearchUser"
-              >查詢</el-button
-            >
-            <div
-              style="text-align: right;padding: 5px 10px;"
-              class="flex-item ellipsis"
-              v-if="names"
-            >
+            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleSearchUser">查詢</el-button>
+            <div style="text-align: right;padding: 5px 10px;" class="flex-item ellipsis" v-if="names">
               選中用戶：{{ names }}
             </div>
           </div>
-          <el-table
-            ref="multipleTable"
-            height="calc(100% - 60px - 45px)"
-            v-if="loginKey === '{loginUser}'"
-            :data="tableData.datas"
-            tooltip-effect="dark"
-            v-loading="tableData.loading"
-            style="width: 100%;border-top: 1px solid #e4e4e4;"
-            @select="handleSelectionUser"
-            @select-all="handleSelectionUser"
-          >
+          <el-table ref="multipleTable" height="calc(100% - 60px - 45px)" v-if="loginKey === '{loginUser}'" :data="tableData.datas" tooltip-effect="dark" v-loading="tableData.loading" style="width: 100%;border-top: 1px solid #e4e4e4;" @select="handleSelectionUser" @select-all="handleSelectionUser">
             <!-- @selection-change="handleSelectionUser"> -->
-            <el-table-column
-              align="center"
-              type="selection"
-              width="55"
-            ></el-table-column>
+            <el-table-column align="center" type="selection" width="55"></el-table-column>
 
             <el-table-column align="center" min-width="80px" :label="'帳號'">
               <template slot-scope="scope">
@@ -234,18 +89,13 @@
               </template>
             </el-table-column>
 
-            <el-table-column align="center" :label="'所屬部門'">
+            <el-table-column align="center" :label="'管理單位'">
               <template slot-scope="scope">
                 <span>{{ scope.row.organizations }}</span>
               </template>
             </el-table-column>
 
-            <el-table-column
-              align="center"
-              class-name="status-col"
-              :label="'狀態'"
-              width="100"
-            >
+            <el-table-column align="center" class-name="status-col" :label="'狀態'" width="100">
               <template slot-scope="scope">
                 <span :class="scope.row.status | userStatusFilter">
                   {{
@@ -256,30 +106,11 @@
               </template>
             </el-table-column>
           </el-table>
-          <el-table
-            ref="multipleTable"
-            height="calc(100%)"
-            v-else
-            :data="tableData.datas"
-            tooltip-effect="dark"
-            v-loading="tableData.loading"
-            border
-            style="width: 100%;"
-            @select="handleSelectionUser"
-            @select-all="handleSelectionUser"
-          >
+          <el-table ref="multipleTable" height="calc(100%)" v-else :data="tableData.datas" tooltip-effect="dark" v-loading="tableData.loading" border style="width: 100%;" @select="handleSelectionUser" @select-all="handleSelectionUser">
             <!-- @selection-change="handleSelectionUser"> -->
-            <el-table-column
-              align="center"
-              type="selection"
-              width="55"
-            ></el-table-column>
+            <el-table-column align="center" type="selection" width="55"></el-table-column>
 
-            <el-table-column
-              align="center"
-              min-width="50px"
-              :label="'角色名稱'"
-            >
+            <el-table-column align="center" min-width="50px" :label="'角色名稱'">
               <template slot-scope="scope">
                 <span>{{ scope.row.name }}</span>
               </template>
@@ -291,12 +122,7 @@
               </template>
             </el-table-column>-->
 
-            <el-table-column
-              align="center"
-              class-name="status-col"
-              :label="'狀態'"
-              width="100"
-            >
+            <el-table-column align="center" class-name="status-col" :label="'狀態'" width="100">
               <template slot-scope="scope">
                 <span :class="scope.row.status | userStatusFilter">
                   {{
@@ -307,24 +133,12 @@
               </template>
             </el-table-column>
           </el-table>
-          <el-pagination
-            background
-            v-if="loginKey === '{loginUser}'"
-            layout="prev, pager, next"
-            :total="tableData.total"
-            :page-size="tableData.listQuery.limit"
-            @current-change="handlePageSearch"
-            style="margin-top: 15px;text-align: right;"
-          ></el-pagination>
+          <el-pagination background v-if="loginKey === '{loginUser}'" layout="prev, pager, next" :total="tableData.total" :page-size="tableData.listQuery.limit" @current-change="handlePageSearch" style="margin-top: 15px;text-align: right;"></el-pagination>
         </div>
       </div>
       <div style="text-align:right;margin-top: 10px;">
-        <el-button size="small" type="cancel" @click="selectDialog = false"
-          >取消</el-button
-        >
-        <el-button size="small" type="primary" @click="handleSaveUsers"
-          >確定</el-button
-        >
+        <el-button size="small" type="cancel" @click="selectDialog = false">取消</el-button>
+        <el-button size="small" type="primary" @click="handleSaveUsers">確定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -610,7 +424,7 @@ export default {
     // 獲取部門信息
     getPartData() {
       login.getOrgs().then((response) => {
-        this.partDatas = response.result.map(function(item) {
+        this.partDatas = response.result.map(function (item) {
           return {
             id: item.id,
             label: item.name,

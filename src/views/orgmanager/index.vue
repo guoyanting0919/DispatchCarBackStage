@@ -2,80 +2,30 @@
   <div class="flex-column">
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
-        <el-input
-          @keyup.enter.native="handleFilter"
-          prefix-icon="el-icon-search"
-          size="small"
-          style="width: 200px; margin-bottom: 0"
-          class="filter-item"
-          :placeholder="'關鍵字'"
-          v-model="listQuery.key"
-        ></el-input>
+        <el-input @keyup.enter.native="handleFilter" prefix-icon="el-icon-search" size="small" style="width: 200px; margin-bottom: 0" class="filter-item" :placeholder="'關鍵字'" v-model="listQuery.key"></el-input>
 
-        <permission-btn
-          moduleName="orgmanager"
-          size="mini"
-          v-on:btn-event="onBtnClicked"
-        ></permission-btn>
-        <el-checkbox
-          size="mini"
-          style="margin-left: 15px"
-          @change="tableKey = tableKey + 1"
-          v-model="showDescription"
-          >Id/描述</el-checkbox
-        >
+        <permission-btn moduleName="orgmanager" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
+        <el-checkbox size="mini" style="margin-left: 15px" @change="tableKey = tableKey + 1" v-model="showDescription">Id/描述</el-checkbox>
       </div>
     </sticky>
     <div class="app-container flex-item">
-      <Title title="組織管理"></Title>
+      <Title title="單位管理"></Title>
       <el-row style="height: calc(100% - 50px)">
         <el-col :span="4" style="height: 100%; border: 1px solid #ebeef5">
-          <el-card
-            shadow="never"
-            class="body-small"
-            style="height: 100%; overflow: auto"
-          >
+          <el-card shadow="never" class="body-small" style="height: 100%; overflow: auto">
             <div slot="header" class="clearfix">
-              <el-button type="text" style="padding: 0 11px" @click="getAllOrgs"
-                >所有組織>></el-button
-              >
+              <el-button type="text" style="padding: 0 11px" @click="getAllOrgs">所有單位>></el-button>
             </div>
 
-            <el-tree
-              :data="orgsTree"
-              :expand-on-click-node="false"
-              default-expand-all
-              :props="defaultProps"
-              @node-click="handleNodeClick"
-            ></el-tree>
+            <el-tree :data="orgsTree" :expand-on-click-node="false" default-expand-all :props="defaultProps" @node-click="handleNodeClick"></el-tree>
           </el-card>
         </el-col>
         <el-col :span="20" style="height: 100%">
           <div class="bg-white" style="height: 100%">
-            <el-table
-              ref="mainTable"
-              :key="tableKey"
-              :data="list"
-              v-loading="listLoading"
-              border
-              fit
-              highlight-current-row
-              style="width: 100%"
-              height="calc(100% - 52px)"
-              @row-click="rowClick"
-              @selection-change="handleSelectionChange"
-            >
-              <el-table-column
-                type="selection"
-                align="center"
-                width="55"
-              ></el-table-column>
+            <el-table ref="mainTable" :key="tableKey" :data="list" v-loading="listLoading" border fit highlight-current-row style="width: 100%" height="calc(100% - 52px)" @row-click="rowClick" @selection-change="handleSelectionChange">
+              <el-table-column type="selection" align="center" width="55"></el-table-column>
 
-              <el-table-column
-                :label="'Id'"
-                v-if="showDescription"
-                min-width="120px"
-              >
+              <el-table-column :label="'Id'" v-if="showDescription" min-width="120px">
                 <template slot-scope="scope">
                   <span>{{ scope.row.id }}</span>
                 </template>
@@ -87,17 +37,17 @@
                 </template>
               </el-table-column>-->
 
-              <el-table-column min-width="400px" :label="'組織名稱'">
+              <el-table-column min-width="400px" :label="'單位名稱'">
                 <template slot-scope="scope">
                   <span>{{ scope.row.name }}</span>
                 </template>
               </el-table-column>
 
-              <!-- <el-table-column min-width="150px" :label="'統一編號'">
+              <el-table-column min-width="150px" :label="'單位代碼'">
                 <template slot-scope="scope">
                   <span>{{ scope.row.einno }}</span>
                 </template>
-              </el-table-column> -->
+              </el-table-column>
 
               <el-table-column min-width="150px" :label="'主要聯絡人'">
                 <template slot-scope="scope">
@@ -123,11 +73,7 @@
                 </template>
               </el-table-column>-->
 
-              <el-table-column
-                class-name="status-col"
-                :label="'狀態'"
-                width="100"
-              >
+              <el-table-column class-name="status-col" :label="'狀態'" width="100">
                 <template slot-scope="scope">
                   <span :class="scope.row.status | statusFilter">
                     {{
@@ -138,13 +84,7 @@
                 </template>
               </el-table-column>
 
-              <el-table-column
-                fixed="right"
-                align="center"
-                :label="'操作'"
-                width="150"
-                class-name="small-padding fixed-width"
-              >
+              <el-table-column fixed="right" align="center" :label="'操作'" width="150" class-name="small-padding fixed-width">
                 <template slot-scope="scope">
                   <!-- <div class="buttonFlexBox">
                     <el-tooltip
@@ -194,47 +134,18 @@
                       </div>
                     </el-tooltip>
                   </div> -->
-                  <el-button
-                    type="info"
-                    size="mini"
-                    @click="handleUpdate(scope.row)"
-                    >編輯</el-button
-                  >
-                  <el-button
-                    v-if="scope.row.status == 0"
-                    size="mini"
-                    type="danger"
-                    @click="handleModifyStatus(scope.row, 1)"
-                    >停用</el-button
-                  >
+                  <el-button type="info" size="mini" @click="handleUpdate(scope.row)">編輯</el-button>
+                  <el-button v-if="scope.row.status == 0" size="mini" type="danger" @click="handleModifyStatus(scope.row, 1)">停用</el-button>
                 </template>
               </el-table-column>
             </el-table>
-            <pagination
-              v-show="total > 0"
-              :total="total"
-              :page.sync="listQuery.page"
-              :limit.sync="listQuery.limit"
-              @pagination="handleCurrentChange"
-            />
+            <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handleCurrentChange" />
           </div>
         </el-col>
       </el-row>
 
-      <el-dialog
-        v-el-drag-dialog
-        class="dialog-mini"
-        width="700px"
-        :title="textMap[dialogStatus]"
-        :visible.sync="dialogFormVisible"
-      >
-        <el-form
-          :rules="rules"
-          ref="dataForm"
-          :model="temp"
-          label-position="top"
-          label-width="auto"
-        >
+      <el-dialog v-el-drag-dialog class="dialog-mini" width="700px" :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+        <el-form :rules="rules" ref="dataForm" :model="temp" label-position="top" label-width="auto">
           <el-row :gutter="10">
             <!-- <el-form-item
               size="small"
@@ -254,35 +165,19 @@
             </el-form-item>-->
 
             <el-col :span="24">
-              <el-form-item size="small" :label="'組織名稱'" prop="name">
-                <el-input
-                  v-model="temp.name"
-                  :disabled="dialogStatus == 'update'"
-                ></el-input>
+              <el-form-item size="small" :label="'單位名稱'" prop="name">
+                <el-input v-model="temp.name" :disabled="dialogStatus == 'update'"></el-input>
               </el-form-item>
             </el-col>
 
-            <!-- <el-col :span="24" v-show="dialogStatus == 'update'">
-              <el-form-item size="small" :label="'組織名稱'" prop="name">
-                <div class="updateName">{{ temp.name }}</div>
+            <el-col :span="12">
+              <el-form-item size="small" :label="'單位代碼'" prop="einno">
+                <el-input v-model="temp.einno" :disabled="dialogStatus == 'update'"></el-input>
               </el-form-item>
-            </el-col>-->
-
-            <!-- <el-col :span="12">
-              <el-form-item size="small" :label="'統一編號'" prop="einno">
-                <el-input
-                  v-model="temp.einno"
-                  :disabled="dialogStatus == 'update'"
-                ></el-input>
-              </el-form-item>
-            </el-col> -->
+            </el-col>
 
             <el-col :span="12">
-              <el-form-item
-                size="small"
-                :label="'主要聯絡人'"
-                prop="chargeName"
-              >
+              <el-form-item size="small" :label="'主要聯絡人'" prop="chargeName">
                 <el-input v-model="temp.chargeName"></el-input>
               </el-form-item>
             </el-col>
@@ -294,91 +189,40 @@
             </el-col>
 
             <el-col :span="12">
-              <el-form-item
-                size="small"
-                :label="'主要聯絡人手機'"
-                prop="chargePhone"
-              >
+              <el-form-item size="small" :label="'主要聯絡人手機'" prop="chargePhone">
                 <el-input v-model="temp.chargePhone"></el-input>
               </el-form-item>
             </el-col>
 
             <el-col :span="12">
               <el-form-item size="small" :label="'狀態'">
-                <el-select
-                  class="filter-item"
-                  v-model="temp.status"
-                  placeholder="Please select"
-                >
-                  <el-option
-                    v-for="item in statusOptions"
-                    :key="item.key"
-                    :label="item.display_name"
-                    :value="item.key"
-                  ></el-option>
+                <el-select class="filter-item" v-model="temp.status" placeholder="Please select">
+                  <el-option v-for="item in statusOptions" :key="item.key" :label="item.display_name" :value="item.key"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
 
             <el-col :span="12">
               <el-form-item size="small" :label="'上級組織'">
-                <treeselect
-                  ref="orgsTree"
-                  :options="mechOrgsTree"
-                  :default-expand-level="3"
-                  :multiple="false"
-                  :open-on-click="true"
-                  :open-on-focus="true"
-                  :clear-on-select="true"
-                  v-model="selectOrgs"
-                ></treeselect>
+                <treeselect ref="orgsTree" :options="mechOrgsTree" :default-expand-level="3" :multiple="false" :open-on-click="true" :open-on-focus="true" :clear-on-select="true" v-model="selectOrgs"></treeselect>
               </el-form-item>
             </el-col>
           </el-row>
         </el-form>
         <div slot="footer">
-          <el-button size="mini" @click="dialogFormVisible = false"
-            >取消</el-button
-          >
-          <el-button
-            size="mini"
-            v-if="dialogStatus == 'create'"
-            type="primary"
-            @click="createData"
-            >確認</el-button
-          >
-          <el-button size="mini" v-else type="primary" @click="updateData"
-            >確認</el-button
-          >
+          <el-button size="mini" @click="dialogFormVisible = false">取消</el-button>
+          <el-button size="mini" v-if="dialogStatus == 'create'" type="primary" @click="createData">確認</el-button>
+          <el-button size="mini" v-else type="primary" @click="updateData">確認</el-button>
         </div>
       </el-dialog>
       <!-- 添加角色用戶 -->
-      <el-dialog
-        class="dialog-mini user-dialog"
-        v-el-drag-dialog
-        :title="'分配用戶'"
-        :visible.sync="roleUsers.dialogUserResource"
-      >
-        <selectUsersCom
-          ref="selectUser"
-          v-if="roleUsers.dialogUserResource"
-          :orgId="multipleSelection[0].id"
-          :hiddenFooter="true"
-          :loginKey="'loginUser'"
-          :selectUsers.sync="
+      <el-dialog class="dialog-mini user-dialog" v-el-drag-dialog :title="'權限設定'" :visible.sync="roleUsers.dialogUserResource">
+        <selectUsersCom ref="selectUser" v-if="roleUsers.dialogUserResource" :orgId="multipleSelection[0].id" :hiddenFooter="true" :loginKey="'loginUser'" :selectUsers.sync="
             roleUsers.rowIndex > -1 && roleUsers.list[roleUsers.rowIndex]
-          "
-        ></selectUsersCom>
+          "></selectUsersCom>
         <div style="text-align: right" slot="footer">
-          <el-button
-            size="small"
-            type="cancel"
-            @click="roleUsers.dialogUserResource = false"
-            >取消</el-button
-          >
-          <el-button size="small" type="primary" @click="handleSaveUsers"
-            >確定</el-button
-          >
+          <el-button size="small" type="cancel" @click="roleUsers.dialogUserResource = false">取消</el-button>
+          <el-button size="small" type="primary" @click="handleSaveUsers">確定</el-button>
         </div>
       </el-dialog>
     </div>
@@ -796,7 +640,7 @@ export default {
     handleUpdate(row) {
       // 彈出編輯框
       this.temp = Object.assign({}, row); // copy obj
-      this.temp.einno = 1;
+      // this.temp.einno = 1;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
       this.selectOrgs = this.temp.parentId;

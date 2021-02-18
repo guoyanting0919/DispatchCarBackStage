@@ -21,6 +21,7 @@
                 <el-input disabled v-model="temp.caseUserNo" placeholder="請輸入個案編號"></el-input>
               </el-form-item>
             </el-col>
+
             <el-col :sm="12" :md="6">
               <el-form-item label="社會福利身份" prop="wealTypeId">
                 <span class="wealSpan" slot="label">社會福利身份 </span>
@@ -37,6 +38,7 @@
                 <el-date-picker disabled v-model="temp.reviewDate" type="month" style="width: 100%" value-format="yyyy-MM" placeholder="請選擇額度控管留用首月"></el-date-picker>
               </el-form-item>
             </el-col>
+
             <el-col :sm="12" :md="6">
               <el-form-item label="失能等級" prop="disabilityLevel">
                 <el-select disabled v-model="temp.disabilityLevel" placeholder="請選擇失能等級" style="width: 100%">
@@ -51,6 +53,21 @@
                 </el-select>
               </el-form-item>
             </el-col>
+
+            <el-col :sm="24" :md="12">
+              <el-form-item label="A單位" prop="orgAId">
+                <el-select disabled v-model="temp.orgAId" placeholder="請選擇A單位" style="width: 100%">
+                  <el-option v-for="org in unitAs" :key="org.id" :value="org.id" :label="org.name"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+
+            <el-col :sm="24" :md="12">
+              <el-form-item label="其他聯絡電話">
+                <el-input placeholder="其他聯絡電話" v-model="temp.otherPhone" disabled></el-input>
+              </el-form-item>
+            </el-col>
+
             <el-col :sm="24" :md="24">
               <el-form-item label="居住地">
                 <el-row :gutter="16">
@@ -88,18 +105,7 @@
                 </el-row>
               </el-form-item>
             </el-col>
-            <el-col :sm="24" :md="12">
-              <el-form-item label="管理單位" prop="orgAId">
-                <el-select disabled v-model="temp.orgAId" placeholder="請選擇管理單位" style="width: 100%">
-                  <el-option v-for="org in unitAs" :key="org.id" :value="org.id" :label="org.name"></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :sm="24" :md="12">
-              <el-form-item label="其他聯絡電話">
-                <el-input placeholder="其他聯絡電話" v-model="temp.otherPhone" disabled></el-input>
-              </el-form-item>
-            </el-col>
+
             <el-col :sm="24" :md="24">
               <el-row :gutter="16">
                 <el-col :sm="12" :md="6">
@@ -117,6 +123,7 @@
                 </el-col>
               </el-row>
             </el-col>
+
           </el-row>
 
           <SubTitle title="緊急聯絡人資訊"></SubTitle>
@@ -289,7 +296,7 @@ export default {
         userId: "", //用戶id
         id: "", //身份id
         caseUserNo: "", //個案編號
-        orgAId: "", //Ａ單位(管理單位)
+        orgAId: "", //Ａ單位(A單位)
         orgBIds: "", //B單位
         disabilityLevel: "", //失能等級
         county: "", //居住縣市
