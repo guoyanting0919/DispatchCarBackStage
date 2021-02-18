@@ -320,7 +320,7 @@
         <div class="stretchItem bg-white">
           <div class="userInfo">
             <SubTitle title="訂單歷程"></SubTitle>
-            <div v-if="history">
+            <div v-if="history" style="height:calc(100vh - 190px)">
               <el-table ref="mainTable" height="100%" :data="history" border fit style="width: 100%">
                 <el-table-column label="變更時間" align="center">
                   <template slot-scope="scope">

@@ -1,39 +1,33 @@
 <template>
   <div class="dragDispatcherContainer">
     <div class="orderContainer customScrollBar">
-      <div
-        v-for="item in list"
-        :key="item.id"
-        draggable="true"
-        class="orderCard"
-        @dragstart="test($event)"
-      >
+      <div v-for="item in list" :key="item.despatchNo" draggable="true" class="orderCard" @dragstart="handleDargOrder(item)">
         <div class="orderCardTitle" v-if="list">
-          <p>{{ item.carCategoryName }}</p>
-          <!-- <p>普通輪椅(可收拆)</p> -->
+          <p>{{ item.data[0].carCategoryName }}</p>
           <p v-if="item.canShared">可共乘</p>
           <p v-else>不可共乘</p>
-          <p>{{ item.passengerNum }}人搭乘</p>
+          <p>{{ item.data[0].familyWith }}人搭乘</p>
         </div>
         <div class="orderCardMain">
           <div class="orderInfo">
-            <p class="orderInfoName">{{ item.userName }}</p>
-            <p style="margin: 0">聯絡電話 : {{ item.noticePhone }}</p>
+            <p class="orderInfoName">{{ item.data[0].name }}</p>
+            <!-- <p style="margin: 0">聯絡電話 : {{ item.data[0].noticePhone }}</p> -->
           </div>
           <p class="orderTime">
-            {{ item.reserveDate | dateFilter }}
+            {{ item.data[0].reserveDate | dateFilter }}
           </p>
           <div class="orderAddr">
             <i class="iconfont icon-circle"></i>
             <i class="iconfont icon-Vector10"></i>
             <p class="startAddr">
-              {{ item.fromAddr }}
+              {{ item.data[0].fromAddr }}
             </p>
-            <p class="endAddr">{{ item.toAddr }}</p>
+            <p class="endAddr">{{ item.data[0].toAddr }}</p>
           </div>
         </div>
       </div>
     </div>
+
     <div class="outsideContainer">
       <div class="driverTimeCard">
         <p>車輛 <i class="iconfont icon-right1"></i></p>
@@ -44,12 +38,12 @@
 
       <!-- driver fake box -->
       <div class="driverFakeBox">
-        <div class="driverCard" v-for="(item, key) in dragData" :key="key">
+        <div class="driverCard" v-for="(car) in carList" :key="car.id">
           <div class="driverCardTitle">
             <div class="driverImg"></div>
-            <p class="driverName">{{ key }}(V53857)</p>
+            <p class="driverName">{{ car.driverName }}({{ car.carNo }})</p>
           </div>
-          <p class="carInfo">座位:8 | 輪椅:0 | 一般車</p>
+          <p class="carInfo">座位:{{ car.seatNum }} | 輪椅:{{ car.wheelchairNum }} | {{ car.carCategoryName }}</p>
         </div>
       </div>
 
@@ -59,56 +53,22 @@
           {{ item }}
         </div>
       </div>
-      <!-- @mousedown.prevent="mouseDownHandler"
-        @mouseup.prevent="mouseUpHandler"
-        @mouseleave.prevent="mouseUpHandler"
-        @mousemove.prevent="ToScroll" -->
+
       <div class="distatchContainer" @dragover.prevent>
         <div class="driverBox">
           <!-- 司機迴圈 -->
-          <div
-            @mouseenter="driverMouseUp"
-            @dragend="driverDragleave"
-            :class="{ active: isActive }"
-            class="driver"
-            draggable="true"
-            v-for="(driver, key) in dragData"
-            :key="key"
-          >
+          <div @mouseenter="driverMouseUp" @dragend="driverDragleave" :class="{ active: isActive }" class="driver" draggable="true" v-for="car in carList" :key="car.id">
             <!-- <div class="driverCard">司機</div> -->
             <!-- 時間迴圈 -->
-            <div
-              @mouseenter="driverMouseUp"
-              @dragover.self="showShadow"
-              @dragleave.self="clearShadow"
-              @dragend.self="clearShadow"
-              @drop="driverDrop($event, driver, time, key, key2)"
-              v-for="(time, key2) in driver"
-              :key="key2"
-              class="timeBox"
-            >
-              <div
-                @mouseenter="driverMouseUp"
-                @dragover.self="showShadow"
-                @dragleave="clearShadow"
-                @dragend="clearShadow"
-                @drop="driverDrop($event, driver, time, key, key2)"
-                class="whiteDriverTime"
-              >
-                {{ key + "" + key2 }}
+            <div @mouseenter="driverMouseUp" @dragover.self="showShadow" @dragleave.self="clearShadow" @dragend.self="clearShadow" @drop="driverDrop($event, car, time, car.id, key2)" v-for="(time, key2) in car.timeList" :key="key2" class="timeBox">
+              <div @mouseenter="driverMouseUp" @dragover.self="showShadow" @dragleave="clearShadow" @dragend="clearShadow" class="whiteDriverTime">
+                {{ car.driverName + "" + key2 }}
               </div>
               <!-- <el-button @click="click(item, item2)">{{ key }}</el-button> -->
-              <template v-if="time">
-                <div
-                  @mouseenter.stop="test2()"
-                  @dragend="test()"
-                  @mouseleave="test()"
-                  @drop.stop="driverDropD($event, driver, time, key, key2)"
-                  class="dispatchCard"
-                  draggable="true"
-                >
+              <div v-for="(rL, index) in car.readyList" :key="index">
+                <div v-if="rL.time===key2" @mouseenter.stop="test2()" @dragend="test()" @mouseleave="test()" @drop.stop="driverDropD($event, driver, time, key, key2)" class="dispatchCard" draggable="true">
                   <div class="dispatchCardTitle">
-                    <p>{{ time[0].OrderDetails.ExpectedMinute }}分</p>
+                    <!-- <p>{{ time[0].OrderDetails.ExpectedMinute }}分</p> -->
                     <p>NEW</p>
                   </div>
                   <p>王小明</p>
@@ -117,7 +77,7 @@
                   <p>王小明</p>
                   <p>{{ time.Id }}</p>
                 </div>
-              </template>
+              </div>
             </div>
           </div>
         </div>
@@ -127,10 +87,15 @@
 </template>
 
 <script>
-import * as dispatchSelfPayUser from "@/api/dispatchSelfPayUser";
-import IScroll from "iscroll/build/iscroll-probe";
 import moment from "moment";
-import dispatchs from "@/assets/dispatch";
+
+import IScroll from "iscroll/build/iscroll-probe";
+// import dispatchs from "@/assets/dispatch";
+import * as orderCaseUser from "@/api/orderCaseUser";
+import * as cars from "@/api/cars";
+import * as drivers from "@/api/drivers";
+import * as dispatchs from "@/api/dispatchs";
+
 export default {
   props: {
     start: {
@@ -151,10 +116,18 @@ export default {
   },
   data() {
     return {
+      /* 司機列表 */
+      driverList: [],
+
+      /* 車輛列表 */
+      carList: [],
+
+      /* order temp */
+      orderTemp: "",
+
       canDrag: true,
       scroll: null,
       dragData: "",
-      driverList: ["YT", "阿華", "安哥", "阿智", "冰鳥"],
       dispatchData: "",
       isActive: false,
       ele: document.querySelectorAll(".distatchContainer")[0],
@@ -165,12 +138,15 @@ export default {
 
       //派遣訂單
       list: [],
+      readyList: [],
       listLoading: false,
       total: 0,
       listQuery: {
         page: 1,
         limit: 999,
         key: undefined,
+        StartDate: null,
+        EndDate: null,
       },
     };
   },
@@ -195,18 +171,49 @@ export default {
     },
   },
   methods: {
-    //獲取派遣訂單
-    getList() {
+    /* 獲取派遣訂單 */
+    async getList() {
       const vm = this;
-      dispatchSelfPayUser.load(vm.listQuery).then((res) => {
-        vm.list = res.data.filter((o) => {
-          return o.status == 1;
+      vm.listQuery.EndDate = vm.listQuery.StartDate;
+      await orderCaseUser.loadDespatch(vm.listQuery).then((res) => {
+        vm.list = res.data.filter((d) => {
+          return d.data[0].status == 1;
         });
-        console.log(vm.list);
+
+        vm.readyList = res.data.filter((d) => {
+          return d.data[0].status !== 1;
+        });
+
+        vm.readyList = vm.readyList.map((l) => {
+          l.time = moment(l.data[0].reserveDate).format("HH:mm");
+          return l;
+        });
         vm.total = res.count;
-        vm.listLoading = false;
       });
     },
+
+    /* 獲取所有司機 */
+    getDriverList() {
+      const vm = this;
+      vm.listLoading = true;
+      drivers.load({ limit: 9999, page: 1 }).then((res) => {
+        vm.driverList = res.data;
+      });
+    },
+
+    /* 獲取所有車輛 */
+    getCarList() {
+      const vm = this;
+      cars.load({ limit: 9999, page: 1 }).then((res) => {
+        vm.carList = res.data;
+        vm.carList.forEach((item) => {
+          item.timeList = this.timelist.reduce((a, b) => ((a[b] = ""), a), {});
+          item.readyList = vm.readyList.filter((rL) => rL.carId === item.id);
+          console.log(item.readyList);
+        });
+      });
+    },
+
     dragSetting() {
       const vm = this;
       this.scroll = new IScroll(".distatchContainer", {
@@ -219,6 +226,7 @@ export default {
 
       this.scroll.on("scroll", function () {
         if (vm.canDrag) {
+          //   console.log(document.querySelectorAll(".timeFakeBox")[0], this.y);
           document.querySelectorAll(".timeFakeBox")[0].style.transform =
             "translate(0px," + this.y + "px) ";
           document.querySelectorAll(".driverFakeBox")[0].style.transform =
@@ -228,57 +236,42 @@ export default {
         }
       });
     },
-    mouseDownHandler(e) {
-      let ele = document.querySelectorAll(".distatchContainer")[0];
-      // console.log(ele.scrollLeft);
-      this.pos = {
-        // The current scroll
-        left: ele.scrollLeft,
-        top: ele.scrollTop,
-        // Get the current mouse position
-        x: e.clientX,
-        y: e.clientY,
-      };
-      //   ele.scrollLeft = ele.scrollLeft + 100;
-      this.isDown = true;
-    },
-    mouseUpHandler() {
-      //console.log(e.which)
-      this.isDown = false;
-    },
-    ToScroll(e) {
-      /*if(this.isDown) {
-        document.querySelectorAll(".contentD")[0].scrollTo({
-          top: 0,
-          left: document.querySelectorAll(".contentD")[0].scrollLeft-=event.movementX,
-          behavior: 'smooth'
-        });
-      }*/
-      //console.log(e)
-      if (!this.isDown) return 0;
-      let ele = document.querySelectorAll(".distatchContainer")[0];
-      const dx = e.clientX - this.pos.x;
-      const dy = e.clientY - this.pos.y;
 
-      // Scroll the element
-      ele.scrollTop = this.pos.top - dy * this.sensitivity;
-      ele.scrollLeft = this.pos.left - dx * this.sensitivity;
-    },
     driverDragleave() {
       //   console.log("a");
     },
     driverMouseUp() {
       //   console.log("a");
     },
-    driverDrop(e, driver, time, key, key2) {
-      console.log(e, driver, time, key, key2);
+    driverDrop(e, car) {
+      const vm = this;
       this.isActive = true;
       e.target.style.background = "#fff";
+
+      let data = {
+        orderNosOrDespatchNos: [vm.orderTemp.despatchNo],
+        carId: car.id,
+        driverInfoName: car.driverName,
+        carNo: car.carNo,
+        driverInfoId: vm.driverList.filter((d) => d.name === car.driverName)[0]
+          .id,
+      };
+
+      this.$cl(data);
+      dispatchs.addOrUpdateShare(data).then((res) => {
+        vm.$alertT.fire({
+          icon: "success",
+          title: res.message,
+        });
+        vm.getList();
+      });
     },
     driverDropD() {
       console.log("aaaa");
     },
-    test() {
+    handleDargOrder(i) {
+      this.orderTemp = Object.assign({}, i); // copy obj
+      console.log(this.orderTemp);
       this.scroll.enabled = true;
     },
     test2() {
@@ -303,29 +296,17 @@ export default {
       return x * step + "px";
     },
   },
-  created() {
-    let resObj = {};
-    this.driverList.forEach((item) => {
-      resObj[`${item}`] = this.timelist.reduce((a, b) => ((a[b] = ""), a), {});
-      let restore = (dispatchs.response ?? []).filter(
-        (item1) => item1.DespatchDetails?.[0]?.DriverName === item
-      );
-
-      (restore ?? []).forEach((item2) => {
-        resObj[`${item}`][
-          `${moment(item2.DespatchDetails?.[0]?.Despatch?.StartDate).format(
-            "HH:mm"
-          )}`
-        ] = item2.DespatchDetails;
-      });
-    });
-    this.dragData = resObj;
-    this.dispatchData = dispatchs;
-    console.log(resObj);
+  async created() {
+    this.listQuery.StartDate = moment(new Date()).format("yyyy-MM-DD");
+    await this.getList();
+    this.getCarList();
+    this.getDriverList();
   },
   mounted() {
-    this.dragSetting();
-    this.getList();
+    const vm = this;
+    setTimeout(() => {
+      vm.dragSetting();
+    }, 1000);
   },
 };
 </script>
