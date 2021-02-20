@@ -6,6 +6,10 @@
         <i style="margin-left:.5rem;font-size:14px" :style="`color:${statusMapping[3]}`" class="iconfont icon-member">已抵達</i>
         <i style="margin-left:.5rem;font-size:14px" :style="`color:${statusMapping[4]}`" class="iconfont icon-member">客上</i>
         <i style="margin-left:.5rem;font-size:14px" :style="`color:${statusMapping[5]}`" class="iconfont icon-member">完成</i>
+
+        <!-- 條件篩選 -->
+        <el-date-picker value-format="yyyy-MM-dd" @change="getList" placeholder="選擇日期" size="mini" style="width: 200px; margin: 0 " v-model="listQuery.StartDate" type="date">
+        </el-date-picker>
         <!-- <el-button size="mini">123</el-button> -->
         <!-- 權限按鈕 -->
         <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
@@ -55,7 +59,7 @@
           <div class="driverCard" v-for="(car) in carList" :key="car.id">
             <div class="driverCardTitle">
               <div class="driverImg"></div>
-              <p class="driverName">{{ car.driverName }}({{ car.carNo }})</p>
+              <p class="driverName">{{ car.carNo }}({{ car.driverName }})</p>
             </div>
             <p class="carInfo">座位:{{ car.seatNum }} | 輪椅:{{ car.wheelchairNum }} | {{ car.carCategoryName }}</p>
           </div>
@@ -161,8 +165,7 @@
           </transition-group>
         </div>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="noOrgDialog = false">取 消</el-button>
-          <el-button type="primary" @click="handleConfirmChange()">確 定</el-button>
+          <el-button type="primary" @click="noOrgDialog = false">確 定</el-button>
         </span>
       </el-dialog>
     </div>
@@ -1072,7 +1075,7 @@ export default {
     box-shadow: 4px 4px 10px #ddd;
 
     &:hover {
-      transform: scale(1.3);
+      transform: scale(1.1);
       z-index: 3;
     }
   }
