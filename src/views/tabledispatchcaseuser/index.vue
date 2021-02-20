@@ -237,7 +237,7 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="carPoolDialog = false">取 消</el-button>
-        <el-button type="primary" @click="handleSetCarPool()">確 定</el-button>
+        <el-button type="primary" @click="handleSetCarPool">確 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -556,6 +556,40 @@ export default {
           title: `請勾選兩張(含)以上訂單並確認個別訂單是否願意共乘`,
         });
       }
+    },
+
+    /* 確認共乘 */
+    handleSetCarPool() {
+      // console.log("a");
+      const vm = this;
+      if (vm.carPoolTemp.driverInfoId == null || vm.carPoolTemp.carId == null) {
+        vm.$alertM.fire({
+          icon: "error",
+          title: `請確實選擇司機及車輛`,
+        });
+        return;
+      }
+      let data = {
+        orderNosOrDespatchNos: vm.multipleSelection.map((i) => {
+          return i.despatchNo;
+        }),
+        driverInfoId: vm.carPoolTemp.driverInfoId,
+        carId: vm.carPoolTemp.carId,
+        driverInfoName: vm.driverList.filter((d) => {
+          return d.id == vm.carPoolTemp.driverInfoId;
+        })[0].name,
+        carNo: vm.carList.filter((c) => {
+          return c.id == vm.carPoolTemp.carId;
+        })[0].carNo,
+      };
+      dispatchs.addOrUpdateShare(data).then((res) => {
+        vm.$alertT.fire({
+          icon: "success",
+          title: res.message,
+        });
+        vm.carPoolDialog = false;
+        vm.getList();
+      });
     },
 
     /* 排班車輛檢核 */

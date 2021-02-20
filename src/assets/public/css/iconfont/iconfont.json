@@ -6,6 +6,13 @@
   "description": "新北營運端",
   "glyphs": [
     {
+      "icon_id": "9648324",
+      "name": "Cross",
+      "font_class": "Cross",
+      "unicode": "e705",
+      "unicode_decimal": 59141
+    },
+    {
       "icon_id": "1410255",
       "name": "check-box",
       "font_class": "check-box",

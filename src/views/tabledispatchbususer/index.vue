@@ -3,20 +3,10 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 非權限按鈕 -->
-        <el-input
-          style="width: 200px; margin-right: 0.5rem"
-          size="mini"
-          v-model="value"
-          clearable
-          placeholder="請輸入關鍵字"
-        ></el-input>
+        <el-input style="width: 200px; margin-right: 0.5rem" size="mini" v-model="value" clearable placeholder="請輸入關鍵字"></el-input>
 
         <!-- 權限按鈕 -->
-        <permission-btn
-          moduleName="builderTables"
-          size="mini"
-          v-on:btn-event="onBtnClicked"
-        ></permission-btn>
+        <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
       </div>
     </sticky>
 
@@ -24,87 +14,29 @@
     <div class="app-container flex-item">
       <Title title="幸福巴士調度台"></Title>
       <div class="bg-white" style="height: calc(100% - 50px)">
-        <el-table
-          ref="mainTable"
-          height="calc(100% - 52px)"
-          :data="list"
-          border
-          fit
-          v-loading="listLoading"
-          highlight-current-row
-          @selection-change="handleSelectionChange"
-          style="width: 100%"
-        >
-          <el-table-column
-            type="selection"
-            width="55"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            align="center"
-            property="userName"
-            label="姓名"
-            width="120"
-          >
+        <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" border fit v-loading="listLoading" highlight-current-row @selection-change="handleSelectionChange" style="width: 100%">
+          <el-table-column type="selection" width="55" align="center"></el-table-column>
+          <el-table-column align="center" property="userName" label="姓名" width="120">
           </el-table-column>
-          <el-table-column
-            align="center"
-            property="userName"
-            label="訂單狀態"
-            width="100"
-          >
+          <el-table-column align="center" property="userName" label="訂單狀態" width="100">
             <template slot-scope="scope">
-              <OrderStatusTag
-                :type="orderStatusMapping[scope.row.status - 1]"
-              ></OrderStatusTag>
+              <OrderStatusTag :type="orderStatusMapping[scope.row.status - 1]"></OrderStatusTag>
             </template>
           </el-table-column>
 
-          <el-table-column
-            property="driver"
-            label="司機"
-            width="200"
-            align="center"
-          >
+          <el-table-column property="driver" label="司機" width="200" align="center">
             <template slot-scope="scope">
-              <el-select
-                v-model="scope.row.driverInfoId"
-                filterable
-                size="mini"
-                placeholder="選擇司機"
-                :disabled="scope.row.status != 1"
-              >
-                <el-option
-                  v-for="driver in driverList"
-                  :key="driver.id"
-                  :label="driver.userName"
-                  :value="driver.id"
-                >
+              <el-select v-model="scope.row.driverInfoId" filterable size="mini" placeholder="選擇司機" :disabled="scope.row.status != 1">
+                <el-option v-for="driver in driverList" :key="driver.id" :label="driver.userName" :value="driver.id">
                   {{ driver.userName }} / {{ driver.phone }}
                 </el-option>
               </el-select>
             </template>
           </el-table-column>
-          <el-table-column
-            property="car"
-            label="車輛"
-            width="200"
-            align="center"
-          >
+          <el-table-column property="car" label="車輛" width="200" align="center">
             <template slot-scope="scope">
-              <el-select
-                v-model="scope.row.carId"
-                filterable
-                size="mini"
-                placeholder="選擇車輛"
-                :disabled="scope.row.status != 1"
-              >
-                <el-option
-                  v-for="car in dispatchCarFilter(carList, scope.row)"
-                  :key="car.id"
-                  :label="car.carNo"
-                  :value="car.id"
-                >
+              <el-select v-model="scope.row.carId" filterable size="mini" placeholder="選擇車輛" :disabled="scope.row.status != 1">
+                <el-option v-for="car in dispatchCarFilter(carList, scope.row)" :key="car.id" :label="car.carNo" :value="car.id">
                   {{ car.carCategoryName || "一般車" }} / {{ car.seatNum }}人座
                   /
                   {{ car.carNo }}
@@ -113,25 +45,14 @@
             </template>
           </el-table-column>
 
-          <el-table-column
-            property="reserveDate"
-            label="預約乘車時間"
-            width="200"
-            align="center"
-          >
+          <el-table-column property="reserveDate" label="預約乘車時間" width="200" align="center">
             <template slot-scope="scope">
-              <span style="margin-left: 10px"
-                >{{ scope.row.reserveDate | dateFilter }}
+              <span style="margin-left: 10px">{{ scope.row.reserveDate | dateFilter }}
               </span>
             </template>
           </el-table-column>
 
-          <el-table-column
-            property="stationLineName"
-            label="預約路線"
-            width="150"
-            align="center"
-          >
+          <el-table-column property="stationLineName" label="預約路線" width="150" align="center">
           </el-table-column>
 
           <el-table-column property="name" label="起迄站" width="300">
@@ -147,117 +68,45 @@
             </template>
           </el-table-column>
 
-          <el-table-column
-            property="passengerNum"
-            label="搭乘人數"
-            width="100"
-            align="center"
-          >
+          <el-table-column property="passengerNum" label="搭乘人數" width="100" align="center">
           </el-table-column>
 
-          <el-table-column
-            align="center"
-            :label="'操作'"
-            fixed="right"
-            width="300"
-          >
+          <el-table-column align="center" :label="'操作'" fixed="right" width="300">
             <template slot-scope="scope">
               <div class="buttonFlexBox">
-                <el-button
-                  type="info"
-                  size="mini"
-                  v-if="scope.row.status == 1"
-                  @click="handleRoster(scope.row)"
-                  >排班</el-button
-                >
-                <el-button
-                  type="success"
-                  size="mini"
-                  v-if="scope.row.status == 1"
-                  @click="
+                <el-button type="info" size="mini" v-if="scope.row.status == 1" @click="handleRoster(scope.row)">排班</el-button>
+                <el-button type="success" size="mini" v-if="scope.row.status == 1" @click="
                     editDialog = true;
                     getOrder(scope.row.id);
-                  "
-                  >編輯訂單</el-button
-                >
-                <el-button
-                  type="warning"
-                  size="mini"
-                  v-if="scope.row.status !== 1 && scope.row.status !== 9"
-                  @click="
+                  ">編輯訂單</el-button>
+                <el-button type="warning" size="mini" v-if="scope.row.status !== 1 && scope.row.status !== 9" @click="
                     changeDialog = true;
-                    handleChange(scope.row);
-                  "
-                  >變更司機車輛</el-button
-                >
-                <el-button
-                  size="mini"
-                  type="danger"
-                  v-if="scope.row.status !== 1 && scope.row.status !== 9"
-                  @click="handleCancelDispatch(scope.row.despatchNo)"
-                  >取消排班</el-button
-                >
-                <el-button
-                  size="mini"
-                  type="danger"
-                  v-if="scope.row.status == 1"
-                  @click="handleCancelOrder(scope.row.id)"
-                  >取消訂單</el-button
-                >
+                    handleChange(scope.row); 
+                  ">變更司機車輛</el-button>
+                <el-button size="mini" type="danger" v-if="scope.row.status !== 1 && scope.row.status !== 9" @click="handleCancelDispatch(scope.row.despatchNo)">取消排班</el-button>
+                <el-button size="mini" type="danger" v-if="scope.row.status == 1" @click="handleCancelOrder(scope.row.id)">取消訂單</el-button>
               </div>
             </template>
           </el-table-column>
         </el-table>
-        <pagination
-          v-show="total > 0"
-          :total="total"
-          :page.sync="listQuery.page"
-          :limit.sync="listQuery.limit"
-          @pagination="handleCurrentChange"
-        />
+        <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handleCurrentChange" />
       </div>
     </div>
 
     <!-- 燈箱 -->
 
     <!-- eidt dialog -->
-    <EditDialog
-      :temp="temp"
-      :editDialogProp="editDialog"
-      :lineList="lineList"
-      :stopList="stopList"
-      :toLineStop="toLineStop"
-      :lineStop="lineStop"
-      @handleLineChange="handleLineChange"
-      @handleFromChange="handleFromChange"
-      @handleEdit="handleEdit"
-      @handleClose="handleClose"
-    ></EditDialog>
+    <EditDialog :temp="temp" :editDialogProp="editDialog" :lineList="lineList" :stopList="stopList" :toLineStop="toLineStop" :lineStop="lineStop" @handleLineChange="handleLineChange" @handleFromChange="handleFromChange" @handleEdit="handleEdit" @handleClose="handleClose"></EditDialog>
 
     <!-- roster dialog -->
     <el-dialog title="批量排班" :visible.sync="rosterDialog" width="800px">
       <div class="rosterDialogBody">
-        <el-form
-          :label-position="labelPosition"
-          label-width="200px"
-          :model="temp"
-          ref="form"
-        >
+        <el-form :label-position="labelPosition" label-width="200px" :model="temp" ref="form">
           <el-row :gutter="16">
             <el-col :sm="12" :md="12">
               <el-form-item label="司機">
-                <el-select
-                  v-model="rosterDriver"
-                  filterable
-                  placeholder="選擇司機"
-                  style="width: 100%"
-                >
-                  <el-option
-                    v-for="driver in driverList"
-                    :key="driver.id"
-                    :label="`${driver.userName} / ${driver.phone}`"
-                    :value="driver.id"
-                  >
+                <el-select v-model="rosterDriver" filterable placeholder="選擇司機" style="width: 100%">
+                  <el-option v-for="driver in driverList" :key="driver.id" :label="`${driver.userName} / ${driver.phone}`" :value="driver.id">
                   </el-option>
                 </el-select>
               </el-form-item>
@@ -265,18 +114,8 @@
 
             <el-col :sm="12" :md="12">
               <el-form-item label="車輛">
-                <el-select
-                  v-model="rosterCar"
-                  filterable
-                  placeholder="選擇車輛"
-                  style="width: 100%"
-                >
-                  <el-option
-                    v-for="car in isShareCarFilter()"
-                    :key="car.id"
-                    :label="`${car.carCategoryName} / ${car.seatNum}人座 / ${car.carNo}`"
-                    :value="car.id"
-                  >
+                <el-select v-model="rosterCar" filterable placeholder="選擇車輛" style="width: 100%">
+                  <el-option v-for="car in isShareCarFilter()" :key="car.id" :label="`${car.carCategoryName} / ${car.seatNum}人座 / ${car.carNo}`" :value="car.id">
                   </el-option>
                 </el-select>
               </el-form-item>
@@ -286,56 +125,29 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="rosterDialog = false">取 消</el-button>
-        <el-button type="primary" @click="handleRosterOrders()"
-          >確 定</el-button
-        >
+        <el-button type="primary" @click="handleRosterOrders()">確 定</el-button>
       </span>
     </el-dialog>
 
     <!-- change dialog -->
     <el-dialog title="變更司機車輛" :visible.sync="changeDialog" width="800px">
       <div class="changeDialogBody">
-        <el-form
-          :label-position="labelPosition"
-          label-width="200px"
-          :model="temp"
-          ref="form"
-        >
+        <el-form :label-position="labelPosition" label-width="200px" :model="temp" ref="form">
           <el-row :gutter="16">
             <el-col :sm="12" :md="12">
               <el-form-item label="司機">
-                <el-select
-                  v-model="orderTemp.driverInfoId"
-                  filterable
-                  placeholder="選擇司機"
-                  style="width: 100%"
-                >
-                  <el-option
-                    v-for="driver in driverList"
-                    :key="driver.id"
-                    :label="`${driver.userName} / ${driver.phone}`"
-                    :value="driver.id"
-                  ></el-option>
+                <el-select v-model="orderTemp.driverInfoId" filterable placeholder="選擇司機" style="width: 100%">
+                  <el-option v-for="driver in driverList" :key="driver.id" :label="`${driver.userName} / ${driver.phone}`" :value="driver.id"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
 
             <el-col :sm="12" :md="12">
               <el-form-item label="車輛">
-                <el-select
-                  v-model="orderTemp.carId"
-                  filterable
-                  placeholder="選擇車輛"
-                  style="width: 100%"
-                >
-                  <el-option
-                    v-for="car in carList"
-                    :key="car.id"
-                    :label="`${car.carCategoryName || '一般車'} / ${
+                <el-select v-model="orderTemp.carId" filterable placeholder="選擇車輛" style="width: 100%">
+                  <el-option v-for="car in carList" :key="car.id" :label="`${car.carCategoryName || '一般車'} / ${
                       car.seatNum
-                    }人座 / ${car.carNo}`"
-                    :value="car.id"
-                  ></el-option>
+                    }人座 / ${car.carNo}`" :value="car.id"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
@@ -344,9 +156,7 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="changeDialog = false">取 消</el-button>
-        <el-button type="primary" @click="handleConfirmChange()"
-          >確 定</el-button
-        >
+        <el-button type="primary" @click="handleConfirmChange()">確 定</el-button>
       </span>
     </el-dialog>
   </div>

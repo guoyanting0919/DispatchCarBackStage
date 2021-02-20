@@ -49,6 +49,10 @@ let routerMappingList = [
     path: "/tabledispatchcaseuser/index",
     title: "派車調度 / 長照調度台",
   },
+  {
+    path: "/dragdispatcher/index",
+    title: "派車調度 / 拖拉式調度台",
+  },
 
   /* 司機車輛管理 */
   {

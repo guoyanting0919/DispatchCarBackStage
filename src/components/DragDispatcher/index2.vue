@@ -1,100 +1,184 @@
 <template>
-  <div class="dragDispatcherContainer">
-    <div class="orderContainer customScrollBar">
-      <div v-for="item in list" :key="item.despatchNo" draggable="true" class="orderCard" @dragstart="handleDargOrder(item)">
-        <div class="orderCardTitle" v-if="list">
-          <p>{{ item.data[0].carCategoryName }}</p>
-          <p v-if="item.canShared">可共乘</p>
-          <p v-else>不可共乘</p>
-          <p>{{ item.data[0].familyWith }}人搭乘</p>
-        </div>
-        <div class="orderCardMain">
-          <div class="orderInfo">
-            <p class="orderInfoName">{{ item.data[0].name }}</p>
-            <!-- <p style="margin: 0">聯絡電話 : {{ item.data[0].noticePhone }}</p> -->
+  <div>
+    <sticky :className="'sub-navbar'">
+      <div class="filter-container">
+        <!-- <el-button size="mini">123</el-button> -->
+        <!-- 權限按鈕 -->
+        <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
+      </div>
+    </sticky>
+    <div class="dragDispatcherContainer">
+      <div id="map" ref="map" style="width: 0%; height: 0%"></div>
+      <div class="orderContainer customScrollBar">
+        <div v-for="item in list" :key="item.despatchNo" draggable="true" class="orderCard" @dragstart="handleDargOrder(item)">
+          <div class="orderCardTitle" v-if="list">
+            <p>{{ item.data[0].carCategoryName }}</p>
+            <p v-if="item.canShared">可共乘</p>
+            <p v-else>不可共乘</p>
+            <p>{{ item.data[0].familyWith }}人搭乘</p>
           </div>
-          <p class="orderTime">
-            {{ item.data[0].reserveDate | dateFilter }}
-          </p>
-          <div class="orderAddr">
-            <i class="iconfont icon-circle"></i>
-            <i class="iconfont icon-Vector10"></i>
-            <p class="startAddr">
-              {{ item.data[0].fromAddr }}
+          <div class="orderCardMain">
+            <div class="orderInfo">
+              <p class="orderInfoName">{{ item.data[0].name }}</p>
+              <!-- <p style="margin: 0">聯絡電話 : {{ item.data[0].noticePhone }}</p> -->
+            </div>
+            <p class="orderTime">
+              {{ item.data[0].reserveDate | dateFilter }}
             </p>
-            <p class="endAddr">{{ item.data[0].toAddr }}</p>
+            <div class="orderAddr">
+              <i class="iconfont icon-circle"></i>
+              <i class="iconfont icon-Vector10"></i>
+              <p class="startAddr">
+                {{ item.data[0].fromAddr }}
+              </p>
+              <p class="endAddr">{{ item.data[0].toAddr }}</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="outsideContainer">
-      <div class="driverTimeCard">
-        <p>車輛 <i class="iconfont icon-right1"></i></p>
-        <p style="margin-top: 0.5rem">
-          時間 <i class="iconfont icon-right1 iconRoate"></i>
-        </p>
-      </div>
+      <div class="outsideContainer">
+        <div class="driverTimeCard">
+          <p>車輛 <i class="iconfont icon-right1"></i></p>
+          <p style="margin-top: 0.5rem">
+            時間 <i class="iconfont icon-right1 iconRoate"></i>
+          </p>
+        </div>
 
-      <!-- driver fake box -->
-      <div class="driverFakeBox">
-        <div class="driverCard" v-for="(car) in carList" :key="car.id">
-          <div class="driverCardTitle">
-            <div class="driverImg"></div>
-            <p class="driverName">{{ car.driverName }}({{ car.carNo }})</p>
+        <!-- driver fake box -->
+        <div class="driverFakeBox">
+          <div class="driverCard" v-for="(car) in carList" :key="car.id">
+            <div class="driverCardTitle">
+              <div class="driverImg"></div>
+              <p class="driverName">{{ car.driverName }}({{ car.carNo }})</p>
+            </div>
+            <p class="carInfo">座位:{{ car.seatNum }} | 輪椅:{{ car.wheelchairNum }} | {{ car.carCategoryName }}</p>
           </div>
-          <p class="carInfo">座位:{{ car.seatNum }} | 輪椅:{{ car.wheelchairNum }} | {{ car.carCategoryName }}</p>
         </div>
-      </div>
 
-      <!-- time fake box -->
-      <div class="timeFakeBox">
-        <div class="timeCard" v-for="item in timelist" :key="item">
-          {{ item }}
+        <!-- time fake box -->
+        <div class="timeFakeBox">
+          <div class="timeCard" v-for="item in timelist" :key="item">
+            {{ item }}
+          </div>
         </div>
-      </div>
 
-      <div class="distatchContainer" @dragover.prevent>
-        <div class="driverBox">
-          <!-- 司機迴圈 -->
-          <div @mouseenter="driverMouseUp" @dragend="driverDragleave" :class="{ active: isActive }" class="driver" draggable="true" v-for="car in carList" :key="car.id">
-            <!-- <div class="driverCard">司機</div> -->
-            <!-- 時間迴圈 -->
-            <div @mouseenter="driverMouseUp" @dragover.self="showShadow" @dragleave.self="clearShadow" @dragend.self="clearShadow" @drop="driverDrop($event, car, time, car.id, key2)" v-for="(time, key2) in car.timeList" :key="key2" class="timeBox">
-              <div @mouseenter="driverMouseUp" @dragover.self="showShadow" @dragleave="clearShadow" @dragend="clearShadow" class="whiteDriverTime">
-                {{ car.driverName + "" + key2 }}
-              </div>
-              <!-- <el-button @click="click(item, item2)">{{ key }}</el-button> -->
-              <div v-for="(rL, index) in car.readyList" :key="index">
-                <div v-if="rL.time===key2" @mouseenter.stop="test2()" @dragend="test()" @mouseleave="test()" @drop.stop="driverDropD($event, driver, time, key, key2)" class="dispatchCard" draggable="true">
-                  <div class="dispatchCardTitle">
-                    <!-- <p>{{ time[0].OrderDetails.ExpectedMinute }}分</p> -->
-                    <p>NEW</p>
+        <div class="distatchContainer" @dragover.prevent>
+          <div class="driverBox">
+            <!-- 司機迴圈 -->
+            <div @mouseenter="driverMouseUp" @dragend="driverDragleave" :class="{ active: isActive }" class="driver" draggable="false" v-for="car in carList" :key="car.id">
+              <!-- <div class="driverCard">司機</div> -->
+              <!-- 時間迴圈 -->
+              <div @mouseenter="driverMouseUp" @dragover.self="showShadow" @dragleave.self="clearShadow" @dragend.self="clearShadow" @drop="handleRoster($event, car)" v-for="(time,key2) in car.timeList" :key="key2" class="timeBox">
+
+                <div v-if="car.readyTime.includes(key2)" class="dispatchCardContainer">
+                  <div v-for="(item, index) in car.timeList[key2]" :key="index" @mouseenter.stop="test2(item)" @dragend="test2()" @mouseleave="test2()" @drop.stop="handleCarPool(item)" class="dispatchCard" draggable="false" :style="`height:${item.totalTime * 9 }px;margin-left:${(item.flag-1) * 33}%`">
+                    <p class="cardHeader">
+                      <span class="totalTime">
+                        {{item.totalTime}}分鐘
+                      </span>
+                      <i @click="handleChangeDC(item)" class='iconfont icon-driver'></i>
+                      <i @click="handleCancelDispatch(item)" class='iconfont icon-Cross'></i>
+                    </p>
+                    <div class="dispatchPassengers">
+                      <p @click="getOrder(item,idx)" class="passengerName" v-for="(o,idx) in item.data" :key='o.id'>
+                        <i :style="`color:${statusMapping[o.status]}`" class="iconfont icon-member"></i> {{o.name}}
+                      </p>
+                    </div>
                   </div>
-                  <p>王小明</p>
-                  <p>王小明</p>
-                  <p>王小明</p>
-                  <p>王小明</p>
-                  <p>{{ time.Id }}</p>
                 </div>
+
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Dialog -->
+      <!-- eidt dialog -->
+      <EditDialog :tempObj="temp" :editDialogProp="editDialog" :carCategorysList="carCategorysList" @handleEdit="handleEdit" @handleClose="handleClose"></EditDialog>
+
+      <!-- change dialog -->
+      <el-dialog title="變更司機車輛" :visible.sync="changeDialog" width="800px">
+        <div class="changeDialogBody">
+          <el-form :label-position="labelPosition" label-width="200px" :model="orderTemp" ref="form">
+            <el-row :gutter="16">
+              <el-col :sm="12" :md="12">
+                <el-form-item label="司機">
+                  <el-select v-model="orderTemp.driverInfoId" filterable placeholder="選擇司機" style="width: 100%">
+                    <el-option v-for="driver in driverList" :key="driver.id" :label="driver.name" :value="driver.id">
+                      {{ driver.name }} / {{ driver.phone }}
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+
+              <el-col :sm="12" :md="12">
+                <el-form-item label="車輛">
+                  <el-select v-model="orderTemp.carId" filterable placeholder="選擇車輛" style="width: 100%">
+                    <el-option v-for="car in changeCarFilter()" :key="car.id" :label="`${car.carCategoryName || '一般車'} / ${
+                      car.seatNum
+                    }人座 / ${car.carNo}`" :value="car.id"></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="changeDialog = false">取 消</el-button>
+          <el-button type="primary" @click="handleConfirmChange()">確 定</el-button>
+        </span>
+      </el-dialog>
+
+      <!-- dispatch dialog -->
+      <el-dialog title="請選擇預約乘車個案" :visible.sync="coDialog" width="400px">
+        <div class="coDialogBody">
+          <el-select style="width: 300px" v-model="dispatchCaseUser" filterable size="mini" placeholder="選擇預約乘車個案">
+            <el-option v-for="user in caseUserList" :key="user.caseUserId" :label="`${user.name}/${user.caseUserNo}`" :value="user.userId">
+            </el-option>
+          </el-select>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="coDialog = false">取 消</el-button>
+          <el-button type="primary" @click="handleDispatch">確 定</el-button>
+        </span>
+      </el-dialog>
+
+      <!-- noOrgDialog dialog -->
+      <el-dialog title="新訂單(尚未接單)" :visible.sync="noOrgDialog" width="910px">
+        <div class="noOrgDialogBody">
+          <p style="color: red; font-size: 14px; width: 100%; text-align: center" v-if="newOrderList.length == 0">
+            暫無新訂單
+          </p>
+          <transition-group name="fade-transform" mode="out-in" class="cardContainer">
+            <OrderCard v-for="item in newOrderList" :key="item.id" :order="item" @handleReceive='handleReceive' @handleTrans='handleTrans' @handleCancle='handleCancle'></OrderCard>
+          </transition-group>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="noOrgDialog = false">取 消</el-button>
+          <el-button type="primary" @click="handleConfirmChange()">確 定</el-button>
+        </span>
+      </el-dialog>
     </div>
   </div>
 </template>
 
 <script>
 import moment from "moment";
-
 import IScroll from "iscroll/build/iscroll-probe";
-// import dispatchs from "@/assets/dispatch";
+
+import Sticky from "@/components/Sticky";
+import permissionBtn from "@/components/PermissionBtn";
+import OrderCard from "@/components/OrderCardCase";
+import EditDialog from "@/components/Dialog/editCaseUserDespatch";
+
 import * as orderCaseUser from "@/api/orderCaseUser";
 import * as cars from "@/api/cars";
 import * as drivers from "@/api/drivers";
+import * as category from "@/api/categorys";
 import * as dispatchs from "@/api/dispatchs";
+import * as caseUsers from "@/api/caseUsers";
 
 export default {
   props: {
@@ -111,20 +195,57 @@ export default {
     step: {
       //間隔時間(分)
       type: Number,
-      default: 15,
+      default: 10,
     },
+  },
+  components: {
+    EditDialog,
+    Sticky,
+    permissionBtn,
+    OrderCard,
   },
   data() {
     return {
+      /* 無組織訂單 */
+      newOrderList: [],
+      noOrgDialog: false,
+
       /* 司機列表 */
       driverList: [],
 
       /* 車輛列表 */
       carList: [],
 
+      /* 車輛類別 */
+      carCategorysList: [],
+
+      /* 表單相關 */
+      labelPosition: "top",
+
       /* order temp */
       orderTemp: "",
+      changeOrder: "",
+      changeDialog: false,
 
+      /* edit temp */
+      temp: {},
+      editDialog: false,
+
+      /* 預約訂單 */
+      coDialog: false,
+      caseUserList: [],
+      dispatchCaseUser: "",
+
+      /* statusMapping */
+      statusMapping: [
+        "",
+        "",
+        "#47c791",
+        "#2f54eb",
+        "#7653c7",
+        "#7b8382",
+        "#f5222d",
+      ],
       canDrag: true,
       scroll: null,
       dragData: "",
@@ -185,10 +306,33 @@ export default {
         });
 
         vm.readyList = vm.readyList.map((l) => {
-          l.time = moment(l.data[0].reserveDate).format("HH:mm");
-          return l;
+          if (l.data.length > 1) {
+            let startTime = l.data[0].reserveDate;
+            for (let index = 1; index < l.data.length; index++) {
+              if (moment(l.data[index].reserveDate).isAfter(startTime)) {
+                console.log("a");
+              } else {
+                startTime = l.data[index].reserveDate;
+              }
+            }
+            l.time = moment(startTime).format("HH:mm");
+            return l;
+            // console.log(arr);
+          } else {
+            l.time = moment(l.data[0].reserveDate).format("HH:mm");
+            return l;
+          }
         });
+        this.getCarList();
         vm.total = res.count;
+      });
+    },
+
+    /* 獲取無組織訂單 */
+    async getListNoOrg() {
+      const vm = this;
+      await orderCaseUser.loadNoOrg().then((res) => {
+        vm.newOrderList = res.result;
       });
     },
 
@@ -207,13 +351,54 @@ export default {
       cars.load({ limit: 9999, page: 1 }).then((res) => {
         vm.carList = res.data;
         vm.carList.forEach((item) => {
-          item.timeList = this.timelist.reduce((a, b) => ((a[b] = ""), a), {});
+          item.timeList = {};
+          vm.timelist.forEach((t) => {
+            item.timeList[t] = vm.readyList.filter((rL) => {
+              return rL.carId === item.id && rL.time === t;
+            });
+          });
+
           item.readyList = vm.readyList.filter((rL) => rL.carId === item.id);
-          console.log(item.readyList);
+
+          item.readyTime = [];
+          vm.readyList.forEach((rL) => {
+            if (rL.carId === item.id) {
+              item.readyTime.push(rL.time);
+            } else {
+              return false;
+            }
+          });
         });
       });
     },
 
+    /* 獲取所有車輛類型 */
+    getCarCategorys() {
+      const vm = this;
+      let query = {
+        page: 1,
+        limit: 20,
+        TypeId: "SYS_CAR",
+      };
+      category.getSimpleList(query).then((res) => {
+        vm.carCategorysList = res.result.filter((car) => {
+          return (
+            car.value === "SYS_CAR_GENERAL" || car.value === "SYS_CAR_WEAL"
+          );
+        });
+      });
+    },
+
+    /* 獲取長照用戶資料 */
+    getCaseUserList() {
+      const vm = this;
+      vm.listLoading = true;
+      caseUsers.load({ limit: 9999, page: 1 }).then((res) => {
+        vm.caseUserList = res.data;
+      });
+    },
+
+    /* 拖曳區塊設置 */
     dragSetting() {
       const vm = this;
       this.scroll = new IScroll(".distatchContainer", {
@@ -237,13 +422,103 @@ export default {
       });
     },
 
-    driverDragleave() {
-      //   console.log("a");
+    /* 預約訂車 */
+    handleDispatch() {
+      const vm = this;
+      if (vm.dispatchCaseUser == "") {
+        vm.$alertT.fire({
+          icon: "error",
+          title: "請選擇預約乘車個案",
+        });
+      } else {
+        let routeParams = vm.caseUserList.filter((u) => {
+          return u.userId === vm.dispatchCaseUser;
+        })[0];
+        vm.coDialog = false;
+        vm.$router.push(
+          `/dragdispatcher/dispatch/${routeParams.userId}-${routeParams.caseUserId}`
+        );
+      }
     },
-    driverMouseUp() {
-      //   console.log("a");
+
+    /* 獲取單筆訂單資料 */
+    getOrder(item, idx) {
+      const vm = this;
+      vm.$cl(item);
+      vm.$cl(idx);
+      const id = item.data[idx].id;
+      vm.editDialog = true;
+      orderCaseUser.get({ id }).then((res) => {
+        console.log(res);
+        vm.temp = Object.assign({}, res.result); // copy obj
+        let fromRemark = ["醫院診所", "洗腎中心", "復健診所", "住家"].includes(
+          vm.temp.fromAddrRemark
+        )
+          ? ""
+          : vm.temp.fromAddrRemark;
+        this.$set(vm.temp, "fromRemark", fromRemark);
+
+        let toRemark = ["醫院診所", "洗腎中心", "復健診所", "住家"].includes(
+          vm.temp.toAddrRemark
+        )
+          ? ""
+          : vm.temp.toAddrRemark;
+        this.$set(vm.temp, "toRemark", toRemark);
+
+        vm.temp.toAddrRemark = [
+          "醫院診所",
+          "洗腎中心",
+          "復健診所",
+          "住家",
+        ].includes(vm.temp.toAddrRemark)
+          ? vm.temp.toAddrRemark
+          : "其他";
+        vm.temp.fromAddrRemark = [
+          "醫院診所",
+          "洗腎中心",
+          "復健診所",
+          "住家",
+        ].includes(vm.temp.fromAddrRemark)
+          ? vm.temp.fromAddrRemark
+          : "其他";
+        this.$set(vm.temp, "date", res.result.reserveDate.split(" ")[0]);
+        this.$set(
+          vm.temp,
+          "time",
+          res.result.reserveDate.split(" ")[1].slice(0, 5)
+        );
+      });
     },
-    driverDrop(e, car) {
+
+    /* 編輯訂單 */
+    handleEdit(data) {
+      console.log(data);
+      const vm = this;
+      data.toAddrRemark =
+        data.toAddrRemark === "其他" ? data.toRemark : data.toAddrRemark;
+      data.fromAddrRemark =
+        data.fromAddrRemark === "其他" ? data.fromRemark : data.fromAddrRemark;
+      data.reserveDate = `${data.date} ${data.time}`;
+      data.carCategoryName = vm.carCategorysList.filter((i) => {
+        return i.value === data.carCategoryId;
+      })[0].label;
+      orderCaseUser.update(data).then(() => {
+        vm.editDialog = false;
+        vm.$alertT.fire({
+          icon: "success",
+          title: `訂單${data.orderNo}編輯成功`,
+        });
+        vm.getList();
+      });
+    },
+
+    /* 關閉編輯燈箱 */
+    handleClose(status) {
+      this.editDialog = status;
+    },
+
+    /* 排班 */
+    handleRoster(e, car) {
       const vm = this;
       this.isActive = true;
       e.target.style.background = "#fff";
@@ -257,7 +532,6 @@ export default {
           .id,
       };
 
-      this.$cl(data);
       dispatchs.addOrUpdateShare(data).then((res) => {
         vm.$alertT.fire({
           icon: "success",
@@ -266,40 +540,264 @@ export default {
         vm.getList();
       });
     },
-    driverDropD() {
-      console.log("aaaa");
+
+    /* 取消排班 */
+    handleCancelDispatch(item) {
+      console.log(item);
+      const vm = this;
+
+      vm.$swal({
+        title: "取消提示",
+        text: `確認取消排班?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#227294",
+        cancelButtonColor: "#d63737",
+        confirmButtonText: "確定",
+        cancelButtonText: "取消",
+      }).then((result) => {
+        if (result.value) {
+          dispatchs.cancel([item.despatchNo]).then((res) => {
+            vm.$alertT.fire({
+              icon: "success",
+              title: res.message,
+            });
+            vm.getList();
+          });
+        } else {
+          vm.$alertT.fire({
+            icon: "info",
+            title: `已取消操作`,
+          });
+        }
+      });
     },
+
+    /* 變更司機車輛 */
+    handleChangeDC(item) {
+      const vm = this;
+      console.log(item);
+      vm.changeOrder = item.data;
+      vm.orderTemp = Object.assign({}, item); // copy obj
+      vm.$nextTick(() => {
+        vm.changeDialog = true;
+      });
+    },
+
+    /* 變更司機車輛檢核 */
+    changeCarFilter() {
+      let data = this.carList;
+      let checkedRowsData = this.changeOrder || [];
+      return data.filter((item) => {
+        return [
+          () => {
+            // 若 車輛 為 不可派發 (status === 0) ，則不能選
+            if (item.status === 0) {
+              return false;
+            }
+            // 若 車輛 為 可派發 (status !== 0) ，則可以選
+            else {
+              return true;
+            }
+          },
+          () => {
+            // 若 有某一張定單 車種 不等於 一般車，那只能是 福祉車
+            if (checkedRowsData.some((el) => el.carCategoryName !== "一般車")) {
+              return item.carCategoryName !== "一般車";
+            }
+            // 若 有某一張定單 車種 等於 一般車，那可以是 一般車、福祉車
+            else {
+              return true; // 車種只有 一般車、福祉車 所以都通過
+            }
+          },
+          () => {
+            return (
+              item.wheelchairNum >=
+              checkedRowsData.reduce(
+                (accumulator, currentValue) =>
+                  accumulator +
+                  (["無", "普通輪椅(可收折)"].includes(
+                    currentValue.wheelchairType
+                  )
+                    ? 0
+                    : 1),
+                0
+              )
+            );
+          },
+          () => {
+            // 座椅數量 必須大於 所有訂單 (一般車訂單的陪同人數 + 1、福祉車訂單的陪同人數) 陪同人數 加總
+            return (
+              item.seatNum >=
+              checkedRowsData.reduce(
+                (accumulator, currentValue) =>
+                  accumulator +
+                  (currentValue.carCategoryName === "一般車"
+                    ? currentValue.familyWith + 1
+                    : currentValue.familyWith),
+                0
+              )
+            );
+          },
+        ].every((it) => it());
+      });
+    },
+
+    /* 確認變更司機車輛 */
+    handleConfirmChange() {
+      const vm = this;
+      let data = {
+        orderNosOrDespatchNos: [vm.orderTemp.despatchNo],
+        driverInfoId: vm.orderTemp.driverInfoId,
+        carId: vm.orderTemp.carId,
+        driverInfoName: vm.driverList.filter((d) => {
+          return d.id == vm.orderTemp.driverInfoId;
+        })[0].name,
+        carNo: vm.carList.filter((c) => {
+          return c.id == vm.orderTemp.carId;
+        })[0].carNo,
+      };
+      dispatchs.addOrUpdateShare(data).then((res) => {
+        vm.$alertT.fire({
+          icon: "success",
+          title: res.message,
+        });
+        vm.changeDialog = false;
+        vm.getList();
+      });
+    },
+
+    /* 共乘 */
+    handleCarPool(item) {
+      const vm = this;
+      console.log(item, this.orderTemp);
+
+      let data = {
+        orderNosOrDespatchNos: [item.despatchNo, vm.orderTemp.despatchNo],
+        carId: item.carId,
+        driverInfoId: item.driverInfoId,
+        driverInfoName: vm.driverList.filter((d) => {
+          return d.id === item.driverInfoId;
+        })[0].name,
+        carNo: vm.carList.filter((c) => c.id === item.carId)[0].carNo,
+      };
+
+      dispatchs.addOrUpdateShare(data).then((res) => {
+        vm.$alertT.fire({
+          icon: "success",
+          title: res.message,
+        });
+        vm.getList();
+      });
+    },
+
+    /* 顯示無組織訂單 */
+    handleShowNoOrg() {
+      const vm = this;
+      vm.getListNoOrg();
+      vm.$nextTick(() => {
+        vm.noOrgDialog = true;
+      });
+    },
+
+    /* 接收訂單 */
+    handleReceive(orderId) {
+      const vm = this;
+      orderCaseUser.acceptOrder({ id: orderId }).then((res) => {
+        console.log(res);
+
+        vm.getList();
+        vm.getListNoOrg();
+      });
+    },
+
+    /* 轉單 */
+    handleTrans(orderId) {
+      const vm = this;
+      orderCaseUser.transOrder({ id: orderId }).then((res) => {
+        console.log(res);
+        vm.getList();
+        vm.getListNoOrg();
+      });
+    },
+
+    /* 取消 */
+    handleCancle(orderId) {
+      const vm = this;
+      orderCaseUser
+        .cancel({
+          id: orderId,
+          cancelRemark: "SYS_ORDERCANCEL_REMARK_CLIENT_NOORG",
+        })
+        .then((res) => {
+          console.log(res);
+          vm.getList();
+          vm.getListNoOrg();
+        });
+    },
+
+    /* 拖曳時記錄該order */
     handleDargOrder(i) {
       this.orderTemp = Object.assign({}, i); // copy obj
       console.log(this.orderTemp);
       this.scroll.enabled = true;
     },
+
+    /*  */
     test2() {
-      console.log("a");
+      // console.log(item?.reserveDate);
       // this.canDrag = false;
       this.scroll.enabled = !this.scroll.enabled;
-      console.log(this.scroll.enabled);
+      // console.log(this.scroll.enabled);
       // this.scroll = {};
       // console.log(this.scroll);
     },
+
+    /* 拖曳上去時添加shadow */
     showShadow(e) {
-      //   this.isActive = true;
       // e.target.style.boxShadow = "inset 0px 0px 20px #888";
-      e.target.style.background = "#00000057";
+      e.target.style.background = "#ffe5d7";
     },
+
+    /* 移除shadow */
     clearShadow(e) {
       // e.target.style.boxShadow = "none";
       e.target.style.background = "#fff";
     },
+
     getHeight(x) {
       let step = 100 / this.step;
       return x * step + "px";
+    },
+
+    driverDragleave() {
+      // console.log("driverDragleave");
+    },
+
+    driverMouseUp() {
+      // this.$cl("driverMouseUp");
+    },
+
+    /* 權限按鈕 */
+    onBtnClicked(domId) {
+      this.$cl(domId);
+      switch (domId) {
+        case "dispatch":
+          this.coDialog = true;
+          break;
+        case "showNoOrg":
+          this.handleShowNoOrg();
+          break;
+        default:
+          break;
+      }
     },
   },
   async created() {
     this.listQuery.StartDate = moment(new Date()).format("yyyy-MM-DD");
     await this.getList();
-    this.getCarList();
+    this.getCaseUserList();
+    this.getCarCategorys();
     this.getDriverList();
   },
   mounted() {
@@ -314,7 +812,7 @@ export default {
 <style lang="scss" scoped>
 .dragDispatcherContainer {
   display: flex;
-  height: calc(100vh - 104px);
+  height: calc(100vh - 136px);
   width: 100%;
   // background: #fff;
   padding: 1rem;
@@ -508,18 +1006,16 @@ export default {
     width: calc(100% - 100px);
     height: 100%;
     // background: lightpink;
-    overflow: auto;
+    overflow: hidden;
+    // overflow: auto;
     display: flex;
     flex-wrap: wrap;
   }
 
   .driver {
     width: 320px;
-    // height: 100px;
     background: lightskyblue;
-    // margin: 1rem;
     position: relative;
-    // padding-top: 100px;
 
     &.active {
       background: lime;
@@ -538,34 +1034,89 @@ export default {
     border: 1px solid #ddd;
     box-sizing: border-box;
     transition: 0.3s;
-    // background: magenta;
-    // margin-bottom: 1rem;
-    // margin-top: 100px;
+  }
+
+  .dispatchCardContainer {
+    display: flex;
+    width: 94%;
+    margin: auto;
   }
 
   .dispatchCard {
+    position: absolute;
     background: #ffefde;
-    padding: 0.5rem;
+    padding: 0.25rem;
     border: 2px solid #fa8c16;
     border-top: 5px solid #fa8c16;
     border-radius: 0px 0px 8px 8px;
     width: 33%;
     z-index: 1;
     transition: 0.3s;
-    height: 90px;
+    min-height: 90px;
     overflow: hidden;
     box-shadow: 4px 4px 10px #ddd;
 
     &:hover {
-      // transform: translate(4px, -4px);
-      z-index: 2;
-      height: auto !important;
+      transform: scale(1.5);
+      z-index: 3;
     }
   }
 
-  .dispatchCardTitle {
+  .cardHeader {
+    display: flex;
+    margin-bottom: 0.25rem;
+    align-items: center;
+    padding: 0 0.15rem;
+  }
+
+  .totalTime {
+    text-align: center;
+    font-size: 14px;
+    margin-right: auto;
+  }
+
+  .icon-driver {
+    font-size: 16px;
+    margin-right: 0.1rem;
+    font-weight: 500;
+    transition: 0.5s;
+    cursor: pointer;
+
+    &:hover {
+      color: #18b82d;
+    }
+  }
+
+  .icon-Cross {
+    font-size: 14px;
+    font-weight: 700;
+    transition: 0.5s;
+    cursor: pointer;
+
+    &:hover {
+      color: #d41818;
+    }
+  }
+
+  .dispatchPassengers {
     display: flex;
     justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 0.25rem;
+  }
+
+  .passengerName {
+    font-size: 13px;
+    cursor: pointer;
+
+    .iconfont {
+      font-size: 10px;
+    }
+
+    .dispatchStatus-ready {
+      color: red;
+    }
   }
 
   .whiteDriverTime {
@@ -581,5 +1132,11 @@ export default {
     position: absolute;
     width: 100%;
   }
+}
+
+.cardContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
 }
 </style>
