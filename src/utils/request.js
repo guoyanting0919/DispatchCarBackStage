@@ -111,6 +111,10 @@ service.interceptors.response.use(
     }
   },
   (error) => {
+    Vue.prototype.$alertM.fire({
+      icon: "error",
+      title: error,
+    });
     // console.log("err" + error);
     // Message({
     //   message:

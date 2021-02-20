@@ -547,10 +547,18 @@ export default {
       };
 
       dispatchs.addOrUpdateShare(data).then((res) => {
-        vm.$alertT.fire({
-          icon: "success",
-          title: res.message,
-        });
+        console.log(res);
+        if (res.code === 200) {
+          vm.$alertT.fire({
+            icon: "success",
+            title: res.message,
+          });
+        } else {
+          vm.$alertM.fire({
+            icon: "error",
+            title: res.message,
+          });
+        }
         vm.getList();
       });
     },

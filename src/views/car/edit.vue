@@ -2,74 +2,42 @@
   <div class="flex-column carAdd">
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
-        <el-button type="info" plain size="mini" @click="handleBack"
-          >回列表</el-button
-        >
-        <el-button @click="handleSave" type="success" size="mini"
-          >儲存</el-button
-        >
+        <el-button type="info" plain size="mini" @click="handleBack">回列表</el-button>
+        <el-button @click="handleSave" type="success" size="mini">儲存</el-button>
       </div>
     </sticky>
     <div class="app-container flex-item">
       <Title title="編輯車輛"></Title>
       <div class="bg-white formContainer customScrollBar">
-        <el-form
-          :label-position="labelPosition"
-          label-width="200px"
-          :model="temp"
-          :rules="rules"
-          ref="form"
-        >
+        <el-form :label-position="labelPosition" label-width="200px" :model="temp" :rules="rules" ref="form">
           <SubTitle title="車輛基本資料編輯"></SubTitle>
           <el-row :gutter="16">
             <el-col :sm="12" :md="6">
               <el-form-item label="車牌號碼" prop="carNo">
-                <el-input
-                  v-model="temp.carNo"
-                  placeholder="請輸入車牌號碼"
-                ></el-input>
+                <el-input v-model="temp.carNo" placeholder="請輸入車牌號碼"></el-input>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="車輛類別" prop="carCategoryId">
-                <el-select
-                  v-model="temp.carCategoryId"
-                  placeholder="請選擇車輛類別"
-                  style="width: 100%"
-                >
-                  <el-option
-                    v-for="category in carCategorysList"
-                    :key="category.id"
-                    :value="category.dtValue"
-                    :label="category.name"
-                  ></el-option>
+                <el-select v-model="temp.carCategoryId" placeholder="請選擇車輛類別" style="width: 100%">
+                  <el-option v-for="category in carCategorysList" :key="category.id" :value="category.dtValue" :label="category.name"></el-option>
                   <!-- <el-option :value="2" :label="'不可派發'">不可派發</el-option> -->
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="車輛顏色" prop="carColor">
-                <el-input
-                  v-model="temp.carColor"
-                  placeholder="請輸入車輛顏色"
-                ></el-input>
+                <el-input v-model="temp.carColor" placeholder="請輸入車輛顏色"></el-input>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="廠牌型號" prop="factoryType">
-                <el-input
-                  v-model="temp.factoryType"
-                  placeholder="請輸入廠牌型號"
-                ></el-input>
+                <el-input v-model="temp.factoryType" placeholder="請輸入廠牌型號"></el-input>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="車輛來源" prop="carFrom">
-                <el-select
-                  v-model="temp.carFrom"
-                  placeholder="請選擇車輛來源"
-                  style="width: 100%"
-                >
+                <el-select v-model="temp.carFrom" placeholder="請選擇車輛來源" style="width: 100%">
                   <el-option :value="'1'" :label="'獎助'"></el-option>
                   <el-option :value="'2'" :label="'自購'"></el-option>
                   <el-option :value="'3'" :label="'捐贈'"></el-option>
@@ -78,63 +46,34 @@
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="捐贈單位" prop="donationUnit">
-                <el-input
-                  v-model="temp.donationUnit"
-                  placeholder="請輸入捐贈單位"
-                ></el-input>
+                <el-input v-model="temp.donationUnit" placeholder="請輸入捐贈單位"></el-input>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="座椅數量" prop="seatNum">
-                <el-input-number
-                  style="width: 100%"
-                  v-model="temp.seatNum"
-                  :min="0"
-                  :max="10"
-                ></el-input-number>
+                <el-input-number style="width: 100%" v-model="temp.seatNum" :min="0" :max="10"></el-input-number>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="輪椅數量" prop="wheelchairNum">
-                <el-input-number
-                  style="width: 100%"
-                  v-model="temp.wheelchairNum"
-                  :min="0"
-                  :max="10"
-                ></el-input-number>
+                <el-input-number style="width: 100%" v-model="temp.wheelchairNum" :min="0" :max="10"></el-input-number>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="車身高度" prop="carTop">
-                <el-input
-                  v-model="temp.carTop"
-                  placeholder="請輸入捐贈單位"
-                ></el-input>
+                <el-input v-model="temp.carTop" placeholder="請輸入捐贈單位"></el-input>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="司機姓名" prop="driverInfoId">
-                <el-select
-                  v-model="temp.driverInfoId"
-                  placeholder="請選擇司機"
-                  style="width: 100%"
-                >
-                  <el-option
-                    v-for="driver in driverList"
-                    :value="driver.id"
-                    :label="driver.userName"
-                    :key="driver.id"
-                  ></el-option>
+                <el-select v-model="temp.driverInfoId" placeholder="請選擇司機" style="width: 100%">
+                  <el-option v-for="driver in driverList" :value="driver.id" :label="driver.userName" :key="driver.id"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="可否派發" prop="status">
-                <el-select
-                  v-model="temp.status"
-                  placeholder="請選擇可否派發"
-                  style="width: 100%"
-                >
+                <el-select v-model="temp.status" placeholder="請選擇可否派發" style="width: 100%">
                   <el-option :value="1" :label="'可派發'">可派發</el-option>
                   <el-option :value="0" :label="'不可派發'">不可派發</el-option>
                 </el-select>
@@ -142,24 +81,12 @@
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="出廠年月" prop="makeDate">
-                <el-date-picker
-                  v-model="temp.makeDate"
-                  type="date"
-                  value-format="yyyy-MM-dd"
-                  placeholder="請選擇出廠年月"
-                  style="width: 100%"
-                ></el-date-picker>
+                <el-date-picker v-model="temp.makeDate" type="date" value-format="yyyy-MM-dd" placeholder="請選擇出廠年月" style="width: 100%"></el-date-picker>
               </el-form-item>
             </el-col>
             <el-col :sm="12" :md="6">
               <el-form-item label="最後驗車日" prop="lastCheckDate">
-                <el-date-picker
-                  v-model="temp.lastCheckDate"
-                  type="date"
-                  value-format="yyyy-MM-dd"
-                  placeholder="請選擇最後驗車日"
-                  style="width: 100%"
-                ></el-date-picker>
+                <el-date-picker v-model="temp.lastCheckDate" type="date" value-format="yyyy-MM-dd" placeholder="請選擇最後驗車日" style="width: 100%"></el-date-picker>
               </el-form-item>
             </el-col>
             <!-- <el-col :sm="12" :md="6">
@@ -172,27 +99,24 @@
             </el-col> -->
           </el-row>
 
+          <SubTitle title="服務身份"></SubTitle>
+          <el-form-item label="" prop="carServiceUserTypes">
+            <el-checkbox-group v-model="temp.carServiceUserTypes">
+              <el-checkbox v-for="type in serviceUserTypesList" :key="type.categoryId" :label="type.categoryId">{{ type.categoryName }}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+
           <SubTitle title="車輛設備"></SubTitle>
           <el-form-item label="" prop="carDevices">
             <el-checkbox-group v-model="temp.carDevices">
-              <el-checkbox
-                v-for="device in carDevicesList"
-                :key="device.categoryId"
-                :label="device.categoryId"
-                >{{ device.categoryName }}</el-checkbox
-              >
+              <el-checkbox v-for="device in carDevicesList" :key="device.categoryId" :label="device.categoryId">{{ device.categoryName }}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
 
           <SubTitle title="所需證照"></SubTitle>
           <el-form-item label="" prop="carLicenses">
             <el-checkbox-group v-model="temp.carLicenses">
-              <el-checkbox
-                v-for="license in carLicensesList"
-                :key="license.categoryId"
-                :label="license.categoryId"
-                >{{ license.categoryName }}</el-checkbox
-              >
+              <el-checkbox v-for="license in carLicensesList" :key="license.categoryId" :label="license.categoryId">{{ license.categoryName }}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
 
@@ -203,39 +127,19 @@
               <div class="expireDate">保險到期日</div>
             </div>
             <el-checkbox-group v-model="temp.carInsurances">
-              <div
-                v-for="insurance in carInsurancesList"
-                :key="insurance.categoryId"
-                style="border-bottom: 1px solid #ddd; display: flex"
-              >
-                <el-checkbox
-                  :label="insurance.categoryId"
-                  style="width: 50%; text-align: center; padding: 1rem"
-                >
+              <div v-for="insurance in carInsurancesList" :key="insurance.categoryId" style="border-bottom: 1px solid #ddd; display: flex">
+                <el-checkbox :label="insurance.categoryId" style="width: 50%; text-align: center; padding: 1rem">
                   {{ insurance.categoryName }}
                 </el-checkbox>
                 <div class="expireDateBox">
-                  <el-date-picker
-                    :disabled="hasChecked(insurance.categoryId)"
-                    style="width: 70%"
-                    v-model="insurance.expireDate"
-                    type="date"
-                    size="mini"
-                    placeholder="選擇日期"
-                    value-format="yyyy-MM-dd"
-                  ></el-date-picker>
+                  <el-date-picker :disabled="hasChecked(insurance.categoryId)" style="width: 70%" v-model="insurance.expireDate" type="date" size="mini" placeholder="選擇日期" value-format="yyyy-MM-dd"></el-date-picker>
                 </div>
               </div>
             </el-checkbox-group>
           </div>
 
           <SubTitle title="備註"></SubTitle>
-          <el-input
-            type="textarea"
-            :rows="2"
-            placeholder="請輸入內容"
-            v-model="temp.remark"
-          ></el-input>
+          <el-input type="textarea" :rows="2" placeholder="請輸入內容" v-model="temp.remark"></el-input>
         </el-form>
       </div>
     </div>
@@ -269,6 +173,8 @@ export default {
       carDevicesList: [],
       // 車輛保險
       carInsurancesList: [],
+      /* 服務身份 */
+      serviceUserTypesList: [],
 
       labelPosition: "top",
       assignObj: "",
@@ -293,6 +199,7 @@ export default {
         remark: "",
         carLicenses: [],
         carInsurances: [],
+        carServiceUserTypes: [], // 服務用戶身份
         carDevices: [],
       },
       rules: {
@@ -305,6 +212,13 @@ export default {
   },
   computed: {
     ...mapGetters(["defaultorgid"]),
+    serviceUserTypesChecked() {
+      return this.serviceUserTypesList.filter((option) =>
+        this.temp.carServiceUserTypes.some(
+          (checked) => checked === option.categoryId
+        )
+      );
+    },
     carDevicesChecked() {
       return this.carDevicesList.filter((option) =>
         this.temp.carDevices.some((checked) => checked === option.categoryId)
@@ -353,6 +267,25 @@ export default {
         // console.log(vm.temp);
       });
     },
+
+    /* 獲取所有用戶身份 */
+    getUserType() {
+      const vm = this;
+      let query = {
+        page: 1,
+        limit: 20,
+        TypeId: "SYS_USERCATEGORY",
+      };
+      categorys.getSimpleList(query).then((res) => {
+        res.result.forEach((userType) => {
+          let obj = {};
+          obj.categoryId = userType.value;
+          obj.categoryName = userType.label;
+          vm.serviceUserTypesList.push(obj);
+        });
+      });
+    },
+
     //獲取所有車輛類別
     getCarCategorys() {
       const vm = this;
@@ -434,6 +367,9 @@ export default {
       obj.carDevices = vm.carDevicesChecked;
       obj.carInsurances = vm.carInsurancesChecked;
       obj.carLicenses = vm.carLicensesChecked;
+
+      //FIXME:修改身份別
+      obj.carServiceUserTypes = vm.serviceUserTypesChecked;
       obj.carCategoryName = vm.carCategorysList.filter((c) => {
         return c.dtValue == obj.carCategoryId;
       })[0].name;
@@ -465,6 +401,7 @@ export default {
     this.getCarDevices();
     this.getCarInsurances();
     this.getCarLicenses();
+    this.getUserType();
   },
 };
 </script>
