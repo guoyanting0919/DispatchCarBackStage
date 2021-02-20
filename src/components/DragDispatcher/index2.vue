@@ -24,7 +24,8 @@
             <p>{{ item.data[0].carCategoryName }}</p>
             <p v-if="item.canShared">可共乘</p>
             <p v-else>不可共乘</p>
-            <p>{{ item.data[0].familyWith }}人搭乘</p>
+            <p style="margin-right:auto">{{ item.data[0].familyWith }}人陪同</p>
+            <el-button @click="getOrder(item)" type="success" size="mini" style="padding:4px">編輯</el-button>
           </div>
           <div class="orderCardMain">
             <div class="orderInfo">
@@ -457,10 +458,8 @@ export default {
     },
 
     /* 獲取單筆訂單資料 */
-    getOrder(item, idx) {
+    getOrder(item, idx = 0) {
       const vm = this;
-      vm.$cl(item);
-      vm.$cl(idx);
       const id = item.data[idx].id;
       vm.editDialog = true;
       orderCaseUser.get({ id }).then((res) => {
@@ -862,6 +861,7 @@ export default {
     background: #fa8c16;
     padding: 0.5rem;
     display: flex;
+    align-items: center;
     font-size: 14px;
     font-weight: 700;
     p {
