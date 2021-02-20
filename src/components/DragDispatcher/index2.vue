@@ -9,8 +9,8 @@
     </sticky>
     <div class="dragDispatcherContainer">
       <div id="map" ref="map" style="width: 0%; height: 0%"></div>
-      <div class="orderContainer customScrollBar">
-        <div v-for="item in list" :key="item.despatchNo" draggable="true" class="orderCard" @dragstart="handleDargOrder(item)">
+      <div class="orderContainer customScrollBar" v-if="list.length!=0">
+        <div v-for="item in list" :key="item.despatchNo" draggable="true" class="orderCardL" @dragstart="handleDargOrder(item)">
           <div class="orderCardTitle" v-if="list">
             <p>{{ item.data[0].carCategoryName }}</p>
             <p v-if="item.canShared">可共乘</p>
@@ -37,7 +37,7 @@
         </div>
       </div>
 
-      <div class="outsideContainer">
+      <div class="outsideContainer" :style='dragContainerWidth'>
         <div class="driverTimeCard">
           <p>車輛 <i class="iconfont icon-right1"></i></p>
           <p style="margin-top: 0.5rem">
@@ -290,6 +290,12 @@ export default {
       }
       return arr;
     },
+
+    dragContainerWidth() {
+      return {
+        width: this.list.length == 0 ? "100%" : "calc(100% - 286px - 16px)",
+      };
+    },
   },
   methods: {
     /* 獲取派遣訂單 */
@@ -333,13 +339,15 @@ export default {
       const vm = this;
       await orderCaseUser.loadNoOrg().then((res) => {
         vm.newOrderList = res.result;
+        if (vm.newOrderList.length > 0) {
+          vm.noOrgDialog = true;
+        }
       });
     },
 
     /* 獲取所有司機 */
     getDriverList() {
       const vm = this;
-      vm.listLoading = true;
       drivers.load({ limit: 9999, page: 1 }).then((res) => {
         vm.driverList = res.data;
       });
@@ -392,7 +400,6 @@ export default {
     /* 獲取長照用戶資料 */
     getCaseUserList() {
       const vm = this;
-      vm.listLoading = true;
       caseUsers.load({ limit: 9999, page: 1 }).then((res) => {
         vm.caseUserList = res.data;
       });
@@ -551,10 +558,10 @@ export default {
         text: `確認取消排班?`,
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#227294",
         cancelButtonColor: "#d63737",
-        confirmButtonText: "確定",
-        cancelButtonText: "取消",
+        confirmButtonColor: "#227294",
+        confirmButtonText: "確定取消",
+        cancelButtonText: "返回",
       }).then((result) => {
         if (result.value) {
           dispatchs.cancel([item.despatchNo]).then((res) => {
@@ -565,10 +572,11 @@ export default {
             vm.getList();
           });
         } else {
-          vm.$alertT.fire({
-            icon: "info",
-            title: `已取消操作`,
-          });
+          // vm.$alertT.fire({
+          //   icon: "info",
+          //   title: `已取消操作`,
+          // });
+          console.log("d");
         }
       });
     },
@@ -799,6 +807,7 @@ export default {
     this.getCaseUserList();
     this.getCarCategorys();
     this.getDriverList();
+    this.getListNoOrg();
   },
   mounted() {
     const vm = this;
@@ -830,7 +839,7 @@ export default {
     margin-right: 1rem;
   }
 
-  .orderCard {
+  .orderCardL {
     width: 280px;
     height: auto;
     background: #fff;
@@ -919,6 +928,7 @@ export default {
     flex-wrap: wrap;
     overflow: hidden;
     width: calc(100% - 286px - 16px);
+    transition: 0.5s;
     position: relative;
   }
 

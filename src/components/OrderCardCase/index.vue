@@ -66,7 +66,7 @@ export default {
 
 <style lang='scss' scoped>
 .orderCard {
-  width: 350px;
+  width: 360px;
   margin-right: 0.5rem;
   height: auto;
   background: #fff;
