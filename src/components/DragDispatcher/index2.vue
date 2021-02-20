@@ -2,9 +2,14 @@
   <div>
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
+        <i style="margin-left:.5rem;font-size:14px" :style="`color:${statusMapping[2]}`" class="iconfont icon-member">已排班</i>
+        <i style="margin-left:.5rem;font-size:14px" :style="`color:${statusMapping[3]}`" class="iconfont icon-member">已抵達</i>
+        <i style="margin-left:.5rem;font-size:14px" :style="`color:${statusMapping[4]}`" class="iconfont icon-member">客上</i>
+        <i style="margin-left:.5rem;font-size:14px" :style="`color:${statusMapping[5]}`" class="iconfont icon-member">完成</i>
         <!-- <el-button size="mini">123</el-button> -->
         <!-- 權限按鈕 -->
         <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
+
       </div>
     </sticky>
     <div class="dragDispatcherContainer">
@@ -1067,7 +1072,7 @@ export default {
     box-shadow: 4px 4px 10px #ddd;
 
     &:hover {
-      transform: scale(1.5);
+      transform: scale(1.3);
       z-index: 3;
     }
   }
