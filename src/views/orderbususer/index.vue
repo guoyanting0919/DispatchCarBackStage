@@ -84,7 +84,7 @@
             <div class="orderRight">
               <div class="orderRightTitle">
                 <p class="orderStatus">
-                  <OrderStatusTag :type="orderStatusMapping[order.status - 1]" size="mini"></OrderStatusTag>
+                  <OrderStatusTag :type="orderStatusMapping[order.status - 1]" :cancelRemark="cancelRemarkList[order.cancelReamrk]"></OrderStatusTag>
                 </p>
               </div>
               <div class="orderRightDetail">
@@ -136,6 +136,7 @@ import EditDialog from "@/components/Dialog/editBusUserDespatch";
 import * as orderBusUser from "@/api/orderBusUser";
 import * as dispatch from "@/api/dispatchs";
 import * as busStationLines from "@/api/busStationLines";
+import * as category from "@/api/categorys";
 import * as busStations from "@/api/busStations";
 export default {
   name: "orderBusUser",
@@ -162,6 +163,8 @@ export default {
       lineStop: [],
       /* 終點站牌 */
       toLineStop: [],
+      /* 取消原因 */
+      cancelRemarkList: {},
 
       /* filter */
       orderby: null,
@@ -322,6 +325,21 @@ export default {
       });
     },
 
+    /* 獲取所有取消原因 */
+    getCancelRemark() {
+      const vm = this;
+      let query = {
+        page: 1,
+        limit: 20,
+        TypeId: "SYS_ORDERCANCEL_REMARK",
+      };
+      category.getSimpleList(query).then((res) => {
+        res.result.forEach((item) => {
+          vm.cancelRemarkList[item.value] = item.label;
+        });
+      });
+    },
+
     /* 篩選訂單狀態 */
     handleSort(a) {
       this.listQuery.Status = a * 1;
@@ -462,6 +480,7 @@ export default {
     this.getLineList();
     this.getStopList();
     this.getList();
+    this.getCancelRemark();
   },
 };
 </script>

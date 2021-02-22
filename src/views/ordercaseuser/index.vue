@@ -92,7 +92,7 @@
               <div class="orderRightTitle">
                 <el-button v-if="order.hasViolation" style="padding: 0px 10px" type="danger" @click="handleViolation(order)">記點</el-button>
                 <p class="orderStatus">
-                  <OrderStatusTag :type="orderStatusMapping[order.status - 1]" size="mini"></OrderStatusTag>
+                  <OrderStatusTag :type="orderStatusMapping[order.status - 1]" :cancelRemark="cancelRemarkList[order.cancelReamrk]"></OrderStatusTag>
                 </p>
               </div>
               <div class="orderRightDetail">
@@ -301,6 +301,8 @@ export default {
     return {
       /* 車輛類別 */
       carCategorysList: [],
+      /* 取消原因 */
+      cancelRemarkList: {},
 
       /* filter */
       orderby: null,
@@ -429,6 +431,21 @@ export default {
           return (
             car.value === "SYS_CAR_GENERAL" || car.value === "SYS_CAR_WEAL"
           );
+        });
+      });
+    },
+
+    /* 獲取所有取消原因 */
+    getCancelRemark() {
+      const vm = this;
+      let query = {
+        page: 1,
+        limit: 20,
+        TypeId: "SYS_ORDERCANCEL_REMARK",
+      };
+      categorys.getSimpleList(query).then((res) => {
+        res.result.forEach((item) => {
+          vm.cancelRemarkList[item.value] = item.label;
         });
       });
     },
@@ -625,6 +642,7 @@ export default {
   mounted() {
     this.getList();
     this.getCarCategorys();
+    this.getCancelRemark();
   },
 };
 </script>

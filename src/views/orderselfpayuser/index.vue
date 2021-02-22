@@ -88,7 +88,7 @@
             <div class="orderRight">
               <div class="orderRightTitle">
                 <p class="orderStatus">
-                  <OrderStatusTag :type="orderStatusMapping[order.status - 1]" size="mini"></OrderStatusTag>
+                  <OrderStatusTag :type="orderStatusMapping[order.status - 1]" :cancelRemark="cancelRemarkList[order.cancelReamrk]"></OrderStatusTag>
                 </p>
               </div>
               <div class="orderRightDetail">
@@ -160,6 +160,8 @@ export default {
     return {
       /* 車輛類別 */
       carCategorysList: [],
+      /* 取消原因 */
+      cancelRemarkList: {},
 
       /* filter */
       orderby: null,
@@ -293,6 +295,21 @@ export default {
       });
     },
 
+    /* 獲取所有取消原因 */
+    getCancelRemark() {
+      const vm = this;
+      let query = {
+        page: 1,
+        limit: 20,
+        TypeId: "SYS_ORDERCANCEL_REMARK",
+      };
+      categorys.getSimpleList(query).then((res) => {
+        res.result.forEach((item) => {
+          vm.cancelRemarkList[item.value] = item.label;
+        });
+      });
+    },
+
     /* 獲取單筆訂單資料 */
     getOrder(id) {
       const vm = this;
@@ -410,6 +427,7 @@ export default {
   mounted() {
     this.getList();
     this.getCarCategorys();
+    this.getCancelRemark();
   },
 };
 </script>

@@ -40,8 +40,13 @@ export default {
   display: flex;
   flex-wrap: wrap;
 
+  .orderStatusTag {
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+  }
+
   span {
-    margin: 1rem;
+    // margin: 1rem;
     margin-left: 0;
     margin-top: 0;
     cursor: pointer;

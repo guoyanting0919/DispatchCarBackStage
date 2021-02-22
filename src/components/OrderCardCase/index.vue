@@ -13,6 +13,10 @@
       <div class="orderInfo">
         <p class="orderInfoName">{{ order.userName }}</p>
         <p>身分證字號 : {{ order.userUid }}</p>
+
+        <el-tooltip v-if="isToday" class="item" effect="dark" content="今日訂單" placement="top-start">
+          <p class="todayOrder">!</p>
+        </el-tooltip>
       </div>
       <p>個案編號 : {{ order.caseUserNo }}</p>
       <p>陪同人數：{{ order.familyWith + order.maidWith}}人</p>
@@ -38,6 +42,11 @@
 import moment from "moment";
 export default {
   name: "OrderCardCase",
+  data() {
+    return {
+      today: moment().format("yyyy-MM-DD"),
+    };
+  },
   props: {
     order: {
       type: Object,
@@ -52,13 +61,23 @@ export default {
       return `${day} ${time}`;
     },
   },
+  computed: {
+    isToday() {
+      return moment(this.order.reserveDate).format("yyyy-MM-DD") === this.today;
+    },
+  },
   methods: {
+    /* 接收訂單 */
     handleReceive(id) {
       this.$emit("handleReceive", id);
     },
+
+    /* 轉單 */
     handleTrans(id) {
       this.$emit("handleTrans", id);
     },
+
+    /* 取消訂單 */
     handleCancle(id) {
       this.$emit("handleCancle", id);
     },
@@ -106,6 +125,16 @@ export default {
 .orderInfoName {
   color: #000;
   font-size: 1rem;
+  margin-right: auto !important;
+}
+.todayOrder {
+  color: #ffffff;
+  background: red;
+  border-radius: 200px;
+  width: 1rem;
+  height: 1rem;
+  font-weight: 700;
+  text-align: center;
 }
 .orderTime {
   margin-bottom: 0.5rem;

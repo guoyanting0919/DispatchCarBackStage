@@ -56,7 +56,7 @@
 
         <!-- table -->
         <div class="bg-white formContainer" style="height: 100%">
-          <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" border fit v-loading="listLoading" highlight-current-row @selection-change="handleSelectionChange" style="width: 100%" :span-method="objectSpanMethod">
+          <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" border fit v-loading="listLoading" highlight-current-row @selection-change="handleSelectionChange" style="width: 100%">
             <el-table-column type="selection" width="55" align="center"></el-table-column>
 
             <el-table-column align="center" property="userName" label="姓名" width="140">
@@ -452,17 +452,12 @@ export default {
     /* 獲取派遣訂單 */
     getList() {
       const vm = this;
-      vm.pos = "";
       vm.listLoading = true;
       vm.listQuery.StartDate = moment(vm.temp.dateRange?.[0]).format(
         "yyyy-MM-DD"
       );
-      vm.listQuery.EndDate = moment(vm.temp.dateRange?.[1]).format(
-        "yyyy-MM-DD"
-      );
+      vm.listQuery.EndDate = vm.listQuery.StartDate;
       orderSelfPayUser.LoadWithDespatch(vm.listQuery).then((res) => {
-        vm.spanArr = [];
-
         vm.list = res.data.map((d) => {
           d.driver = "";
           d.car = "";
@@ -471,49 +466,8 @@ export default {
         });
 
         vm.total = res.count;
-        vm.getSpanArr(vm.list);
         vm.listLoading = false;
       });
-    },
-
-    /* 合併row array */
-    getSpanArr(data) {
-      const vm = this;
-      for (let i = 0; i < data.length; i++) {
-        if (i === 0) {
-          vm.spanArr.push(1);
-          vm.pos = 0;
-        } else {
-          // 判斷當前元素與上一個元素是否相同
-          if (data[i].despatchNo === data[i - 1].despatchNo) {
-            vm.spanArr[vm.pos] += 1;
-            vm.spanArr.push(0);
-          } else {
-            vm.spanArr.push(1);
-            vm.pos = i;
-          }
-        }
-      }
-    },
-
-    /* 合併共乘欄位 */
-    objectSpanMethod({ rowIndex, columnIndex }) {
-      if (
-        columnIndex === 11 ||
-        columnIndex === 0 ||
-        columnIndex === 3 ||
-        columnIndex === 7 ||
-        columnIndex === 4
-      ) {
-        const _row = this.spanArr[rowIndex];
-        const _col = _row > 0 ? 1 : 0;
-        // alert(_row);
-        // alert(_col);
-        return {
-          rowspan: _row,
-          colspan: _col,
-        };
-      }
     },
 
     /* 獲取無組織訂單 */
@@ -580,7 +534,6 @@ export default {
 
     /* 變更司機 */
     handleDriverChange(row, isTable = true, carData = []) {
-      console.log(row, isTable, carData);
       const vm = this;
       if (isTable) {
         if (!row.carId) {
@@ -1063,6 +1016,7 @@ export default {
     changeCarFilter() {
       let data = this.carList;
       let checkedRowsData = this.changeOrder;
+      console.log(checkedRowsData);
       return data.filter((item) => {
         return [
           () => {

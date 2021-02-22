@@ -8,6 +8,14 @@ export function load(params) {
   });
 }
 
+export function loadDespatch(params) {
+  return request({
+    url: "/orderOfBusUsers/loadwithdespatch",
+    method: "get",
+    params,
+  });
+}
+
 export function loadNoOrg(params) {
   return request({
     url: "/orderOfBusUsers/loadNoOrg",

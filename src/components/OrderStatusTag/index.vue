@@ -1,6 +1,7 @@
 <template>
   <span @click="handleSort" class="orderStatusTag" :class="btnClass">
-    {{ msgMapping[type] }}
+    <span v-if="type!=='cancel'"> {{ msgMapping[type] }}</span>
+    <span v-else>{{cancelRemark}}</span>
   </span>
 </template>
 
@@ -21,6 +22,11 @@ export default {
     };
   },
   props: {
+    cancelRemark: {
+      type: String,
+      default: "已取消",
+      require: false,
+    },
     active: {
       type: Boolean,
       default: false,
