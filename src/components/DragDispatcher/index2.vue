@@ -350,6 +350,8 @@ export default {
         vm.newOrderList = res.result;
         if (vm.newOrderList.length > 0) {
           vm.noOrgDialog = true;
+        } else {
+          vm.noOrgDialog = false;
         }
       });
     },
