@@ -886,7 +886,7 @@ export default {
       };
       dispatchs.addOrUpdateShare(data).then((res) => {
         vm.$alertT.fire({
-          icon: "success",
+          icon: res.code == 200 ? "success" : "error",
           title: res.message,
         });
         vm.getList();
@@ -1016,7 +1016,6 @@ export default {
     changeCarFilter() {
       let data = this.carList;
       let checkedRowsData = this.changeOrder;
-      console.log(checkedRowsData);
       return data.filter((item) => {
         return [
           () => {
