@@ -50,6 +50,7 @@ export default {
         mapTypeId: "roadmap",
       });
       dD.setMap(this.map);
+      this.$cl("---------------------init map----------------------");
     },
 
     /* remoteMethod  */

@@ -518,11 +518,11 @@ export default {
       data.carCategoryName = vm.carCategorysList.filter((i) => {
         return i.value === data.carCategoryId;
       })[0].label;
-      orderCaseUser.update(data).then(() => {
+      orderCaseUser.update(data).then((res) => {
         vm.editDialog = false;
         vm.$alertT.fire({
-          icon: "success",
-          title: `訂單${data.orderNo}編輯成功`,
+          icon: res.code == 200 ? "success" : "error",
+          title: res.code == 200 ? `訂單${data.orderNo}編輯成功` : res.message,
         });
         vm.getList();
       });
