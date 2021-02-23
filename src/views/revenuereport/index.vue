@@ -42,6 +42,8 @@
 <script>
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
+
+import * as report from "@/api/report";
 export default {
   name: "carUse",
   components: {
@@ -49,12 +51,15 @@ export default {
     Title,
   },
   data() {
-    // this.chartSettings = {
-    //   metrics: ["金額"],
-    //   dimension: ["車牌"],
-    //   yAxisName: ["單位(NTD)"],
-    // };
     return {
+      list: "",
+      listQuery: {
+        StartDate: null,
+        EndDate: null,
+        OrgId: "",
+        Sex: null,
+      },
+
       chartSettings: {
         metrics: ["金額"],
         dimension: ["key"],
@@ -62,11 +67,13 @@ export default {
       chartData: {
         columns: ["key", "金額"],
         rows: [
-          { key: "總營收", 金額: 654614 },
-          { key: "個案負擔", 金額: 126768 },
-          { key: "政府補助", 金額: 491846 },
+          { key: "總營收", 金額: 0 },
+          { key: "個案負擔", 金額: 0 },
+          { key: "陪同金額", 金額: 0 },
+          { key: "政府補助", 金額: 0 },
         ],
       },
+
       chartSettings2: {
         radius: [40, 80],
         offsetY: 120,
@@ -107,6 +114,38 @@ export default {
         },
       ],
     };
+  },
+  methods: {
+    /* 獲取接送數據 */
+    getList() {
+      report.getRevenue(this.listQuery).then((res) => {
+        console.log(res);
+        this.list = res.result;
+
+        this.chartData.rows.forEach((r) => {
+          switch (r.key) {
+            case "總營收":
+              r.金額 = res.result.totalAmt;
+              break;
+            case "個案負擔":
+              r.金額 = res.result.selfPayAmt;
+              break;
+            case "陪同金額":
+              r.金額 = res.result.withAmt;
+              break;
+            case "政府補助":
+              r.金額 = res.result.discountAmt;
+              break;
+
+            default:
+              break;
+          }
+        });
+      });
+    },
+  },
+  mounted() {
+    this.getList();
   },
 };
 </script>

@@ -3,50 +3,20 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 用戶身份選擇 -->
-        <el-select
-          size="mini"
-          @change="end = end + 200"
-          v-model="value"
-          clearable
-          placeholder="請選擇用戶身份"
-        >
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
+        <el-select size="mini" @change="end = end + 200" v-model="value" clearable placeholder="請選擇用戶身份">
+          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
 
         <!-- 服務單位選擇 -->
-        <el-select
-          size="mini"
-          v-model="value"
-          clearable
-          placeholder="請選擇服務單位"
-        >
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
+        <el-select size="mini" v-model="value" clearable placeholder="請選擇服務單位">
+          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
 
         <!-- 日期選擇 -->
-        <el-date-picker
-          size="mini"
-          v-model="value1"
-          type="date"
-          placeholder="選擇日期"
-        ></el-date-picker>
+        <el-date-picker size="mini" v-model="value1" type="date" placeholder="選擇日期"></el-date-picker>
 
         <!-- 權限按鈕 -->
-        <permission-btn
-          moduleName="builderTables"
-          size="mini"
-          v-on:btn-event="onBtnClicked"
-        ></permission-btn>
+        <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
       </div>
     </sticky>
 
@@ -54,71 +24,41 @@
       <!-- 接送數據 -->
       <div class="chartContainer">
         <Title title="接送數據"></Title>
-        <div class="cardContainer">
+        <div class="cardContainer" v-if="list">
           <div class="dataCard">
             <i class="iconfont icon-chart"></i>
             <p>總趟次</p>
-            <count-to
-              class="card-panel-num"
-              :startVal="0"
-              :endVal="end"
-              :duration="2000"
-            ></count-to>
+            <count-to class="card-panel-num" :startVal="0" :endVal="list.totalTrip" :duration="2000"></count-to>
           </div>
 
           <div class="dataCard">
             <i class="iconfont icon-success"></i>
             <p>已完成(共乘)</p>
-            <count-to
-              class="card-panel-num"
-              :startVal="0"
-              :endVal="end"
-              :duration="2000"
-            ></count-to>
+            <count-to class="card-panel-num" :startVal="0" :endVal="list.carpoolCompleteTrip" :duration="2000"></count-to>
           </div>
 
           <div class="dataCard">
             <i class="iconfont icon-success"></i>
             <p>已完成(非共乘)</p>
-            <count-to
-              class="card-panel-num"
-              :startVal="0"
-              :endVal="end"
-              :duration="2000"
-            ></count-to>
+            <count-to class="card-panel-num" :startVal="0" :endVal="list.completeTrip" :duration="2000"></count-to>
           </div>
 
           <div class="dataCard">
             <i class="iconfont icon-Frame1304"></i>
             <p>空趟</p>
-            <count-to
-              class="card-panel-num"
-              :startVal="0"
-              :endVal="end"
-              :duration="2000"
-            ></count-to>
+            <count-to class="card-panel-num" :startVal="0" :endVal="list.noSeatTrip" :duration="2000"></count-to>
           </div>
 
           <div class="dataCard">
             <i class="iconfont icon-InfoCircle"></i>
             <p>未執行</p>
-            <count-to
-              class="card-panel-num"
-              :startVal="0"
-              :endVal="end"
-              :duration="2000"
-            ></count-to>
+            <count-to class="card-panel-num" :startVal="0" :endVal="list.unExecutionTrip" :duration="2000"></count-to>
           </div>
 
           <div class="dataCard">
             <i class="iconfont icon-Star"></i>
             <p>達成率</p>
-            <count-to
-              class="card-panel-num"
-              :startVal="0"
-              :endVal="end"
-              :duration="2000"
-            ></count-to>
+            <count-to class="card-panel-num" :startVal="0" :endVal="list.completeRate" :duration="2000"></count-to>
           </div>
         </div>
       </div>
@@ -137,6 +77,8 @@ import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import CountTo from "vue-count-to";
 import permissionBtn from "@/components/PermissionBtn";
+
+import * as report from "@/api/report";
 export default {
   name: "todaypickup",
   components: {
@@ -147,6 +89,14 @@ export default {
   },
   data() {
     return {
+      list: "",
+      listQuery: {
+        StartDate: null,
+        EndDate: null,
+        OrgId: "",
+        Sex: null,
+      },
+
       value: "",
       value1: "",
       options: [
@@ -185,6 +135,13 @@ export default {
     };
   },
   methods: {
+    /* 獲取接送數據 */
+    getList() {
+      report.getPickUp(this.listQuery).then((res) => {
+        console.log(res);
+        this.list = res.result;
+      });
+    },
     /* 權限按鈕 */
     onBtnClicked(domId) {
       switch (domId) {
@@ -198,6 +155,9 @@ export default {
           break;
       }
     },
+  },
+  mounted() {
+    this.getList();
   },
 };
 </script>
