@@ -340,10 +340,12 @@ export default {
         if (valid) {
           console.log(vm.temp);
           caseUsers.add(vm.temp).then((res) => {
-            console.log(res);
             vm.$alertT.fire({
-              icon: "success",
-              title: `用戶${vm.basicTemp.name} 長照身份編輯成功`,
+              icon: res.code == 200 ? "success" : "error",
+              title:
+                res.code === 200
+                  ? `用戶${vm.basicTemp.name} 長照身份編輯成功`
+                  : res.message,
             });
             // vm.$router.push("/alluser/index");
             this.$router.go(-1);

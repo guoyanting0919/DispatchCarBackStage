@@ -3,17 +3,18 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 用戶身份選擇 -->
-        <el-select size="mini" @change="end = end + 200" v-model="value" clearable placeholder="請選擇用戶身份">
+        <!-- <el-select size="mini" @change="end = end + 200" v-model="value" clearable placeholder="請選擇用戶身份">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
-        </el-select>
+        </el-select> -->
 
         <!-- 服務單位選擇 -->
-        <el-select size="mini" v-model="value" clearable placeholder="請選擇服務單位">
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        <el-select v-if="orgList" size="mini" @change="getList" v-model="listQuery.OrgId" clearable placeholder="請選擇服務單位">
+          <el-option :label="'全部單位'" :value="''"></el-option>
+          <el-option v-for="org in orgList" :key="org.id" :label="org.name" :value="org.id"></el-option>
         </el-select>
 
         <!-- 日期選擇 -->
-        <el-date-picker size="mini" v-model="value1" type="date" placeholder="選擇日期"></el-date-picker>
+        <el-date-picker size="mini" v-model="dateRange" type="daterange" start-placeholder="開始日期" end-placeholder="结束日期" @change="getList"></el-date-picker>
 
         <!-- 權限按鈕 -->
         <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
@@ -58,7 +59,10 @@
           <div class="dataCard">
             <i class="iconfont icon-Star"></i>
             <p>達成率</p>
-            <count-to class="card-panel-num" :startVal="0" :endVal="list.completeRate" :duration="2000"></count-to>
+            <div>
+              <count-to class="card-panel-num card-panel-num-num" :startVal="0" :endVal="list.completeRate" :duration="2000"></count-to>
+              <span class="card-panel-num card-panel-num-persent">%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -73,11 +77,17 @@
 </template>
 
 <script>
+import { getToken } from "@/utils/auth";
+import { mapGetters } from "vuex";
+import axios from "axios";
+import moment from "moment";
+
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import CountTo from "vue-count-to";
 import permissionBtn from "@/components/PermissionBtn";
 
+import * as orgs from "@/api/login";
 import * as report from "@/api/report";
 export default {
   name: "todaypickup",
@@ -89,6 +99,10 @@ export default {
   },
   data() {
     return {
+      /* 組織列表 */
+      orgList: [],
+
+      /* 接送數據列表 */
       list: "",
       listQuery: {
         StartDate: null,
@@ -98,7 +112,7 @@ export default {
       },
 
       value: "",
-      value1: "",
+      dateRange: [],
       options: [
         {
           value: "選項1",
@@ -134,19 +148,91 @@ export default {
       },
     };
   },
+  computed: {
+    ...mapGetters(["defaultorgid"]),
+  },
   methods: {
     /* 獲取接送數據 */
     getList() {
+      this.listQuery.StartDate = this.dateRange[0];
+      this.listQuery.EndDate = this.dateRange[1];
       report.getPickUp(this.listQuery).then((res) => {
-        console.log(res);
         this.list = res.result;
       });
     },
+
+    /* 獲取用戶組織 */
+    getOrg() {
+      orgs.getOrgs().then((res) => {
+        this.orgList = res.result;
+      });
+    },
+
+    /* 匯出報表 */
+    handleExpoort() {
+      const vm = this;
+      let { StartDate, EndDate, OrgId } = vm.listQuery;
+      StartDate = moment(StartDate).format("yyyy-MM-DD");
+      EndDate = moment(EndDate).format("yyyy-MM-DD");
+      const nowTime = Date.parse(new Date());
+      let config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        responseType: "blob", //// 回應類型為 blob
+      };
+      config.headers["X-Token"] = getToken();
+      axios
+        .get(
+          `${process.env.VUE_APP_BASE_API}Reports/ExportPickReportByCaseOrgA?StartDate=${StartDate}&EndDate=${EndDate}&OrgId=${OrgId}`,
+          config
+        )
+        .then((res) => {
+          let blob = new Blob([res.data], {
+            type: "application/" + res.headers["content-type"],
+          });
+          let downloadElement = document.createElement("a");
+          let href = window.URL.createObjectURL(blob); // 創建下載的鏈接
+          downloadElement.href = href;
+          downloadElement.download = `接送數據${nowTime}.xlsx`; // 下載後文件名
+          // 此寫法兼容可火狐瀏覽器
+          document.body.appendChild(downloadElement);
+          downloadElement.click(); // 點擊下載
+          document.body.removeChild(downloadElement); // 下載完成移除元素
+          window.URL.revokeObjectURL(href); // 釋放掉 blob 對象
+        })
+        .catch(() => {
+          vm.$alertM.fire({
+            icon: "error",
+            title: "下載失敗",
+          });
+        });
+    },
+
     /* 權限按鈕 */
     onBtnClicked(domId) {
+      const vm = this;
       switch (domId) {
-        case "violationBtn":
-          this.violationDialog = true;
+        case "export":
+          vm.$swal({
+            title: "匯出提示",
+            text: `匯出資料將與搜尋結果相同`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#227294",
+            cancelButtonColor: "#d63737",
+            confirmButtonText: "確認匯出",
+            cancelButtonText: "取消匯出",
+          }).then((result) => {
+            if (result.value) {
+              vm.handleExpoort();
+            } else {
+              vm.$alertT.fire({
+                icon: "info",
+                title: "已取消匯出",
+              });
+            }
+          });
           break;
         case "search":
           this.getList();
@@ -157,7 +243,10 @@ export default {
     },
   },
   mounted() {
+    this.$set(this.dateRange, 0, moment().format("yyyy-MM-DD"));
+    this.$set(this.dateRange, 1, moment().format("yyyy-MM-DD"));
     this.getList();
+    this.getOrg();
   },
 };
 </script>
@@ -200,5 +289,16 @@ export default {
   font-weight: 600;
   font-size: 2rem;
   color: $--color-primary;
+}
+
+.card-panel-num-num {
+  display: inline-block;
+  transform: translate(0.25rem);
+}
+
+.card-panel-num-persent {
+  font-size: 1.25rem;
+  transform: translate(0.25rem);
+  display: inline-block;
 }
 </style>

@@ -449,7 +449,7 @@ export default {
       }
       return time;
     },
-    /* 判斷當前登入橫霧是否為orgB且判斷是否為快速預約訂單 */
+    /* 判斷當前登入用戶組織是否為orgB且判斷是否為快速預約訂單 */
     isOrgB() {
       const vm = this;
       return vm.useBunit.includes(vm.defaultorgid);

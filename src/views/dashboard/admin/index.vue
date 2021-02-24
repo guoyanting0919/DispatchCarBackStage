@@ -12,7 +12,7 @@
       <el-input v-model="despatchNo" placeholder="請輸入訂單ID" style='width:200px;margin-right:1rem'></el-input>
       <el-button @click="changeStatus(3)" type="success">已抵達</el-button>
       <el-button @click="changeStatus(4)" type="success">客上</el-button>
-      <el-button @click="orderPay" type="info">收款 + 完成</el-button>
+      <el-button @click="changeStatus(5),orderPay" type="info">收款 + 完成</el-button>
       <el-button @click="changeStatus(9,'SYS_ORDERCANCEL_REMARK_DRIVER')" type="danger">取消</el-button>
       <div class="resMessage">
 
