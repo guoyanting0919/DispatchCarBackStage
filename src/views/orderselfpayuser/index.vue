@@ -1,6 +1,6 @@
 <template>
   <div class="flex-column orderSelfPayUser">
-    <div id="map" ref="map" style="display:none"></div>
+    <!-- <div id="map" ref="map" style="display:none"></div> -->
 
     <sticky :className="'sub-navbar'">
       <div class="filter-container">

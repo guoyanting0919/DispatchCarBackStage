@@ -1,7 +1,7 @@
 <template>
   <div class="flex-column dispatch" style="height: calc(100% - 20px)">
     <BatchLoader @handleClose="handleCloseLoader" :isShow="batchLoaderShow" :totalDataCount="totalDataCount" :currentDataIndex="currentDataIndex" :errorDataArray="errorDataArray" />
-    <div id="map" ref="map" style="display:none"></div>
+    <!-- <div id="map" ref="map" style="display:none"></div> -->
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 無權限權限按鈕 -->

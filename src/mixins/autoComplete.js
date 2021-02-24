@@ -1,4 +1,5 @@
 import * as map from "@/api/map";
+// import { Loading } from "element-ui";
 /* eslint-disable */
 export default {
   data() {
@@ -32,25 +33,32 @@ export default {
       let bounds = new google.maps.LatLngBounds();
       vm.sessionToken = new google.maps.places.AutocompleteSessionToken();
       vm.service = new window.google.maps.places.AutocompleteService();
-      this.map = new google.maps.Map(document.getElementById("map"), {
-        center: this.mapCenter, // 中心點座標
-        zoom: 16, // 1-20，數字愈大，地圖愈細：1是世界地圖，20就會到街道
-        maxZoom: 20,
-        minZoom: 3,
-        zoomControl: false,
-        mapTypeControl: false,
-        scaleControl: false,
-        streetViewControl: false,
-        rotateControl: false,
-        fullscreenControl: false,
-        // roadmap 顯示默認道路地圖視圖。
-        // satellite 顯示 Google 地球衛星圖像。
-        // hybrid 顯示正常和衛星視圖的混合。
-        // terrain 顯示基於地形信息的物理地圖。
-        mapTypeId: "roadmap",
-      });
-      dD.setMap(this.map);
-      this.$cl("---------------------init map----------------------");
+
+      /* 頁面是否需要顯示地圖 */
+      console.log(document.getElementById("map"));
+      if (document.getElementById("map")) {
+        this.map = new google.maps.Map(document.getElementById("map"), {
+          center: this.mapCenter, // 中心點座標
+          zoom: 16, // 1-20，數字愈大，地圖愈細：1是世界地圖，20就會到街道
+          maxZoom: 20,
+          minZoom: 3,
+          zoomControl: false,
+          mapTypeControl: false,
+          scaleControl: false,
+          streetViewControl: false,
+          rotateControl: false,
+          fullscreenControl: false,
+          // roadmap 顯示默認道路地圖視圖。
+          // satellite 顯示 Google 地球衛星圖像。
+          // hybrid 顯示正常和衛星視圖的混合。
+          // terrain 顯示基於地形信息的物理地圖。
+          mapTypeId: "roadmap",
+        });
+        dD.setMap(this.map);
+        this.$cl(
+          "---------------------init map (page has map div)----------------------"
+        );
+      }
     },
 
     /* remoteMethod  */
@@ -103,10 +111,10 @@ export default {
         sessionToken: vm.sessionToken,
       };
 
-      const service = new google.maps.places.PlacesService(vm.map);
+      let serviceMap = vm.map || document.createElement("div");
+      const service = new google.maps.places.PlacesService(serviceMap);
       service.getDetails(request, (place, status) => {
-        // vm.$cl(request);
-        vm.getPlaceDetail(place, direction);
+        vm.getPlaceDetail(place, direction); //回傳資料,form || to
         vm.sessionToken = new google.maps.places.AutocompleteSessionToken();
       });
     },
@@ -151,7 +159,7 @@ export default {
       });
       vm[`${direction}Marker`].push(marker);
       vm[`${direction}Addr`] = data.addrFormat;
-      vm.map.panTo(position);
+      vm.map?.panTo(position);
       vm.getDiscount();
 
       if (vm.fromAddr && vm.toAddr) {
@@ -227,7 +235,7 @@ export default {
           map: vm.map,
         });
         vm.polyline.setMap(vm.map);
-        vm.map.fitBounds(bounds);
+        vm.map?.fitBounds(bounds);
         // vm.$cl(res);
       });
     },

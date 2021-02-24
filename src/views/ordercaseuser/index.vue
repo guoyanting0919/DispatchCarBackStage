@@ -1,6 +1,6 @@
 <template>
   <div class="flex-column orderCaseUser">
-    <div id="map" ref="map" style="width: 0%; height: 0%"></div>
+    <!-- <div id="map" ref="map" style="width: 0%; height: 0%"></div> -->
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 關鍵字 -->

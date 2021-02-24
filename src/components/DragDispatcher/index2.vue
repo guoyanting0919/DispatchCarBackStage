@@ -17,7 +17,7 @@
       </div>
     </sticky>
     <div class="dragDispatcherContainer">
-      <div id="map" ref="map" style="width: 0%; height: 0%"></div>
+      <!-- <div id="map" ref="map" style="width: 0%; height: 0%"></div> -->
       <div class="orderContainer customScrollBar" v-if="list.length!=0">
         <div v-for="item in list" :key="item.despatchNo" draggable="true" class="orderCardL" @dragstart="handleDargOrder(item)">
           <div class="orderCardTitle" v-if="list">
