@@ -9,13 +9,7 @@
     <div class="app-container flex-item">
       <Title title="車資參數設定"></Title>
       <div class="bg-white parametersContainer">
-        <el-form
-          :label-position="labelPosition"
-          label-width="200px"
-          :model="temp"
-          :rules="rules"
-          ref="form"
-        >
+        <el-form :label-position="labelPosition" label-width="200px" :model="temp" :rules="rules" ref="form">
           <SubTitle title="車資參數基本設定"></SubTitle>
           <el-row :gutter="16">
             <el-col :sm="12" :md="6">
