@@ -87,8 +87,8 @@
                       <span class="totalTime">
                         {{item.totalTime}}分鐘
                       </span>
-                      <i @click="handleChangeDC(item)" class='iconfont icon-driver'></i>
-                      <i @click="handleCancelDispatch(item)" class='iconfont icon-Cross'></i>
+                      <i v-if="checkOrderStatus(item)" @click="handleChangeDC(item)" class='iconfont icon-driver'></i>
+                      <i v-if="checkOrderStatus(item)" @click="handleCancelDispatch(item)" class='iconfont icon-Cross'></i>
                     </p>
                     <div class="dispatchPassengers">
                       <p @click="getOrder(item,idx)" class="passengerName" v-for="(o,idx) in item.data" :key='o.id'>
@@ -596,6 +596,11 @@ export default {
           console.log("d");
         }
       });
+    },
+
+    /* 檢查派遣單裡的訂單狀態是否皆為已排班 若是則顯示變更司機車輛與取消訂單 */
+    checkOrderStatus(item) {
+      return item.data.every((o) => o.status == 2);
     },
 
     /* 變更司機車輛 */
