@@ -14,7 +14,7 @@
         </el-select>
 
         <!-- 日期選擇 -->
-        <el-date-picker size="mini" v-model="dateRange" type="daterange" start-placeholder="開始日期" end-placeholder="结束日期" @change="getList"></el-date-picker>
+        <el-date-picker value-format="yyyy-MM-dd" size="mini" v-model="dateRange" type="daterange" start-placeholder="開始日期" end-placeholder="结束日期" @change="getList"></el-date-picker>
 
         <!-- 權限按鈕 -->
         <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
