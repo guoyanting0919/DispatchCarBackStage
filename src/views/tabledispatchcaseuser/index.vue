@@ -428,10 +428,7 @@ export default {
       vm.listLoading = true;
       vm.listQuery.EndDate = vm.listQuery.StartDate;
       orderCaseUser.loadDespatch(vm.listQuery).then((res) => {
-        vm.list = res.data.map((d) => {
-          d.despatchNo = d.despatchNo ? d.despatchNo : d.orderNo;
-          return d;
-        });
+        vm.list = res.data;
         vm.total = res.count;
         vm.listLoading = false;
       });
@@ -449,7 +446,7 @@ export default {
     getDriverList() {
       const vm = this;
       vm.listLoading = true;
-      drivers.load({ limit: 9999, page: 1 }).then((res) => {
+      drivers.load({ limit: 99, page: 1 }).then((res) => {
         vm.driverList = res.data;
       });
     },
@@ -458,7 +455,7 @@ export default {
     getCarList() {
       const vm = this;
       vm.listLoading = true;
-      cars.load({ limit: 9999, page: 1 }).then((res) => {
+      cars.load({ limit: 99, page: 1 }).then((res) => {
         vm.carList = res.data.filter((car) => {
           return (
             car.carCategoryId === "SYS_CAR_GENERAL" ||
@@ -489,7 +486,7 @@ export default {
     getCaseUserList() {
       const vm = this;
       vm.listLoading = true;
-      caseUsers.load({ limit: 9999, page: 1 }).then((res) => {
+      caseUsers.load({ limit: 10, page: 1 }).then((res) => {
         vm.caseUserList = res.data;
       });
     },

@@ -359,7 +359,7 @@ export default {
     /* 獲取所有司機 */
     getDriverList() {
       const vm = this;
-      drivers.load({ limit: 9999, page: 1 }).then((res) => {
+      drivers.load({ limit: 999, page: 1 }).then((res) => {
         vm.driverList = res.data;
       });
     },
@@ -367,7 +367,8 @@ export default {
     /* 獲取所有車輛 */
     getCarList() {
       const vm = this;
-      cars.load({ limit: 9999, page: 1 }).then((res) => {
+      //FIXME:車輛太多
+      cars.load({ limit: 99, page: 1 }).then((res) => {
         vm.carList = res.data;
         vm.carList.forEach((item) => {
           item.timeList = {};

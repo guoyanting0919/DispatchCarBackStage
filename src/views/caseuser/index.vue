@@ -253,8 +253,9 @@ export default {
         vm.caseUserTemp = Object.assign({}, res.result); // copy obj
         let str = `${vm.caseUserTemp.orgBId1},${vm.caseUserTemp.orgBId2},${vm.caseUserTemp.orgBId3}`;
         let arr = str.split(",");
+        console.log(arr);
         vm.checkedUnitBs = arr.filter((id) => {
-          return id !== "null";
+          return id !== "" && id !== null;
         });
 
         vm.unitBDialog = true;
