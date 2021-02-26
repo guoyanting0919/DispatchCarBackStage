@@ -55,9 +55,9 @@
     </div>
 
     <!-- unitBDialog -->
-    <el-dialog :title="unitBDialogTitle" :visible.sync="unitBDialog" width="50%">
+    <el-dialog :title="unitBDialogTitle" :visible.sync="unitBDialog" width="60%">
       <el-checkbox-group v-model="checkedUnitBs" :min="0" :max="3">
-        <el-checkbox v-for="unitB in unitBs" :label="unitB.id" :key="unitB.id">{{ unitB.name }}</el-checkbox>
+        <el-checkbox class="unitBCheckBox" v-for="unitB in unitBs" :label="unitB.id" :key="unitB.id">{{ unitB.name }}</el-checkbox>
       </el-checkbox-group>
       <span slot="footer" class="dialog-footer">
         <el-button @click="unitBDialog = false">取 消</el-button>
@@ -367,6 +367,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .el-checkbox {
+  width: 50%;
+  margin-right: 0;
+  margin-bottom: 1rem;
+}
 .quotaBody {
   width: 100%;
 }

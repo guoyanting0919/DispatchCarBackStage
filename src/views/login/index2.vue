@@ -138,6 +138,11 @@ export default {
           password: "CBSD_ADMIN",
         },
         {
+          name: "太豐",
+          account: "df2233",
+          password: "Df12345678",
+        },
+        {
           name: "卡通A單位",
           account: "CartoonsA",
           password: "CartoonsA",

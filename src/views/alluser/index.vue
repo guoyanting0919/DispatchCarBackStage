@@ -982,6 +982,7 @@ export default {
 ::v-deep .el-tag {
   margin-right: 8px;
 }
+
 .allUser {
   .el-checkbox {
     width: 50%;
