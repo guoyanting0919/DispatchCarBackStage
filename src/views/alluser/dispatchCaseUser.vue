@@ -999,6 +999,7 @@ export default {
   height: 60px;
   background: $--color-primary-light-8;
   border: 1px solid #ddd;
+  text-align: center;
 }
 
 .orgBIndex {

@@ -724,7 +724,7 @@ export default {
         let str = `${vm.caseUserTemp.orgBId1},${vm.caseUserTemp.orgBId2},${vm.caseUserTemp.orgBId3}`;
         let arr = str.split(",");
         vm.checkedUnitBs = arr.filter((id) => {
-          return id !== "null";
+          return id !== "null" && id !== "";
         });
 
         vm.unitBDialog = true;
