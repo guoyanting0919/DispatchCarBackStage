@@ -4,7 +4,7 @@
       <!-- loginTitle -->
       <div class="loginTitle">
         <h1 class="cityTitle" @click="handleSuperLogin">
-          瑪家鄉公所
+          新北市政府
         </h1>
         <h5 class="cityDescrip">
           長照交通接送統一預約服務及管理系統
@@ -59,6 +59,10 @@
         <el-input placeholder="請輸入您的密碼" @keyup.enter.native="handleLogin" v-model="passwordInput" show-password></el-input>
         <el-button type="warning" :loading="btnLoading" @click="handleLogin" round>登入</el-button>
         <div @click="isForget = 2" class="forgetPw">忘記密碼?</div>
+        <p style="color:white;text-align:center;margin-top:1rem">
+          客服專線：02-8953-2253｜服務時間：週一至週五 09:00-12:00，13:30-19:00
+          <br />©小驢行股份有限公司版權所有｜系統維護：小驢行股份有限公司
+        </p>
       </div>
       <!-- forgetInput -->
       <div class="forgetInput" v-if="isForget == 2">
