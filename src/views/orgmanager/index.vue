@@ -195,6 +195,21 @@
             </el-col>
 
             <el-col :span="12">
+              <el-form-item size="small" :label="'主要聯絡信箱'" prop="chargeMail">
+                <el-input v-model="temp.chargeMail"></el-input>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="12">
+              <el-form-item size="small" :label="'信箱通知'">
+                <el-select class="filter-item" v-model="temp.noticeMail" placeholder="Please select">
+                  <el-option :label="'關閉'" :value="false"></el-option>
+                  <el-option :label="'開起'" :value="true"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="12">
               <el-form-item size="small" :label="'狀態'">
                 <el-select class="filter-item" v-model="temp.status" placeholder="Please select">
                   <el-option v-for="item in statusOptions" :key="item.key" :label="item.display_name" :value="item.key"></el-option>
@@ -304,6 +319,8 @@ export default {
         chargeName: "", //主要聯絡人
         chargePhone: "", //主要聯絡人手機
         chargeTel: "", //主要聯絡人電話
+        chargeMail: "", //主要聯絡信箱
+        noticeMail: true, //主要聯絡信箱
         einno: "", //統一編號
       },
       dialogFormVisible: false,

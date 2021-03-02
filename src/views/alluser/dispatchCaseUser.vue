@@ -334,6 +334,7 @@ import * as user from "@/api/users";
 import * as caseUser from "@/api/caseUsers";
 import * as orderCaseUser from "@/api/orderCaseUser";
 import * as category from "@/api/categorys";
+import * as mapss from "@/api/map";
 export default {
   mixins: [acMixins],
   components: {
@@ -480,16 +481,34 @@ export default {
     getCaseUser() {
       const vm = this;
       caseUser.get({ id: this.$route.params.id.split("-")[1] }).then((res) => {
-        vm.$cl(res.result);
+        console.log(res.result);
         let caseUserTemp = res.result;
-        let data = {
-          lat: res.result.lat,
-          lon: res.result.lon,
-        };
-        vm.setMarker(data, "from");
-        vm.temp.fromAddr = `${caseUserTemp.county}${caseUserTemp.district}${caseUserTemp.addr}`;
-        vm.temp.fromAddrRemark = "住家";
-        vm.fromAddr = `${caseUserTemp.county}${caseUserTemp.district}${caseUserTemp.addr}`;
+        // 判定是否有經緯度
+        if (!res.result.lat) {
+          console.log("個案資料無經緯度");
+          let _addr = `${res.result.county}${res.result.district}${res.result.addr}`;
+
+          mapss.geocode({ _addr }).then((place) => {
+            console.log(place);
+            let data = {
+              lat: place.result.lat,
+              lon: place.result.lon,
+            };
+            vm.setMarker(data, "from");
+            vm.temp.fromAddr = `${caseUserTemp.county}${caseUserTemp.district}${caseUserTemp.addr}`;
+            vm.temp.fromAddrRemark = "住家";
+            vm.fromAddr = `${caseUserTemp.county}${caseUserTemp.district}${caseUserTemp.addr}`;
+          });
+        } else {
+          let data = {
+            lat: res.result.lat,
+            lon: res.result.lon,
+          };
+          vm.setMarker(data, "from");
+          vm.temp.fromAddr = `${caseUserTemp.county}${caseUserTemp.district}${caseUserTemp.addr}`;
+          vm.temp.fromAddrRemark = "住家";
+          vm.fromAddr = `${caseUserTemp.county}${caseUserTemp.district}${caseUserTemp.addr}`;
+        }
       });
     },
 
@@ -500,7 +519,6 @@ export default {
         .loadHistory({ userId: vm.$route.params.id.split("-")[0] })
         .then((res) => {
           vm.list = res.result;
-          // this.$cl(vm.list);
         });
     },
 
@@ -527,6 +545,7 @@ export default {
       const vm = this;
       caseUser.get({ id: this.$route.params.id.split("-")[1] }).then((res) => {
         this.roleInfo = res.result;
+        console.log(this.roleInfo);
 
         vm.useBunit = [
           res.result.orgBId1,
@@ -534,6 +553,7 @@ export default {
           res.result.orgBId3,
         ];
 
+        // 判定是否為B單位
         if (vm.useBunit.includes(vm.defaultorgid)) {
           //若登入單位包含用戶所選B單位(B單位訂車)
           this.roleOrgB = this.orgBList.filter((i) => i.id === vm.defaultorgid);
