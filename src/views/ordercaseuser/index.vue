@@ -34,6 +34,7 @@
       <!-- 全部訂單 -->
       <Title title="長照訂單"></Title>
       <div class="bg-white customScrollBar" style="height: calc(100% - 50px)">
+        <LoadingWord :active='loadingActive' :text='"LOADING..."'></LoadingWord>
         <div class="orderTableContainer customScrollBar">
 
           <OrderStatusFilter @handleSort="handleSort"></OrderStatusFilter>
@@ -271,6 +272,7 @@ import Pagination from "@/components/Pagination";
 import OrderStatusTag from "@/components/OrderStatusTag";
 import OrderStatusFilter from "@/components/OrderStatusFilter";
 import EditDialog from "@/components/Dialog/editCaseUserDespatch";
+import LoadingWord from "@/components/LoadingWord";
 
 import * as orderCaseUser from "@/api/orderCaseUser";
 import * as categorys from "@/api/categorys";
@@ -286,6 +288,7 @@ export default {
     OrderStatusTag,
     EditDialog,
     OrderStatusFilter,
+    LoadingWord,
   },
   directives: {
     elDragDialog,
@@ -299,6 +302,8 @@ export default {
   },
   data() {
     return {
+      /* loading */
+      loadingActive: false,
       /* 車輛類別 */
       carCategorysList: [],
       /* 取消原因 */
@@ -307,7 +312,7 @@ export default {
       /* filter */
       orderby: null,
       desc: true,
-      dateRange: null,
+      dateRange: [],
 
       /* table */
       list: [],
@@ -406,6 +411,7 @@ export default {
     /* 獲取訂單 */
     getList() {
       const vm = this;
+      vm.loadingActive = true;
       if (!vm.desc) {
         vm.listQuery.orderby = vm.orderby || null;
       } else {
@@ -414,7 +420,7 @@ export default {
       orderCaseUser.load(vm.listQuery).then((res) => {
         vm.list = res.data;
         vm.total = res.count;
-        this.$cl(vm.list);
+        vm.loadingActive = false;
       });
     },
 
@@ -640,6 +646,8 @@ export default {
     },
   },
   mounted() {
+    // this.$set(this.dateRange, 0, moment().format("yyyy-MM-DD"));
+    // this.$set(this.dateRange, 1, moment().format("yyyy-MM-DD"));
     this.getList();
     this.getCarCategorys();
     this.getCancelRemark();
