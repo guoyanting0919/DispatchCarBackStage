@@ -1,5 +1,6 @@
 <template>
   <div class="flex-column dispatch" style="height: calc(100% - 20px)">
+    <LoadingWord :active='loadingActive' :text='"LOADING..."'></LoadingWord>
     <BatchLoader @handleClose="handleCloseLoader" :isShow="batchLoaderShow" :totalDataCount="totalDataCount" :currentDataIndex="currentDataIndex" :errorDataArray="errorDataArray" />
     <!-- <div id="map" ref="map" style="width: 0%; height: 0%"></div> -->
     <sticky :className="'sub-navbar'">
@@ -11,9 +12,11 @@
 
     <!-- 長照調度台 -->
     <div class="app-container flex-item">
+
       <Title title="長照調度台"></Title>
 
       <div class="bg-white" style="height: calc(100% - 50px); padding: 0 16px;overflow:auto">
+
         <!-- 新訂單 -->
         <SubTitle title="新訂單">
           <template v-slot:btn>
@@ -38,7 +41,8 @@
         <el-input style="width: 200px; margin-left: 0.5rem" size="mini" v-model="listQuery.key" clearable placeholder="請輸入關鍵字"></el-input>
 
         <!-- 列表 -->
-        <el-table ref="mainTable" :data="list" border fit v-loading="listLoading" highlight-current-row @selection-change="handleSelectionChange" style="width: 100% ;margin-top:8px">
+        <el-table ref="mainTable" :data="list" border fit highlight-current-row @selection-change="handleSelectionChange" style="width: 100% ;margin-top:8px">
+
           <el-table-column type="selection" width="55" align="center"></el-table-column>
 
           <el-table-column align="center" property="userName" label="姓名" width="140">
@@ -255,6 +259,7 @@ import Pagination from "@/components/Pagination";
 import OrderStatusTag from "@/components/OrderStatusTag";
 import EditDialog from "@/components/Dialog/editCaseUserDespatch";
 import OrderCard from "@/components/OrderCardCase";
+import LoadingWord from "@/components/LoadingWord";
 import BatchLoader from "@/components/BatchLoader";
 
 import * as orderCaseUser from "@/api/orderCaseUser";
@@ -275,6 +280,7 @@ export default {
     EditDialog,
     OrderCard,
     BatchLoader,
+    LoadingWord,
   },
   computed: {
     ...mapGetters(["defaultorgid"]),
@@ -293,6 +299,8 @@ export default {
   },
   data() {
     return {
+      /* loading */
+      loadingActive: false,
       /* 長照個案列表 */
       caseUserList: [],
       dispatchCaseUser: "",
@@ -425,12 +433,12 @@ export default {
     /* 獲取派遣訂單 */
     getList() {
       const vm = this;
-      vm.listLoading = true;
+      vm.loadingActive = true;
       vm.listQuery.EndDate = vm.listQuery.StartDate;
       orderCaseUser.loadDespatch(vm.listQuery).then((res) => {
         vm.list = res.data;
         vm.total = res.count;
-        vm.listLoading = false;
+        vm.loadingActive = false;
       });
     },
 
@@ -445,7 +453,6 @@ export default {
     /* 獲取所有司機 */
     getDriverList() {
       const vm = this;
-      vm.listLoading = true;
       drivers.load({ limit: 99, page: 1 }).then((res) => {
         vm.driverList = res.data;
       });
@@ -454,7 +461,6 @@ export default {
     /* 獲取所有車輛 */
     getCarList() {
       const vm = this;
-      vm.listLoading = true;
       cars.load({ limit: 99, page: 1 }).then((res) => {
         vm.carList = res.data.filter((car) => {
           return (
@@ -485,8 +491,7 @@ export default {
     /* 獲取長照用戶資料 */
     getCaseUserList() {
       const vm = this;
-      vm.listLoading = true;
-      caseUsers.load({ limit: 10, page: 1 }).then((res) => {
+      caseUsers.load({ limit: 1000, page: 1 }).then((res) => {
         vm.caseUserList = res.data;
       });
     },

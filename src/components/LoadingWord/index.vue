@@ -2,7 +2,7 @@
   <transition name="fade">
     <div class="loadingContainer" v-if="active && wordArr">
       <div :style="countingStyle" class="loadMain">
-        <span class="w50" v-for="(word,idx) in wordArr" :key="idx">{{word}}</span>
+        <span class="w50" :class='{"biggerText":idx ==  count,"middleText":(idx== count-1 || idx== count+1) && !typing}' v-for="(word,idx) in wordArr" :key="idx">{{word}}</span>
       </div>
     </div>
   </transition>
@@ -25,6 +25,11 @@ export default {
     delay: {
       type: Number,
       default: 150,
+      require: false,
+    },
+    typing: {
+      type: Boolean,
+      default: false,
       require: false,
     },
   },
@@ -56,7 +61,8 @@ export default {
     countingStyle() {
       const vm = this;
       return {
-        width: `${vm.count * 50}px`,
+        width: vm.typing ? `${vm.count * 50}px` : `${vm.wordLength * 50}px`,
+        overflow: vm.typing ? "hidden" : "",
       };
     },
   },
@@ -80,12 +86,14 @@ export default {
 <style lang="scss" scoped>
 .loadingContainer {
   position: absolute;
+  cursor: progress;
   width: 100%;
   height: 100%;
-  background: #ffffff;
-  opacity: 0.8;
-  z-index: 2;
+  background: #ffffffeb;
+  // opacity: 0.8;
+  z-index: 20;
   top: 0;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,18 +101,30 @@ export default {
 
 .loadMain {
   font-size: 3rem;
-  font-weight: 700;
-  overflow: hidden;
+  // overflow: hidden;
   position: relative;
   padding-right: 9px;
   white-space: nowrap;
-  transition: 0.2s;
+  // transition: 0.05s;
+  font-weight: 700;
   //   animation: wordContainerAni 2s ease 0s infinite;
 
   .w50 {
     display: inline-block;
     width: 50px;
     text-align: center;
+    transition: 0.5s;
+  }
+
+  .middleText {
+    color: $--color-info;
+    transform: scale(1.25);
+  }
+
+  .biggerText {
+    // width: auto;
+    transform: scale(2);
+    color: $--color-info;
   }
 
   &::after {

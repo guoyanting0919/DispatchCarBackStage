@@ -13,7 +13,9 @@
       <!-- ㄒ資料 -->
       <Title title="全部用戶"></Title>
       <div class="bg-white" style="height: calc(100% - 50px)">
-        <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" border fit v-loading="listLoading" highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" @row-click="rowClick">
+        <LoadingWord :active='loadingActive' typing :text='"LOADING..."'></LoadingWord>
+
+        <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" border fit highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" @row-click="rowClick">
 
           <el-table-column label="預約" width="100" align="center" fixed="left">
             <template slot-scope="scope">
@@ -272,6 +274,7 @@ import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import permissionBtn from "@/components/PermissionBtn";
 import elDragDialog from "@/directive/el-dragDialog";
+import LoadingWord from "@/components/LoadingWord";
 import Pagination from "@/components/Pagination";
 
 import * as users from "@/api/users";
@@ -286,6 +289,7 @@ export default {
     Title,
     permissionBtn,
     Pagination,
+    LoadingWord,
   },
   directives: {
     elDragDialog,
@@ -367,6 +371,8 @@ export default {
     //   }
     // };
     return {
+      /* loading */
+      loadingActive: false,
       // B單位相關
       unitBId: "802cdce7-1474-438f-b616-777cff9db321",
       unitBs: "",
@@ -522,7 +528,7 @@ export default {
     // 獲取用戶資料
     async getList() {
       const vm = this;
-      vm.listLoading = true;
+      vm.loadingActive = true;
       let ex = vm.buttons.join("").toLowerCase();
       await users.getClientList(vm.listQuery).then((res) => {
         // console.log(res.data, ex);
@@ -547,7 +553,7 @@ export default {
         vm.list = users;
         vm.setDefaultRole();
         vm.total = res.count;
-        vm.listLoading = false;
+        vm.loadingActive = false;
       });
       // console.log("ss", vm.list);
     },
