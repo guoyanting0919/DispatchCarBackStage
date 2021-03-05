@@ -527,13 +527,13 @@ export default {
       const vm = this;
       console.log(order);
       vm.temp = Object.assign({}, order); // copy obj
-      vm.temp.transOrgs = [order.orgId];
+      vm.$set(this.temp, "transOrgs", []);
       // vm.temp.isBackTemp = false;
       vm.$set(this.temp, "isBackTemp", false);
       vm.$set(this.temp, "reTime", null);
       vm.fromAddr = order.fromAddr;
       vm.toAddr = order.toAddr;
-      vm.handleOrgBSelect(order.orgId * 1);
+      // vm.handleOrgBSelect(order.orgId * 1);
       vm.$nextTick(() => {
         vm.setOldMarker({ lat: vm.temp.fromLat, lon: vm.temp.fromLon }, "from");
         vm.setOldMarker({ lat: vm.temp.toLat, lon: vm.temp.toLon }, "to");
