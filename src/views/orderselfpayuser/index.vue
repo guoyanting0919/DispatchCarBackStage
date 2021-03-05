@@ -33,7 +33,11 @@
     <div class="app-container flex-item">
       <!-- 全部訂單 -->
       <Title title="白牌車訂單"></Title>
+
       <div class="bg-white customScrollBar" style="height: calc(100% - 50px)">
+
+        <LoadingWord :typing='typing' :active='loadingActive' :text='loadingText'></LoadingWord>
+
         <div class="orderTableContainer customScrollBar">
 
           <OrderStatusFilter @handleSort="handleSort"></OrderStatusFilter>
@@ -136,6 +140,7 @@ import elDragDialog from "@/directive/el-dragDialog";
 import Pagination from "@/components/Pagination";
 import OrderStatusTag from "@/components/OrderStatusTag";
 import OrderStatusFilter from "@/components/OrderStatusFilter";
+import LoadingWord from "@/components/LoadingWord";
 import EditDialog from "@/components/Dialog/editSelfPayUserDespatch";
 
 import * as orderSelfPayUser from "@/api/orderSelfPayUser";
@@ -152,12 +157,17 @@ export default {
     OrderStatusFilter,
     OrderStatusTag,
     EditDialog,
+    LoadingWord,
   },
   directives: {
     elDragDialog,
   },
   data() {
     return {
+      /* loading */
+      loadingActive: false,
+      loadingText: "Loading...",
+      typing: false,
       /* 車輛類別 */
       carCategorysList: [],
       /* 取消原因 */
@@ -267,6 +277,7 @@ export default {
     /* 獲取訂單 */
     getList() {
       const vm = this;
+      vm.loadingActive = true;
       if (!vm.desc) {
         vm.listQuery.orderby = vm.orderby || null;
       } else {
@@ -275,6 +286,12 @@ export default {
       orderSelfPayUser.load(vm.listQuery).then((res) => {
         vm.list = res.data;
         vm.total = res.count;
+        if (vm.list.length == 0) {
+          vm.loadingText = "NO DATA 無資料";
+          vm.typing = true;
+        } else {
+          vm.loadingActive = false;
+        }
       });
     },
 

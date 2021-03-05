@@ -43,11 +43,11 @@ export default {
   watch: {
     active(val1) {
       const vm = this;
+      vm.count = 0;
       if (val1) {
         vm.timer();
       } else {
         clearInterval(vm.time);
-        vm.count = vm.wordLength;
       }
     },
   },
@@ -61,7 +61,7 @@ export default {
     countingStyle() {
       const vm = this;
       return {
-        width: vm.typing ? `${vm.count * 50}px` : `${vm.wordLength * 50}px`,
+        width: vm.typing ? `${vm.count * 52}px` : `${vm.wordLength * 52}px`,
         overflow: vm.typing ? "hidden" : "",
       };
     },
@@ -73,7 +73,12 @@ export default {
         if (vm.wordLength > vm.count) {
           vm.count++;
         } else {
-          vm.count = 0;
+          if (vm.typing) {
+            clearInterval(vm.time);
+            // vm.count = 0;
+          } else {
+            vm.count = 0;
+          }
         }
       }, vm.delay);
     },
@@ -100,8 +105,8 @@ export default {
 }
 
 .loadMain {
-  font-size: 3rem;
-  // overflow: hidden;
+  font-size: 2rem;
+  padding: 1.5rem 0;
   position: relative;
   padding-right: 9px;
   white-space: nowrap;
@@ -131,10 +136,10 @@ export default {
     content: "";
     position: absolute;
     background: #000;
-    top: 5%;
+    top: 25%;
     right: 4px;
-    height: 90%;
-    width: 5px;
+    height: 50%;
+    width: 3px;
     animation: cursorAni 0.75s ease 0s infinite;
   }
 }
