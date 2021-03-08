@@ -91,6 +91,7 @@ export default {
   components: { Sticky, Title, permissionBtn, LoadingWord },
   data() {
     return {
+      currentPath: "",
       /* loading */
       loadingActive: false,
       /* 車輛類別 */
@@ -125,7 +126,11 @@ export default {
       vm.loadingActive = true;
       this.listQuery.StartDate = this.dateRange?.[0];
       this.listQuery.EndDate = this.dateRange?.[1];
-      report.getStartEndRatio(vm.listQuery).then((res) => {
+      let fnName =
+        vm.currentPath === "startendratio"
+          ? "getStartEndRatio"
+          : "getStartEndRatioB";
+      report[fnName](vm.listQuery).then((res) => {
         vm.$cl(res);
         console.log(res);
         vm.list = res.result;
@@ -172,6 +177,10 @@ export default {
     /* 匯出報表 */
     handleExpoort() {
       const vm = this;
+      let crlName =
+        vm.currentPath === "startendratio"
+          ? "ExportSEareaReportByCaseOrgA"
+          : "ExportSEareaReportByOrderOrg";
       vm.loadingActive = true;
       let {
         StartDate,
@@ -193,7 +202,7 @@ export default {
       config.headers["X-Token"] = getToken();
       axios
         .get(
-          `${process.env.VUE_APP_BASE_API}Reports/ExportSEareaReportByCaseOrgA?StartDate=${StartDate}&EndDate=${EndDate}&OrgId=${OrgId}&UserType=${UserType}&CarFrom=${CarFrom}&CarCategoryId=${CarCategoryId}`,
+          `${process.env.VUE_APP_BASE_API}Reports/${crlName}?StartDate=${StartDate}&EndDate=${EndDate}&OrgId=${OrgId}&UserType=${UserType}&CarFrom=${CarFrom}&CarCategoryId=${CarCategoryId}`,
           config
         )
         .then((res) => {
@@ -289,6 +298,9 @@ export default {
     this.getCarCategorys();
     this.getUserCategorys();
     this.getOrg();
+  },
+  created() {
+    this.currentPath = this.$route.path.split("/")[1];
   },
 };
 </script>

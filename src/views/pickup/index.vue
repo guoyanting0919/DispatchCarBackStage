@@ -99,6 +99,7 @@ export default {
   },
   data() {
     return {
+      currentPath: "",
       /* 組織列表 */
       orgList: [],
 
@@ -119,9 +120,11 @@ export default {
   methods: {
     /* 獲取接送數據 */
     getList() {
+      const vm = this;
       this.listQuery.StartDate = this.dateRange?.[0];
       this.listQuery.EndDate = this.dateRange?.[1];
-      report.getPickUp(this.listQuery).then((res) => {
+      let fnName = vm.currentPath === "pickup" ? "getPickUp" : "getPickUpB";
+      report[fnName](this.listQuery).then((res) => {
         this.list = res.result;
       });
     },
@@ -136,6 +139,10 @@ export default {
     /* 匯出報表 */
     handleExpoort() {
       const vm = this;
+      let crlName =
+        vm.currentPath === "pickup"
+          ? "ExportPickReportByCaseOrgA"
+          : "ExportPickReportByOrderOrg";
       let { StartDate, EndDate, OrgId } = vm.listQuery;
       StartDate = moment(StartDate).format("yyyy-MM-DD");
       EndDate = moment(EndDate).format("yyyy-MM-DD");
@@ -149,7 +156,7 @@ export default {
       config.headers["X-Token"] = getToken();
       axios
         .get(
-          `${process.env.VUE_APP_BASE_API}Reports/ExportPickReportByCaseOrgA?StartDate=${StartDate}&EndDate=${EndDate}&OrgId=${OrgId}`,
+          `${process.env.VUE_APP_BASE_API}Reports/${crlName}?StartDate=${StartDate}&EndDate=${EndDate}&OrgId=${OrgId}`,
           config
         )
         .then((res) => {
@@ -212,6 +219,9 @@ export default {
     this.$set(this.dateRange, 1, moment().format("yyyy-MM-DD"));
     this.getList();
     this.getOrg();
+  },
+  created() {
+    this.currentPath = this.$route.path.split("/")[1];
   },
 };
 </script>

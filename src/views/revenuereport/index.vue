@@ -9,7 +9,7 @@
         </el-select> -->
 
         <!-- 服務單位選擇 -->
-        <el-select v-if="orgList" size="mini" @change="getList" v-model="listQuery.OrgId" clearable placeholder="請選擇服務單位">
+        <el-select filterable v-if="orgList" size="mini" @change="getList" v-model="listQuery.OrgId" clearable placeholder="請選擇服務單位">
           <el-option :label="'全部單位'" :value="''"></el-option>
           <el-option v-for="org in orgList" :key="org.id" :label="org.name" :value="org.id"></el-option>
         </el-select>
@@ -49,6 +49,31 @@
         </div>
       </div> -->
     </div>
+    <el-table ref="mainTable" v-if="driverRevenueList" :data="driverRevenueList" border fit style="width: 100%;padding: 0 1rem;background: #efefef;" height="calc(100% - 52px)">
+      <el-table-column align='center' :label="'司機'" prop="driverName"> </el-table-column>
+
+      <el-table-column sortable align='center' :label="'車資總額'" prop="totalAmt"> </el-table-column>
+
+      <el-table-column sortable align='center' :label="'政府補助'" prop="discountAmt"> </el-table-column>
+
+      <el-table-column sortable align='center' :label="'自負額'" prop="selfPayAmt"> </el-table-column>
+
+      <el-table-column sortable align='center' :label="'陪同金額'" prop="withAmt"> </el-table-column>
+
+      <!-- <el-table-column sortable align='center' width="250px" :label="'所屬單位'" prop="totalMileage"> </el-table-column> -->
+
+      <!-- <el-table-column sortable align='center' width="250px" :label="'使用率(%)'" prop="useRate">
+        <template slot-scope="scope">
+          <span>{{ scope.row.useRate | ratioFilter }}</span>
+        </template>
+      </el-table-column> -->
+
+      <!-- <el-table-column property="setting" label="操作" width="220">
+            <template slot-scope="scope">
+              <el-button size="mini" type="warning" @click="handleEdit(scope.row)" v-if="hasButton('edit')">編輯</el-button>
+            </template>
+          </el-table-column> -->
+    </el-table>
   </div>
 </template>
 
@@ -77,6 +102,7 @@ export default {
 
       /* 列表 */
       list: "",
+      driverRevenueList: "",
       listQuery: {
         StartDate: null,
         EndDate: null,
@@ -120,10 +146,12 @@ export default {
   methods: {
     /* 獲取接送數據 */
     getList() {
+      const vm = this;
       this.listQuery.StartDate = this.dateRange?.[0];
       this.listQuery.EndDate = this.dateRange?.[1];
       report.getRevenue(this.listQuery).then((res) => {
         console.log(res);
+        vm.getDriverRevenue();
         this.list = res.result;
 
         this.chartData.rows.forEach((r) => {
@@ -145,6 +173,16 @@ export default {
               break;
           }
         });
+      });
+    },
+
+    /* 獲取司機營收 */
+    getDriverRevenue() {
+      this.listQuery.StartDate = this.dateRange?.[0];
+      this.listQuery.EndDate = this.dateRange?.[1];
+      report.getDriverRevenue(this.listQuery).then((res) => {
+        console.log(res);
+        this.driverRevenueList = res.result;
       });
     },
 
@@ -171,7 +209,7 @@ export default {
       config.headers["X-Token"] = getToken();
       axios
         .get(
-          `${process.env.VUE_APP_BASE_API}Reports/ExportRevenueReportByCaseOrgA?StartDate=${StartDate}&EndDate=${EndDate}&OrgId=${OrgId}&WealTypeId=${WealTypeId}`,
+          `${process.env.VUE_APP_BASE_API}Reports/ExportRevenueReportByOrderOrg?StartDate=${StartDate}&EndDate=${EndDate}&OrgId=${OrgId}&WealTypeId=${WealTypeId}`,
           config
         )
         .then((res) => {
