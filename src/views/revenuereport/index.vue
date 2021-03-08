@@ -120,8 +120,8 @@ export default {
   methods: {
     /* 獲取接送數據 */
     getList() {
-      this.listQuery.StartDate = this.dateRange[0];
-      this.listQuery.EndDate = this.dateRange[1];
+      this.listQuery.StartDate = this.dateRange?.[0];
+      this.listQuery.EndDate = this.dateRange?.[1];
       report.getRevenue(this.listQuery).then((res) => {
         console.log(res);
         this.list = res.result;
@@ -230,7 +230,11 @@ export default {
     },
   },
   mounted() {
-    this.$set(this.dateRange, 0, moment().format("yyyy-MM-DD"));
+    this.$set(
+      this.dateRange,
+      0,
+      moment().subtract(1, "month").format("yyyy-MM-DD")
+    );
     this.$set(this.dateRange, 1, moment().format("yyyy-MM-DD"));
     this.getList();
     this.getOrg();

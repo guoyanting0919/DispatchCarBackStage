@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-column carUse">
+  <div class="flex-column areaService">
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
 
@@ -32,35 +32,32 @@
       </div>
     </sticky>
     <div class="app-container flex-item">
-      <Title title="車輛使用狀況"></Title>
+      <Title title="區域服務趟次"></Title>
       <div class="bg-white" style="height: calc(100% - 50px)">
         <LoadingWord :active='loadingActive' :text='"LOADING..."'></LoadingWord>
         <el-table ref="mainTable" :data="list" border fit highlight-current-row style="width: 100%" height="calc(100% - 52px)" @row-click="rowClick" @selection-change="handleSelectionChange">
-          <el-table-column align='center' width="250px" :label="'車牌號碼'" prop="carNo"> </el-table-column>
+          <!-- <el-table-column align="center" type="selection" width="55" fixed></el-table-column> -->
+          <el-table-column align='center' :label="'區域'" prop="areaName"> </el-table-column>
 
-          <el-table-column sortable align='center' width="250px" :label="'所屬單位'" prop="orgName"> </el-table-column>
+          <el-table-column sortable align='center' width="250px" :label="'總趟次'" prop="totalTrip"> </el-table-column>
 
-          <el-table-column align='center' width="250px" :label="'車輛來源'" prop="carFrom"> </el-table-column>
+          <el-table-column sortable align='center' width="250px" :label="'已完成趟次'" prop="completeTrip"> </el-table-column>
 
-          <el-table-column align='center' width="250px" :label="'車輛類別'" prop="carCategory"> </el-table-column>
-
-          <el-table-column sortable align='center' width="250px" :label="'完成趟次'" prop="totalTrip"> </el-table-column>
-
-          <el-table-column sortable align='center' width="250px" :label="'完成總里程數'" prop="totalMileage"> </el-table-column>
-
-          <el-table-column sortable align='center' width="250px" :label="'使用率(%)'" prop="useRate">
+          <el-table-column sortable align='center' width="250px" :label="'完成趟次比率'" prop="completeRate">
             <template slot-scope="scope">
-              <span>{{ scope.row.useRate | ratioFilter }}</span>
+              <span>{{ scope.row.completeRate | ratioFilter }}</span>
             </template>
           </el-table-column>
 
-          <!-- <el-table-column property="setting" label="操作" width="220">
+          <el-table-column sortable align='center' width="250px" :label="'空趟次'" prop="missTrip"> </el-table-column>
+
+          <!-- <el-table-column sortable align='center' width="80" :label="'使用率(%)'" prop="useRate">
             <template slot-scope="scope">
-              <el-button size="mini" type="warning" @click="handleEdit(scope.row)" v-if="hasButton('edit')">編輯</el-button>
+              <span>{{ scope.row.useRate | ratioFilter }}</span>
             </template>
           </el-table-column> -->
+
         </el-table>
-        <!-- <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handleCurrentChange" /> -->
       </div>
     </div>
   </div>
@@ -85,7 +82,7 @@ import * as orgs from "@/api/login";
 import * as report from "@/api/report";
 
 export default {
-  name: "carUse",
+  name: "areaService",
   mixins: [pbMixins],
   components: { Sticky, Title, permissionBtn, LoadingWord },
   data() {
@@ -109,7 +106,6 @@ export default {
         CarFrom: "", //車輛來源
         CarCategoryId: "", //車輛類別
         OrgId: "", //所屬單位
-        Area: "", //先不用
       },
     };
   },
@@ -125,8 +121,9 @@ export default {
       vm.loadingActive = true;
       this.listQuery.StartDate = this.dateRange?.[0];
       this.listQuery.EndDate = this.dateRange?.[1];
-      report.getCarUse(vm.listQuery).then((res) => {
+      report.getAreaService(vm.listQuery).then((res) => {
         vm.$cl(res);
+        console.log(res);
         vm.list = res.result;
         vm.loadingActive = false;
       });
@@ -191,7 +188,7 @@ export default {
       config.headers["X-Token"] = getToken();
       axios
         .get(
-          `${process.env.VUE_APP_BASE_API}Reports/ExportCarUseReportByCaseOrgA?StartDate=${StartDate}&EndDate=${EndDate}&OrgId=${OrgId}&UserType=${UserType}&CarFrom=${CarFrom}&CarCategoryId=${CarCategoryId}`,
+          `${process.env.VUE_APP_BASE_API}Reports/ExportUserAreaReportByCaseOrgA?StartDate=${StartDate}&EndDate=${EndDate}&OrgId=${OrgId}&UserType=${UserType}&CarFrom=${CarFrom}&CarCategoryId=${CarCategoryId}`,
           config
         )
         .then((res) => {
@@ -201,7 +198,7 @@ export default {
           let downloadElement = document.createElement("a");
           let href = window.URL.createObjectURL(blob); // 創建下載的鏈接
           downloadElement.href = href;
-          downloadElement.download = `車輛使用狀況報表${nowTime}.xlsx`; // 下載後文件名
+          downloadElement.download = `區域服務趟次報表${nowTime}.xlsx`; // 下載後文件名
           // 此寫法兼容可火狐瀏覽器
           document.body.appendChild(downloadElement);
           downloadElement.click(); // 點擊下載

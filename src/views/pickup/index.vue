@@ -119,8 +119,8 @@ export default {
   methods: {
     /* 獲取接送數據 */
     getList() {
-      this.listQuery.StartDate = this.dateRange[0];
-      this.listQuery.EndDate = this.dateRange[1];
+      this.listQuery.StartDate = this.dateRange?.[0];
+      this.listQuery.EndDate = this.dateRange?.[1];
       report.getPickUp(this.listQuery).then((res) => {
         this.list = res.result;
       });
@@ -217,10 +217,14 @@ export default {
 </script>
  
 <style lang="scss" scoped>
+.chartContainer {
+  height: 100%;
+}
 .cardContainer {
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
+  height: calc(100% - 50px);
 }
 
 .dataCard {
