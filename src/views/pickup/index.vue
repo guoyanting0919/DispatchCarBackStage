@@ -97,9 +97,15 @@ export default {
     Title,
     permissionBtn,
   },
+  props: {
+    isB: {
+      type: Boolean,
+      default: false,
+      require: false,
+    },
+  },
   data() {
     return {
-      currentPath: "",
       /* 組織列表 */
       orgList: [],
 
@@ -123,7 +129,7 @@ export default {
       const vm = this;
       this.listQuery.StartDate = this.dateRange?.[0];
       this.listQuery.EndDate = this.dateRange?.[1];
-      let fnName = vm.currentPath === "pickup" ? "getPickUp" : "getPickUpB";
+      let fnName = !vm.isB ? "getPickUp" : "getPickUpB";
       report[fnName](this.listQuery).then((res) => {
         this.list = res.result;
       });
@@ -139,10 +145,9 @@ export default {
     /* 匯出報表 */
     handleExpoort() {
       const vm = this;
-      let crlName =
-        vm.currentPath === "pickup"
-          ? "ExportPickReportByCaseOrgA"
-          : "ExportPickReportByOrderOrg";
+      let crlName = !vm.isB
+        ? "ExportPickReportByCaseOrgA"
+        : "ExportPickReportByOrderOrg";
       let { StartDate, EndDate, OrgId } = vm.listQuery;
       StartDate = moment(StartDate).format("yyyy-MM-DD");
       EndDate = moment(EndDate).format("yyyy-MM-DD");
@@ -220,9 +225,7 @@ export default {
     this.getList();
     this.getOrg();
   },
-  created() {
-    this.currentPath = this.$route.path.split("/")[1];
-  },
+  created() {},
 };
 </script>
  

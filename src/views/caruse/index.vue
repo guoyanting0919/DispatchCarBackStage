@@ -92,9 +92,15 @@ export default {
   name: "carUse",
   mixins: [pbMixins],
   components: { Sticky, Title, permissionBtn, LoadingWord },
+  props: {
+    isB: {
+      type: Boolean,
+      default: false,
+      require: false,
+    },
+  },
   data() {
     return {
-      currentPath: "",
       /* loading */
       loadingActive: false,
       /* 車輛類別 */
@@ -130,7 +136,7 @@ export default {
       vm.loadingActive = true;
       this.listQuery.StartDate = this.dateRange?.[0];
       this.listQuery.EndDate = this.dateRange?.[1];
-      let fnName = vm.currentPath === "caruse" ? "getCarUse" : "getCarUseB";
+      let fnName = !vm.isB ? "getCarUse" : "getCarUseB";
       report[fnName](vm.listQuery).then((res) => {
         vm.$cl(res);
         vm.list = res.result;
@@ -177,10 +183,9 @@ export default {
     /* 匯出報表 */
     handleExpoort() {
       const vm = this;
-      let crlName =
-        vm.currentPath === "caruse"
-          ? "ExportCarUseReportByCaseOrgA"
-          : "ExportCarUseReportByOrderOrg";
+      let crlName = !vm.isB
+        ? "ExportCarUseReportByCaseOrgA"
+        : "ExportCarUseReportByOrderOrg";
       let {
         StartDate,
         EndDate,
@@ -293,9 +298,7 @@ export default {
     this.getUserCategorys();
     this.getOrg();
   },
-  created() {
-    this.currentPath = this.$route.path.split("/")[1];
-  },
+  created() {},
 };
 </script>
 

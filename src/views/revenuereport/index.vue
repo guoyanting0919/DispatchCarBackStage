@@ -3,11 +3,6 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
 
-        <!-- 區域選擇 -->
-        <!-- <el-select size="mini" v-model="value" clearable placeholder="請選擇區域">
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
-        </el-select> -->
-
         <!-- 服務單位選擇 -->
         <el-select filterable v-if="orgList" size="mini" @change="getList" v-model="listQuery.OrgId" clearable placeholder="請選擇服務單位">
           <el-option :label="'全部單位'" :value="''"></el-option>
@@ -37,17 +32,6 @@
         <ve-bar height="300px" :data="chartData"></ve-bar>
       </div>
 
-      <!-- 車輛使用率 -->
-      <!-- <div class="carContainer">
-        <Title title="車輛使用率"></Title>
-        <div class="carBoxies">
-          <div class="carBox" v-for="item in 5" :key="item">
-            <p>NAM-03</p>
-            <p>豐均國際租賃有限公司</p>
-            <ve-ring class="carChart" :data="chartData2" :settings="chartSettings2"></ve-ring>
-          </div>
-        </div>
-      </div> -->
     </div>
     <el-table ref="mainTable" v-if="driverRevenueList" :data="driverRevenueList" border fit style="width: 100%;padding: 0 1rem;background: #efefef;" height="calc(100% - 52px)">
       <el-table-column align='center' :label="'司機'" prop="driverName"> </el-table-column>
@@ -60,19 +44,6 @@
 
       <el-table-column sortable align='center' :label="'陪同金額'" prop="withAmt"> </el-table-column>
 
-      <!-- <el-table-column sortable align='center' width="250px" :label="'所屬單位'" prop="totalMileage"> </el-table-column> -->
-
-      <!-- <el-table-column sortable align='center' width="250px" :label="'使用率(%)'" prop="useRate">
-        <template slot-scope="scope">
-          <span>{{ scope.row.useRate | ratioFilter }}</span>
-        </template>
-      </el-table-column> -->
-
-      <!-- <el-table-column property="setting" label="操作" width="220">
-            <template slot-scope="scope">
-              <el-button size="mini" type="warning" @click="handleEdit(scope.row)" v-if="hasButton('edit')">編輯</el-button>
-            </template>
-          </el-table-column> -->
     </el-table>
   </div>
 </template>
@@ -95,6 +66,7 @@ export default {
     Title,
     permissionBtn,
   },
+
   data() {
     return {
       /* 組織列表 */

@@ -212,7 +212,6 @@ export default {
         fromAddr: vm.fromAddr,
         toAddr: vm.toAddr,
       };
-      console.log(params, "a");
       map.route(params).then((res) => {
         let jsonData = {
           overview_polyline: {

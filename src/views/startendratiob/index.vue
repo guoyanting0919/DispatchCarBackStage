@@ -1,6 +1,6 @@
 <template>
   <!-- TODO:這邊用非車行頁面作為元件使用 views/startendratio/index -->
-  <StartEndRatio></StartEndRatio>
+  <StartEndRatio :isB='true'></StartEndRatio>
 </template>
 
 <script>

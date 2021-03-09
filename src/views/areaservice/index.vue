@@ -89,9 +89,15 @@ export default {
   name: "areaService",
   mixins: [pbMixins],
   components: { Sticky, Title, permissionBtn, LoadingWord },
+  props: {
+    isB: {
+      type: Boolean,
+      default: false,
+      require: false,
+    },
+  },
   data() {
     return {
-      currentPath: "",
       /* loading */
       loadingActive: false,
       /* 車輛類別 */
@@ -126,8 +132,7 @@ export default {
       vm.loadingActive = true;
       this.listQuery.StartDate = this.dateRange?.[0];
       this.listQuery.EndDate = this.dateRange?.[1];
-      let fnName =
-        vm.currentPath === "areaservice" ? "getAreaService" : "getAreaServiceB";
+      let fnName = !vm.isB ? "getAreaService" : "getAreaServiceB";
       report[fnName](vm.listQuery).then((res) => {
         vm.$cl(res);
         console.log(res);
@@ -175,10 +180,9 @@ export default {
     /* 匯出報表 */
     handleExpoort() {
       const vm = this;
-      let crlName =
-        vm.currentPath === "areaservice"
-          ? "ExportUserAreaReportByCaseOrgA"
-          : "ExportUserAreaReportByOrderOrg";
+      let crlName = !vm.isB
+        ? "ExportUserAreaReportByCaseOrgA"
+        : "ExportUserAreaReportByOrderOrg";
       let {
         StartDate,
         EndDate,

@@ -1,6 +1,6 @@
 <template>
   <!-- TODO:這邊用非車行頁面作為元件使用 views/areaservice/index -->
-  <AreaService></AreaService>
+  <AreaService :isB='true'></AreaService>
 </template>
 
 <script>
