@@ -11,8 +11,8 @@
     </sticky>
     <div class="app-container flex-item">
       <Title title="權限管理"></Title>
-      <div class="bg-white" style="height:calc(100% - 50px)">
-        <el-table ref="mainTable" :key="tableKey" :data="list" v-loading="listLoading" border fit highlight-current-row style="width: 100%;" height="calc(100% - 52px)" @row-click="rowClick" @selection-change="handleSelectionChange">
+      <div class="bg-white" style="height:calc(100% - 50px);overflow:auto">
+        <el-table ref="mainTable" :key="tableKey" :data="list" v-loading="listLoading" border fit highlight-current-row style="width: 100%;" @row-click="rowClick" @selection-change="handleSelectionChange">
           <el-table-column align="center" type="selection" width="55"></el-table-column>
 
           <el-table-column :label="'Id'" v-if="showDescription" min-width="120px">

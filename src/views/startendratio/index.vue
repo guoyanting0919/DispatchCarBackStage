@@ -4,17 +4,20 @@
       <div class="filter-container">
 
         <!-- 車輛類別 -->
-        <el-select style="width:100px" clearable size="mini" @change="getList" v-model="listQuery.CarCategoryId" placeholder="車輛類別">
+        <el-select style="width:120px" clearable size="mini" @change="getList" v-model="listQuery.CarCategoryId" placeholder="車輛類別">
+          <el-option :value="''" label="所有車輛類別"></el-option>
           <el-option v-for="item in carCategorysList" :value="item.value" :label="item.label" :key="item.value"></el-option>
         </el-select>
 
         <!-- 用戶類別 -->
         <el-select style="width:120px" clearable size="mini" @change="getList" v-model="listQuery.UserType" placeholder="用戶類別">
+          <el-option :value="''" label="所有用戶身份"></el-option>
           <el-option v-for="item in userCategorysList" :value="item.value" :label="item.label" :key="item.value"></el-option>
         </el-select>
 
         <!-- 車輛來源 -->
         <el-select style="width:150px" clearable size="mini" v-model="listQuery.CarFrom" placeholder="車輛來源" @change="getList">
+          <el-option :value="''" label="所有車輛來源"></el-option>
           <el-option :value="'1'" :label="'獎助'"></el-option>
           <el-option :value="'2'" :label="'自購'"></el-option>
           <el-option :value="'3'" :label="'捐贈'"></el-option>
@@ -22,6 +25,7 @@
 
         <!-- 服務單位選擇 -->
         <el-select style="width:150px" filterable v-if="orgList" size="mini" @change="getList" v-model="listQuery.OrgId" clearable placeholder="服務單位">
+          <el-option :value="''" label="全部單位"></el-option>
           <el-option v-for="org in orgList" :key="org.id" :label="org.name" :value="org.id"></el-option>
         </el-select>
 
