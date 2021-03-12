@@ -29,22 +29,22 @@
       </div>
       <!-- newPwBox -->
       <div class="newPwBox" v-if="isForget == 4">
-        <h2 class="newPwTitle">設定登入密碼</h2>
+        <h2 class="newPwTitle">設定登入密碼<span v-if="passwordOK">OK</span></h2>
         <div class="pwRoles">
-          <p :class="{ OkRole: auth.minLength }" class="pwRole">
+          <p :class="{ OkRole: auth.MinLength }" class="pwRole">
             <i class="fas fa-check"></i>8碼以上(必要)
           </p>
-          <p :class="{ OkRole: auth.upperCase }" class="pwRole">
+          <p :class="{ OkRole: auth.UpperCase }" class="pwRole">
             <i class="fas fa-check"></i>大寫英文
           </p>
-          <p :class="{ OkRole: auth.lowerCase }" class="pwRole">
+          <p :class="{ OkRole: auth.LowerCase }" class="pwRole">
             <i class="fas fa-check"></i>小寫英文
           </p>
-          <p :class="{ OkRole: auth.number }" class="pwRole">
+          <p :class="{ OkRole: auth.Number }" class="pwRole">
             <i class="fas fa-check"></i>數字
           </p>
           <el-tooltip class="item" effect="dark" content="特殊符號包含 ~!@#$%^&*()" placement="bottom-end">
-            <p :class="{ OkRole: auth.mark }" class="pwRole">
+            <p :class="{ OkRole: auth.Mark }" class="pwRole">
               <i class="fas fa-check"></i>特殊符號
             </p>
           </el-tooltip>
@@ -200,11 +200,11 @@ export default {
       passwordOK: false,
       num: 0,
       auth: {
-        minLength: false,
-        lowerCase: false,
-        upperCase: false,
-        number: false,
-        mark: false,
+        MinLength: false,
+        LowerCase: false,
+        UpperCase: false,
+        Number: false,
+        Mark: false,
       },
     };
   },
@@ -218,21 +218,36 @@ export default {
   },
   watch: {
     newPwInput(val) {
-      this.num = 0;
-      this.auth.minLength = this.checkMinLength(val);
-      this.auth.lowerCase = this.checkLowerCase(val);
-      this.auth.upperCase = this.checkUpperCase(val);
-      this.auth.number = this.checkNumber(val);
-      this.auth.mark = this.checkMark(val);
-      if (this.auth.lowerCase) this.num++;
-      if (this.auth.upperCase) this.num++;
-      if (this.auth.number) this.num++;
-      if (this.auth.mark) this.num++;
-      if (this.auth.minLength && this.num >= 3) this.passwordOK = true;
-      else this.passwordOK = false;
+      this.num = Object.keys(this.auth).filter((key) => {
+        this.auth[key] = this[`check${key}`](val);
+        return key !== "MinLength" && this.auth[key];
+      }).length;
+      this.passwordOK = this.num >= 3 && this.auth.MinLength;
     },
   },
   methods: {
+    // 密碼格式REG驗證
+    checkMinLength(val) {
+      //8碼以上
+      return val.length >= 8;
+    },
+    checkLowerCase(val) {
+      //小寫英文
+      return /[a-z]/.test(val);
+    },
+    checkUpperCase(val) {
+      //大寫英文
+      return /[A-Z]/.test(val);
+    },
+    checkNumber(val) {
+      //數字
+      return /[0-9]/.test(val);
+    },
+    checkMark(val) {
+      //特殊符號
+      return /[~!@#$%^&*()]/.test(val);
+    },
+
     loginBy(str, pas) {
       pas ? (this.passwordInput = pas) : (this.passwordInput = str);
       this.accountInput = str;
@@ -241,7 +256,6 @@ export default {
 
     handleLogin() {
       const vm = this;
-
       vm.btnLoading = true;
       vm.$store
         .dispatch("Login", {
@@ -364,28 +378,6 @@ export default {
       vm.codeInput = "";
       vm.newPwInput = "";
       vm.newPwInputCheck = "";
-    },
-
-    // 密碼格式REG驗證
-    checkMinLength(val) {
-      //8碼以上
-      return val.length >= 8;
-    },
-    checkLowerCase(val) {
-      //小寫英文
-      return /[a-z]/.test(val);
-    },
-    checkUpperCase(val) {
-      //大寫英文
-      return /[A-Z]/.test(val);
-    },
-    checkNumber(val) {
-      //數字
-      return /[0-9]/.test(val);
-    },
-    checkMark(val) {
-      //特殊符號
-      return /[~!@#$%^&*()]/.test(val);
     },
   },
 };
