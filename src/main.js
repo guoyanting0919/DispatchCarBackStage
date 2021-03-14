@@ -3,6 +3,8 @@ import layer from "vue-layer";
 
 import "normalize.css/normalize.css"; // A modern alternative to CSS resets
 
+import * as gb from "./utils/gb.js";
+
 import ElementUI from "element-ui";
 // import "@/assets/custom-theme/index.css";
 
@@ -108,6 +110,7 @@ Vue.prototype.$api = api;
 Vue.prototype.$cl = globalConsole;
 Vue.prototype.$alertT = alertT;
 Vue.prototype.$alertM = alertM;
+Vue.prototype.$gb = gb.gb;
 Vue.prototype.$layer = layer(Vue, {
   msgtime: 3,
 });

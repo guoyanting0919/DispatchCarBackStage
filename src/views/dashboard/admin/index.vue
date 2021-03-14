@@ -24,9 +24,10 @@
   <script
       async
       defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCO-vJiy_0WsK6RB9ucxTR98zdIB6f7AxI&libraries=places&language=zh-TW&region=TW"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmDZNynF56ygMKFLRpypU-LiVLTxD-v9I&libraries=places&language=zh-TW&region=TW"
     ></script>
 <script>
+import moment from "moment";
 import * as driverApp from "@/api/driverApp";
 
 export default {
@@ -35,6 +36,75 @@ export default {
       despatchNo: "",
       resMessage: "RES MESSAGE",
       map: null,
+
+      data: {
+        columnHeaders: [],
+        code: 200,
+        msg: "加載成功",
+        count: 3,
+        data: [
+          {
+            driverId: "6756231610261610497",
+            punchType: 3,
+            punchTime: "2021-03-12 10:31:01",
+            createDate: "2021-03-12 10:31:01",
+            createUserId: "6756231610261610497",
+            createUserName: "測試司機",
+            modifyDate: "2021-03-12 10:31:01",
+            modifyUserId: "",
+            modifyUserName: "",
+            id: "6769264436414291968",
+          },
+          {
+            driverId: "6756231610261610497",
+            punchType: 3,
+            punchTime: "2021-03-14 10:31:01",
+            createDate: "2021-03-14 10:31:01",
+            createUserId: "6756231610261610497",
+            createUserName: "測試司機2",
+            modifyDate: "2021-03-14 10:31:01",
+            modifyUserId: "",
+            modifyUserName: "",
+            id: "6769264436414291968",
+          },
+          {
+            driverId: "6756231610261610497",
+            punchType: 3,
+            punchTime: "2021-03-14 12:31:01",
+            createDate: "2021-03-14 12:31:01",
+            createUserId: "6756231610261610497",
+            createUserName: "測試司機2",
+            modifyDate: "2021-03-14 12:31:01",
+            modifyUserId: "",
+            modifyUserName: "",
+            id: "6769264436414291968",
+          },
+          {
+            driverId: "6756231610261610497",
+            punchType: 3,
+            punchTime: "2021-03-12 16:17:54",
+            createDate: "2021-03-12 16:17:54",
+            createUserId: "6756231610261610497",
+            createUserName: "測試司機",
+            modifyDate: "2021-03-12 16:17:54",
+            modifyUserId: "",
+            modifyUserName: "",
+            id: "6769351731372924928",
+          },
+          {
+            driverId: "6756231610261610497",
+            punchType: 3,
+            punchTime: "2021-03-12 16:28:32",
+            createDate: "2021-03-12 16:28:32",
+            createUserId: "6756231610261610497",
+            createUserName: "測試司機",
+            modifyDate: "2021-03-12 16:28:32",
+            modifyUserId: "",
+            modifyUserName: "",
+            id: "6769354411071807488",
+          },
+        ],
+      },
     };
   },
   computed: {
@@ -110,12 +180,33 @@ export default {
         this.resMessage = res;
       });
     },
+    gb(dateData, key) {
+      let keys = [];
+      let o = {};
+      dateData.forEach((d) => {
+        if (!keys.includes(d[key])) {
+          keys.push(d[key]);
+          o[d[key]] = [d];
+        } else {
+          o[d[key]].push(d);
+        }
+      });
+      console.log(o);
+      return o;
+    },
   },
   mounted() {
     this.initMap();
+    let arr = this.data.data.map((i) => {
+      i.time = moment(i.punchTime).format("yyyy-MM-DD");
+      return i;
+    });
+    console.log(arr);
+    console.log(this.$gb(arr, "createUserName"));
+    // this.gb();
   },
   created() {},
 };
 </script>
 <style scoped lang='scss'>
-</style>
+</style> 
