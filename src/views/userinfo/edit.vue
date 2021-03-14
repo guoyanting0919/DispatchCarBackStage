@@ -1,17 +1,18 @@
 <template>
-  <div class="flex-column driverAdd">
+  <div class="flex-column userInfoEdit">
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
-        <el-button type="info" plain size="mini" @click="$router.push('/driver/index')">回列表</el-button>
+        <el-button type="info" plain size="mini" @click="handleBack">回列表</el-button>
         <el-button @click="handleSave" type="success" size="mini">儲存</el-button>
       </div>
     </sticky>
     <div class="app-container flex-item">
-      <Title title="編輯司機"></Title>
+      <Title title="編輯乘客"></Title>
       <div class="bg-white formContainer customScrollBar">
         <el-form :label-position="labelPosition" label-width="200px" :model="temp" :rules="rules" ref="form">
-          <SubTitle title="基本資料編輯"></SubTitle>
+          <SubTitle title="乘客基本資料編輯"></SubTitle>
           <el-row :gutter="16">
+
             <el-col :sm="12" :md="6">
               <el-form-item label="帳號" prop="account">
                 <el-input v-model="temp.account" placeholder="請輸入帳號"></el-input>
@@ -31,19 +32,17 @@
             </el-col>
 
             <el-col :sm="12" :md="6">
-              <el-form-item label="司機狀態" prop="town">
-                <el-select v-model="temp.town" placeholder="請選擇司機狀態" style="width: 100%">
-                  <el-option :value="'在職'" :label="'在職'"></el-option>
-                  <el-option :value="'離職'" :label="'離職'"></el-option>
+              <el-form-item label="鄉鎮" prop="town">
+                <el-select v-model="temp.town" placeholder="請選擇鄉鎮" style="width: 100%">
+                  <el-option :value="'尖石鄉'" :label="'尖石鄉'"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
 
             <el-col :sm="12" :md="6">
-              <el-form-item label="性別" prop="sex">
-                <el-select v-model="temp.sex" placeholder="請選擇性別" style="width: 100%">
-                  <el-option :value="'1'" :label="'男'"></el-option>
-                  <el-option :value="'0'" :label="'女'"></el-option>
+              <el-form-item label="村里" prop="village">
+                <el-select v-model="temp.village" placeholder="請選擇村里" style="width: 100%">
+                  <el-option :value="'尖石鄉'" :label="'尖石鄉'"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
@@ -61,26 +60,29 @@
             </el-col>
 
             <el-col :sm="12" :md="6">
-              <el-form-item label="身分證字號" prop="uid">
-                <el-input v-model="temp.uid" placeholder="請輸入身分證字號"></el-input>
+              <el-form-item label="身分" prop="userType">
+                <el-select v-model="temp.userType" placeholder="請選擇身分" style="width: 100%">
+                  <el-option :value="'身份1'" :label="'身份1'"></el-option>
+                  <el-option :value="'身份2'" :label="'身份2'"></el-option>
+                </el-select>
               </el-form-item>
             </el-col>
 
             <el-col :sm="12" :md="6">
-              <el-form-item label="地址" prop="addr">
-                <el-input v-model="temp.addr" placeholder="請輸入地址"></el-input>
+              <el-form-item label="是否為低收入戶" prop="isLowIncome">
+                <el-select v-model="temp.isLowIncome" placeholder="請選擇是否為低收入戶" style="width: 100%">
+                  <el-option :value="'1'" :label="'是'"></el-option>
+                  <el-option :value="'0'" :label="'否'"></el-option>
+                </el-select>
               </el-form-item>
             </el-col>
 
             <el-col :sm="12" :md="6">
-              <el-form-item label="地址經度" prop="addrLng">
-                <el-input v-model="temp.addrLng" placeholder="請輸入地址經度"></el-input>
-              </el-form-item>
-            </el-col>
-
-            <el-col :sm="12" :md="6">
-              <el-form-item label="地址緯度" prop="addrLat">
-                <el-input v-model="temp.addrLat" placeholder="請輸入地址緯度"></el-input>
+              <el-form-item label="性別" prop="sex">
+                <el-select v-model="temp.sex" placeholder="請選擇性別" style="width: 100%">
+                  <el-option :value="'1'" :label="'男'"></el-option>
+                  <el-option :value="'0'" :label="'女'"></el-option>
+                </el-select>
               </el-form-item>
             </el-col>
 
@@ -96,9 +98,10 @@
 import Sticky from "@/components/Sticky";
 import Title from "@/components/ConsoleTableTitle";
 import SubTitle from "@/components/SubTitle";
-import * as drivers from "@/api/drivers";
+import * as userInfo from "@/api/userInfo";
+
 export default {
-  name: "driverAdd",
+  name: "userInfoEdit",
   components: {
     Sticky,
     Title,
@@ -108,24 +111,17 @@ export default {
     return {
       labelPosition: "top",
       temp: {
+        thiId: "",
         account: "",
         password: "",
         name: "",
-        thiId: null,
         town: "",
-        sex: "",
+        village: "",
         phone: "",
         birthday: "",
-        uid: "",
-        addr: "",
-        addrLng: "",
-        addrLat: "",
-        driverLicense: "",
-        releaseDate: "",
-        highestEdu: "",
-        localEvaluation: "",
-        onJobDate: "",
-        offJobDate: "",
+        userType: "", //userType
+        isLowIncome: "1", //是否為低收入戶
+        sex: "1",
       },
       rules: {
         Id: [{ required: true, message: "請輸入個案編號", trigger: "blur" }],
@@ -137,33 +133,30 @@ export default {
   },
 
   methods: {
-    /* 獲取司機 */
+    // 獲取乘客資料
     getList() {
       const vm = this;
-      drivers.get({ id: vm.$route.params.id }).then((res) => {
-        console.log(res.result);
-
-        vm.temp = res.result;
-        console.log(vm.temp);
+      userInfo.get({ id: vm.$route.params.id }).then((res) => {
+        vm.temp = JSON.parse(JSON.stringify(res.result));
       });
     },
 
-    /* 確認編輯司機 */
+    // 確認編輯乘客
     handleSave() {
       const vm = this;
-      vm.temp.account = vm.temp.phone;
-      vm.temp.password = vm.temp.uid.slice(-4);
-      let obj = JSON.parse(JSON.stringify(vm.temp));
-      obj.driverLicenses = vm.driverLicensesChecked;
-      obj.driverInsurance = vm.driverInsurancesChecked;
-      drivers.update(obj).then(() => {
-        // console.log(res);
-        vm.$router.push("/driver/index");
+      userInfo.update(vm.temp).then(() => {
         vm.$alertT.fire({
           icon: "success",
-          title: `司機 ${obj.name} 修改成功`,
+          title: `乘客 ${vm.temp.name} 修改成功`,
         });
+        vm.$router.push("/userinfo/index");
       });
+    },
+
+    // back
+    handleBack() {
+      const vm = this;
+      vm.$router.push("/userinfo/index");
     },
   },
   mounted() {
@@ -181,6 +174,12 @@ export default {
   height: 240px;
   background: #ffe6d1;
   margin: auto;
+  margin-top: 1.5rem;
+}
+.avatar-uploader-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .tableContainer {
   width: 100%;

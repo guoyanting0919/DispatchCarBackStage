@@ -86,6 +86,12 @@ let routerMappingList = [
     title: "基礎配置 / 表單設計",
   },
 
+  /* 乘客管理 */
+  {
+    path: "/userinfo/index",
+    title: "乘客管理 / 乘客資訊",
+  },
+
   /* 流程中心 */
   {
     path: "/flowinstances/index",

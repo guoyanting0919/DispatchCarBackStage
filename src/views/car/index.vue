@@ -3,12 +3,7 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 關鍵字搜尋 -->
-        <el-input style="width: 200px; margin-right: 0.5rem" size="mini" v-model="value" clearable placeholder="請輸入關鍵字"></el-input>
 
-        <!-- 公司選擇 -->
-        <el-select size="mini" v-model="value" clearable placeholder="請選擇公司">
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
-        </el-select>
         <!-- 權限按鈕 -->
         <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
       </div>
@@ -18,33 +13,56 @@
       <div class="bg-white" style="height: calc(100% - 50px)">
         <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" v-if="list" v-loading="listLoading" border fit highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" @row-click="rowClick">
           <el-table-column type="selection" width="55" align="center"></el-table-column>
-          <!-- <el-table-column
-            property="pic"
-            label="照片"
-            width="80"
-            align="center"
-          ></el-table-column> -->
-          <el-table-column property="carNo" label="車牌號碼" width="120" align="center"></el-table-column>
-          <el-table-column property="carCategoryName" label="車輛類別" min-width="140" align="center">
-          </el-table-column>
-          <el-table-column property="carTop" label="車頂高度" width="120" align="center"></el-table-column>
-          <el-table-column property="factoryType" label="廠牌型號" width="170" align="center"></el-table-column>
-          <el-table-column property="wheelchairNum" label="輪椅數量" min-width="170" align="center"></el-table-column>
-          <el-table-column property="seatNum" label="座椅數量" min-width="170" align="center"></el-table-column>
-          <el-table-column property="driverName" label="司機姓名" min-width="170" align="center">
+
+          <el-table-column property="status" label="車輛狀態" width="120" align="center">
             <template slot-scope="scope">
-              <span>{{scope.row.driverName }}</span>
+              <span>{{scope.row.status=='Y' ? '可派發' : '不可派發'}}</span>
             </template>
           </el-table-column>
-          <el-table-column property="status" label="狀態" width="130" align="center">
+          <el-table-column property="township" label="鄉鎮" width="120" align="center"></el-table-column>
+          <el-table-column property="carNo" label="車牌號碼" min-width="140" align="center"></el-table-column>
+          <el-table-column property="brand" label="廠牌" width="120" align="center"></el-table-column>
+          <el-table-column property="carCategoryName" label="車輛類型" width="170" align="center"></el-table-column>
+          <el-table-column property="carType" label="型式" min-width="170" align="center"></el-table-column>
+          <el-table-column property="seatNum" label="載客人數" min-width="170" align="center"></el-table-column>
+
+          <el-table-column property="carOwner" label="車輛產權" min-width="170" align="center"></el-table-column>
+          <el-table-column property="releaseDate" label="發照日期" min-width="170" align="center">
             <template slot-scope="scope">
-              <div>
-                <el-tag v-if="scope.row.status" type="success">可派發</el-tag>
-                <el-tag v-else type="danger">不可派發</el-tag>
-              </div>
+              <span>{{scope.row.releaseDate | globalDateFilter("yyyy-MM-DD")}}</span>
             </template>
           </el-table-column>
-          <el-table-column property="setting" label="操作" :fixed="isMobile()" width="220">
+          <el-table-column property="displacement" label="排氣量" min-width="170" align="center"></el-table-column>
+          <el-table-column property="makeDate" label="出廠日期" min-width="170" align="center">
+            <template slot-scope="scope">
+              <span>{{scope.row.makeDate | globalDateFilter("yyyy-MM-DD")}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column property="insuranceNo" label="保險證號" min-width="170" align="center"></el-table-column>
+          <el-table-column property="insuranceItem" label="投保項目與金額" min-width="170" align="center"></el-table-column>
+          <el-table-column property="checkDate" label="檢驗合格日期" min-width="170" align="center">
+            <template slot-scope="scope">
+              <span>{{scope.row.checkDate | globalDateFilter("yyyy-MM-DD")}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column property="nextCheckDate" label="下次檢定日期" min-width="170" align="center">
+            <template slot-scope="scope">
+              <span>{{scope.row.nextCheckDate | globalDateFilter("yyyy-MM-DD")}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column property="maintainDate" label="上次保養日期" min-width="170" align="center">
+            <template slot-scope="scope">
+              <span>{{scope.row.maintainDate | globalDateFilter("yyyy-MM-DD")}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column property="nextMaintainDate" label="下次定保日期" min-width="170" align="center">
+            <template slot-scope="scope">
+              <span>{{scope.row.nextMaintainDate | globalDateFilter("yyyy-MM-DD")}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column property="maintainItems" label="定期保養項目" min-width="170" align="center"></el-table-column>
+
+          <el-table-column property="setting" label="操作" :fixed="isMobile()" width="150">
             <template slot-scope="scope">
               <div class="buttonFlexBox">
                 <el-button size="mini" type="warning" @click="handleEdit(scope.row)" v-if="hasButton('edit')">編輯</el-button>
@@ -81,29 +99,6 @@ export default {
   },
   data() {
     return {
-      value: "",
-      options: [
-        {
-          value: "选项1",
-          label: "黄金糕",
-        },
-        {
-          value: "选项2",
-          label: "双皮奶",
-        },
-        {
-          value: "选项3",
-          label: "蚵仔煎",
-        },
-        {
-          value: "选项4",
-          label: "龙须面",
-        },
-        {
-          value: "选项5",
-          label: "北京烤鸭",
-        },
-      ],
       // 司機列表
       driverList: [],
       // main data
@@ -261,7 +256,7 @@ export default {
   },
   mounted() {
     this.getList();
-    this.getDrivers();
+    // this.getDrivers();
   },
 };
 </script>
