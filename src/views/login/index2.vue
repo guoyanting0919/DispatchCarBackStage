@@ -32,7 +32,7 @@
         <h2 class="newPwTitle">設定登入密碼<span v-if="passwordOK">OK</span></h2>
         <div class="pwRoles">
           <p :class="{ OkRole: auth.MinLength }" class="pwRole">
-            <i class="fas fa-check"></i>8碼以上(必要)
+            <i class="fas fa-check"></i>8碼以上 (必要)
           </p>
           <p :class="{ OkRole: auth.UpperCase }" class="pwRole">
             <i class="fas fa-check"></i>大寫英文
