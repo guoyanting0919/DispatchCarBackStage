@@ -24,7 +24,7 @@
   <script
       async
       defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCO-vJiy_0WsK6RB9ucxTR98zdIB6f7AxI&libraries=places&language=zh-TW&region=TW"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmDZNynF56ygMKFLRpypU-LiVLTxD-v9I&libraries=places&language=zh-TW&region=TW"
     ></script>
 <script>
 import * as driverApp from "@/api/driverApp";
