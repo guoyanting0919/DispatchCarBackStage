@@ -38,12 +38,15 @@
 
           <el-table-column property="phone" label="手機" width="250" align="center"></el-table-column>
 
-          <el-table-column property="status" label="狀態" width="130" align="center">
+          <el-table-column property="town" label="狀態" width="130" align="center">
             <template slot-scope="scope">
-              <div>
-                <el-tag v-if="scope.row.status" type="success">可派發</el-tag>
-                <el-tag v-else type="danger">不可派發</el-tag>
-              </div>
+              <span>{{scope.row.town}}</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column property="driverLicense" label="駕照種類" width="130" align="center">
+            <template slot-scope="scope">
+              <span>{{scope.row.driverLicense}}</span>
             </template>
           </el-table-column>
 
@@ -134,8 +137,11 @@ export default {
       const vm = this;
       vm.listLoading = true;
       drivers.load(vm.listQuery).then((res) => {
-        console.log(res);
-        vm.list = res.data;
+        vm.list = res.data.map((d) => {
+          // d.driverLicense = d.driverLicense.split(",");
+          return d;
+        });
+        console.log(vm.list);
         vm.total = res.count;
         vm.listLoading = false;
       });

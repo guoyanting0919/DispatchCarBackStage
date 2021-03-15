@@ -12,7 +12,7 @@
     <div class="app-container flex-item">
       <Title title="用戶管理"></Title>
       <el-row :gutter="4" style="height: calc(100% - 50px)">
-        <el-col :span="6" class="fh ls-border">
+        <!-- <el-col :span="6" class="fh ls-border">
           <el-card shadow="never" class="body-small fh" style="overflow: auto">
             <div slot="header" class="clearfix">
               <el-button type="text" style="padding: 0 11px" @click="getAllUsers">全部單位>></el-button>
@@ -20,8 +20,8 @@
 
             <el-tree :data="orgsTree" :expand-on-click-node="false" default-expand-all :props="defaultProps" @node-click="handleNodeClick"></el-tree>
           </el-card>
-        </el-col>
-        <el-col :span="18" class="fh">
+        </el-col> -->
+        <el-col :span="24" class="fh">
           <div class="bg-white fh">
             <el-table ref="mainTable" :key="tableKey" :data="list" v-loading="listLoading" border fit highlight-current-row style="width: 100%" height="calc(100% - 52px)" @row-click="rowClick" @selection-change="handleSelectionChange">
               <el-table-column align="center" type="selection" width="55"></el-table-column>

@@ -7,6 +7,7 @@
       </div>
     </sticky>
     <div class="app-container flex-item">
+
       <Title title="編輯司機"></Title>
       <div class="bg-white formContainer customScrollBar">
         <el-form :label-position="labelPosition" label-width="200px" :model="temp" :rules="rules" ref="form">
@@ -83,6 +84,51 @@
                 <el-input v-model="temp.addrLat" placeholder="請輸入地址緯度"></el-input>
               </el-form-item>
             </el-col>
+            <!-- 普通大貨車/普通小型車/普通聯結車/職業大客車/職業大貨車/職業小型車/職業小客車/職業聯結車) -->
+            <el-col :sm="12" :md="6">
+              <el-form-item label="駕照種類" prop="driverLicense">
+                <el-select multiple v-model="temp.driverLicense" placeholder="請選擇駕照種類" style="width: 100%">
+                  <el-option :value="'普通大貨車'" :label="'普通大貨車'"></el-option>
+                  <el-option :value="'普通小型車'" :label="'普通小型車'"></el-option>
+                  <el-option :value="'普通聯結車'" :label="'普通聯結車'"></el-option>
+                  <el-option :value="'職業大客車'" :label="'職業大客車'"></el-option>
+                  <el-option :value="'職業大貨車'" :label="'職業大貨車'"></el-option>
+                  <el-option :value="'職業小型車'" :label="'職業小型車'"></el-option>
+                  <el-option :value="'職業小客車'" :label="'職業小客車'"></el-option>
+                  <el-option :value="'職業聯結車'" :label="'職業聯結車'"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+
+            <el-col :sm="12" :md="6">
+              <el-form-item label="發照日期" prop="releaseDate">
+                <el-date-picker v-model="temp.releaseDate" type="date" placeholder="請選擇發照日期" style="width: 100%" value-format="yyyy-MM-dd"></el-date-picker>
+              </el-form-item>
+            </el-col>
+
+            <el-col :sm="12" :md="6">
+              <el-form-item label="最高學歷" prop="highestEdu">
+                <el-input v-model="temp.highestEdu" placeholder="請輸入最高學歷"></el-input>
+              </el-form-item>
+            </el-col>
+
+            <el-col :sm="12" :md="6">
+              <el-form-item label="地方風評" prop="localEvaluation">
+                <el-input v-model="temp.localEvaluation" placeholder="請輸入地方風評"></el-input>
+              </el-form-item>
+            </el-col>
+
+            <el-col :sm="12" :md="6">
+              <el-form-item label="到職日" prop="onJobDate">
+                <el-date-picker v-model="temp.onJobDate" type="date" placeholder="請選擇到職日" style="width: 100%" value-format="yyyy-MM-dd"></el-date-picker>
+              </el-form-item>
+            </el-col>
+
+            <el-col :sm="12" :md="6">
+              <el-form-item label="離職日" prop="offJobDate">
+                <el-date-picker v-model="temp.offJobDate" type="date" placeholder="請選擇離職日" style="width: 100%" value-format="yyyy-MM-dd"></el-date-picker>
+              </el-form-item>
+            </el-col>
 
           </el-row>
 
@@ -120,7 +166,7 @@ export default {
         addr: "",
         addrLng: "",
         addrLat: "",
-        driverLicense: "",
+        driverLicense: [],
         releaseDate: "",
         highestEdu: "",
         localEvaluation: "",
@@ -141,9 +187,8 @@ export default {
     getList() {
       const vm = this;
       drivers.get({ id: vm.$route.params.id }).then((res) => {
-        console.log(res.result);
-
         vm.temp = res.result;
+        vm.temp.driverLicense = vm.temp.driverLicense.split(",");
         console.log(vm.temp);
       });
     },
@@ -151,13 +196,9 @@ export default {
     /* 確認編輯司機 */
     handleSave() {
       const vm = this;
-      vm.temp.account = vm.temp.phone;
-      vm.temp.password = vm.temp.uid.slice(-4);
       let obj = JSON.parse(JSON.stringify(vm.temp));
-      obj.driverLicenses = vm.driverLicensesChecked;
-      obj.driverInsurance = vm.driverInsurancesChecked;
+      obj.driverLicense = obj.driverLicense.join(",");
       drivers.update(obj).then(() => {
-        // console.log(res);
         vm.$router.push("/driver/index");
         vm.$alertT.fire({
           icon: "success",

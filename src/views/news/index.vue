@@ -15,18 +15,24 @@
       <div class="bg-white" style="height: calc(100% - 50px)">
         <el-table ref="mainTable" height="calc(100% - 52px)" :data="list" border fit v-loading="listLoading" highlight-current-row style="width: 100%" @selection-change="handleSelectionChange" @row-click="rowClick">
           <el-table-column type="selection" width="55" align="center"></el-table-column>
+          <el-table-column property="title" width="150" align="center" label="主旨"></el-table-column>
           <el-table-column property="createDate" label="創建日期" width="150" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.createDate | dateFilter }}</span>
             </template>
           </el-table-column>
           <el-table-column property="createUserName" label="創建人" width="200" align="center"></el-table-column>
+          <el-table-column property="newsCategoryId" label="類別" width="150" align="center"></el-table-column>
+          <el-table-column property="isTop" label="是否置頂" width="200" align="center">
+            <template slot-scope="scope">
+              <span>{{ scope.row.isTop ?'是':'否' }}</span>
+            </template>
+          </el-table-column>
           <el-table-column property="createDate" label="發布日期" width="150" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.releaseDate | dateFilter }}</span>
             </template>
           </el-table-column>
-          <el-table-column property="title" label="主旨"></el-table-column>
           <el-table-column property="setting" label="操作" fixed="right" width="166">
             <template slot-scope="scope">
               <div class="buttonFlexBox">
