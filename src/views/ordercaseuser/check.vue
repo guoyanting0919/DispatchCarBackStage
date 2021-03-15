@@ -302,10 +302,12 @@
                 </div>
               </el-col>
 
-              <el-col :sm="12" :md="24">
+              <el-col :sm="12" :md="24" style="height:220px">
                 <div class="inputBox">
                   <div class="inputLable">乘客或家屬簽名</div>
-                  <div class="inputValue">{{pay.signPic}} </div>
+                  <div class="inputValue" style="height:200px">
+                    <img style="height:100%" :src='`data:image/png;base64,${pay.signPic}`'>
+                  </div>
                 </div>
               </el-col>
 
