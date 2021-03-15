@@ -5,15 +5,15 @@
     <sticky :className="'sub-navbar'">
       <div class="filter-container">
         <!-- 關鍵字 -->
-        <el-input @clear="getList" @keyup.native.enter="getList" style="width: 200px; margin-right: 0.5rem" size="mini" v-model="listQuery.key" clearable placeholder="請輸入關鍵字">
-        </el-input>
+        <!-- <el-input @clear="getList" @keyup.native.enter="getList" style="width: 200px; margin-right: 0.5rem" size="mini" v-model="listQuery.key" clearable placeholder="請輸入關鍵字">
+        </el-input> -->
 
         <!-- 日期選擇 -->
-        <el-date-picker size="mini" v-model="dateRange" type="daterange" range-separator="至" start-placeholder="開始日期" end-placeholder="结束日期">
-        </el-date-picker>
+        <!-- <el-date-picker size="mini" v-model="dateRange" type="daterange" range-separator="至" start-placeholder="開始日期" end-placeholder="结束日期">
+        </el-date-picker> -->
 
         <!-- 排序 姓名name 乘車時間reserveDate 起點fromAddr 迄點toAddr + desc-->
-        <el-select style="margin-left:.5rem;width:150px" clearable @change="getList()" size="mini" v-model="orderby" placeholder="請選擇排序方式">
+        <!-- <el-select style="margin-left:.5rem;width:150px" clearable @change="getList()" size="mini" v-model="orderby" placeholder="請選擇排序方式">
           <el-option label="姓名" value="name"></el-option>
           <el-option label="預約乘車時間" value="reserveDate"></el-option>
           <el-option label="起點" value="fromAddr"></el-option>
@@ -22,7 +22,7 @@
         <el-button @click="desc=!desc,getList()" class="sortBtn" size="mini" plain>
           <i v-if="!desc" class="iconfont icon-sortalphaasc"></i>
           <i v-else class="iconfont icon-sortalphadesc"></i>
-        </el-button>
+        </el-button> -->
 
         <!-- 權限按鈕 -->
         <permission-btn moduleName="builderTables" size="mini" v-on:btn-event="onBtnClicked"></permission-btn>
@@ -32,7 +32,7 @@
 
     <div class="app-container flex-item">
       <!-- 全部訂單 -->
-      <Title title="白牌車訂單"></Title>
+      <Title title="訂單管理"></Title>
 
       <div class="bg-white customScrollBar" style="height: calc(100% - 50px)">
 
@@ -40,17 +40,16 @@
 
         <div class="orderTableContainer customScrollBar">
 
-          <OrderStatusFilter @handleSort="handleSort"></OrderStatusFilter>
-
           <div v-for="order in list" :key="order.id" class="orderContainer">
             <div class="orderLeft">
-              <div class="orderLeftTitle">訂單編號 {{ order.orderNo }}</div>
+              <div class="orderLeftTitle">乘客姓名 {{ order.name }}</div>
               <div class="orderLeftDetail">
-                <p>承接單位：{{ order.orgName }}</p>
-                <p>車種類型：{{ order.carCategoryName }}</p>
+                <p>鄉鎮村里：{{ order.town=='SSTW' ? '尖石鄉':' ' }}{{ order.village }}</p>
+                <!-- <p>轉乘業者：{{ order.transferOperator }}</p> -->
+                <p>身分：{{ order.userType }}</p>
                 <p>
                   預約時間：{{ order.reserveDate | globalDateFilter('yyyy-MM-DD') }}
-                  {{order.reserveDate | globalDateFilter('HH:mm')}}
+                  {{order.fromTime | globalDateFilter('HH:mm')}}
                 </p>
                 <!-- <p>建立時間：{{ order.createDate | dateFilter }}</p> -->
                 <!-- <p>行程：回程</p> -->
@@ -60,22 +59,27 @@
             <div class="orderCenter">
               <div class="orderCenterTitle">
                 <p class="isCarpool">
-                  <span :class="[order.canShared ? 'shared' : 'notShared']">
-                    <i class="iconfont" :class="[order.canShared ? 'icon-circle' : 'icon-delete']"></i>
-                    {{order.canShared ? '可共乘' : '不可共乘'}}
+
+                  <span :class="[order.hasTransfer==='是' ? 'shared' : 'notShared']">
+                    <i class="iconfont" :class="[order.hasTransfer==='是' ? 'icon-circle' : 'icon-delete']"></i>
+                    {{order.hasTransfer==='是' ? '可轉乘' : '不可轉乘' }}
                   </span>
                 </p>
-                <!-- <span>預估時間</span> -->
-
-                <p>搭乘人數：{{ order.passengerNum }}人</p>
               </div>
               <div class="orderCenterDetail">
                 <div class="driverInfo">
-                  <div class="driverName">
-                    {{ order.name }}
+
+                  <div class="userId">
+                    轉乘原因： {{ order.transferPurpose }}
+                  </div>
+                  <div class="userId">
+                    轉乘運具： {{ order.transferTraffic }}
+                  </div>
+                  <div class="userId">
+                    轉乘業者： {{ order.transferOperator }}
                   </div>
                   <!-- <div class="userId">
-                    聯絡電話：{{ order.noticePhone || "0934343234" }}
+                    轉乘原因： {{ order.transferPurpose }}
                   </div> -->
                   <i style="margin-right: 4px" class="iconfont icon-member" v-for="item in order.passengerNum" :key="item">
                   </i>
@@ -90,24 +94,14 @@
               </div>
             </div>
             <div class="orderRight">
-              <div class="orderRightTitle">
-                <p class="orderStatus">
-                  <OrderStatusTag :type="orderStatusMapping[order.status - 1]" :cancelRemark="cancelRemarkList[order.cancelReamrk]"></OrderStatusTag>
-                </p>
-              </div>
+
               <div class="orderRightDetail">
                 <div class="rightBtnBox">
-                  <button v-if="hasButton('check')" class="orderButton orderDetail" @click="handleCheck(order.id)">
+                  <!-- <button v-if="hasButton('check')" class="orderButton orderDetail" @click="handleCheck(order.id)">
                     查看訂單
-                  </button>
-                  <button class="orderButton orderEdit" @click="
-                      editDialog = true;
-                      getOrder(order.id);
-                    " v-if="[1,2,3].includes(order.status) && hasButton('edit') ">
+                  </button> -->
+                  <button class="orderButton orderEdit" @click="$router.push(`/orderselfpayuser/edit/${order.id}`)" v-if="hasButton('edit') ">
                     編輯訂單
-                  </button>
-                  <button @click="handleDespatch(order)" class="orderButton orderStatus" v-if="hasButton('dispatch')">
-                    快速預約
                   </button>
                   <button class="orderButton orderCancel" v-if="[1,2,3].includes(order.status) && hasButton('cancel') " @click="handleCancelOrder(order.id)">
                     取消訂單
@@ -138,13 +132,10 @@ import Title from "@/components/ConsoleTableTitle";
 import permissionBtn from "@/components/PermissionBtn";
 import elDragDialog from "@/directive/el-dragDialog";
 import Pagination from "@/components/Pagination";
-import OrderStatusTag from "@/components/OrderStatusTag";
-import OrderStatusFilter from "@/components/OrderStatusFilter";
 import LoadingWord from "@/components/LoadingWord";
 import EditDialog from "@/components/Dialog/editSelfPayUserDespatch";
 
 import * as orderSelfPayUser from "@/api/orderSelfPayUser";
-import * as categorys from "@/api/categorys";
 import * as dispatch from "@/api/dispatchs";
 export default {
   name: "orderSelfPayUser",
@@ -154,8 +145,6 @@ export default {
     Title,
     permissionBtn,
     Pagination,
-    OrderStatusFilter,
-    OrderStatusTag,
     EditDialog,
     LoadingWord,
   },
@@ -292,38 +281,7 @@ export default {
         } else {
           vm.loadingActive = false;
         }
-      });
-    },
-
-    /* 獲取所有車輛類型 */
-    getCarCategorys() {
-      const vm = this;
-      let query = {
-        page: 1,
-        limit: 20,
-        TypeId: "SYS_CAR",
-      };
-      categorys.getSimpleList(query).then((res) => {
-        vm.carCategorysList = res.result.filter((car) => {
-          return (
-            car.value === "SYS_CAR_GENERAL" || car.value === "SYS_CAR_WEAL"
-          );
-        });
-      });
-    },
-
-    /* 獲取所有取消原因 */
-    getCancelRemark() {
-      const vm = this;
-      let query = {
-        page: 1,
-        limit: 20,
-        TypeId: "SYS_ORDERCANCEL_REMARK",
-      };
-      categorys.getSimpleList(query).then((res) => {
-        res.result.forEach((item) => {
-          vm.cancelRemarkList[item.value] = item.label;
-        });
+        console.log(vm.list);
       });
     },
 
@@ -436,6 +394,9 @@ export default {
         case "search":
           this.getList();
           break;
+        case "dispatch":
+          this.$router.push("/orderselfpayuser/dispatch/reservation");
+          break;
         default:
           break;
       }
@@ -443,8 +404,8 @@ export default {
   },
   mounted() {
     this.getList();
-    this.getCarCategorys();
-    this.getCancelRemark();
+    // this.getCarCategorys();
+    // this.getCancelRemark();
   },
 };
 </script>

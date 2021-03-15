@@ -2,7 +2,7 @@ import request from "@/utils/request";
 
 export function load(params) {
   return request({
-    url: "/orderOfSelfPayUsers/load",
+    url: "/orders/load",
     method: "get",
     params,
   });
@@ -10,7 +10,7 @@ export function load(params) {
 
 export function acceptOrder(params) {
   return request({
-    url: "/orderOfSelfPayUsers/acceptOrder",
+    url: "/orders/acceptOrder",
     method: "get",
     params,
   });
@@ -18,7 +18,7 @@ export function acceptOrder(params) {
 
 export function LoadWithDespatch(params) {
   return request({
-    url: "/orderOfSelfPayUsers/LoadWithDespatch",
+    url: "/orders/LoadWithDespatch",
     method: "get",
     params,
   });
@@ -26,7 +26,7 @@ export function LoadWithDespatch(params) {
 
 export function loadHistory(params) {
   return request({
-    url: "/orderOfSelfPayUsers/loadHistory",
+    url: "/orders/loadHistory",
     method: "get",
     params,
   });
@@ -34,7 +34,7 @@ export function loadHistory(params) {
 
 export function loadNoOrg(params) {
   return request({
-    url: "/orderOfSelfPayUsers/loadNoOrg",
+    url: "/orders/loadNoOrg",
     method: "get",
     params,
   });
@@ -42,7 +42,7 @@ export function loadNoOrg(params) {
 
 export function get(params) {
   return request({
-    url: "/orderOfSelfPayUsers/get",
+    url: "/orders/get",
     method: "get",
     params,
   });
@@ -50,7 +50,7 @@ export function get(params) {
 
 export function getDetail(params) {
   return request({
-    url: "/orderOfSelfPayUsers/getDetail",
+    url: "/orders/getDetail",
     method: "get",
     params,
   });
@@ -58,7 +58,7 @@ export function getDetail(params) {
 
 export function receive(data) {
   return request({
-    url: "/orderOfSelfPayUsers/updateOrgId",
+    url: "/orders/updateOrgId",
     method: "post",
     data,
   });
@@ -66,7 +66,7 @@ export function receive(data) {
 
 export function add(data) {
   return request({
-    url: "/orderOfSelfPayUsers/add",
+    url: "/orders/add",
     method: "post",
     data,
   });
@@ -74,7 +74,7 @@ export function add(data) {
 
 export function update(data) {
   return request({
-    url: "/orderOfSelfPayUsers/update",
+    url: "/orders/update",
     method: "post",
     data,
   });
@@ -82,7 +82,7 @@ export function update(data) {
 
 export function remove(data) {
   return request({
-    url: "/orderOfSelfPayUsers/delete",
+    url: "/orders/delete",
     method: "post",
     data,
   });
@@ -106,7 +106,7 @@ export function loadDespatch(params) {
 
 export function cancel(data) {
   return request({
-    url: "/orderOfSelfPayUsers/cancelOrder",
+    url: "/orders/cancelOrder",
     method: "post",
     data,
   });
