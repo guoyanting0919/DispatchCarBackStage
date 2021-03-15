@@ -44,22 +44,6 @@ import "@/assets/public/css/comIconfont/iconfont/iconfont.js";
 /* all(建議放套件Css下層) */
 import "../src/assets/all.scss";
 
-/* 自定義流程表單 */
-import FrmLeaveReqAdd from "@/views/forms/userDefine/frmLeaveReq/add"; // 請假流程
-import FrmLeaveReqDetail from "@/views/forms/userDefine/frmLeaveReq/detail"; // 請假流程
-Vue.component("FrmLeaveReqAdd", FrmLeaveReqAdd); // 請假流程
-Vue.component("FrmLeaveReqDetail", FrmLeaveReqDetail); // 請假流程
-
-import FrmCarReqAdd from "@/views/forms/userDefine/frmCarReq/add"; // 車輛申請流程
-import FrmCarReqDetail from "@/views/forms/userDefine/frmCarReq/detail"; // 車輛申請流程
-Vue.component("FrmCarReqAdd", FrmCarReqAdd); // 車輛申請流程
-Vue.component("FrmCarReqDetail", FrmCarReqDetail); // 車輛申請流程
-
-import FrmDriverReqAdd from "@/views/forms/userDefine/frmDriverReq/add"; // 司機申請流程
-import FrmDriverReqDetail from "@/views/forms/userDefine/frmDriverReq/detail"; // 司機申請流程
-Vue.component("FrmDriverReqAdd", FrmDriverReqAdd); // 司機申請流程
-Vue.component("FrmDriverReqDetail", FrmDriverReqDetail); // 司機申請流程
-
 import vueEsign from "vue-esign";
 Vue.use(vueEsign);
 

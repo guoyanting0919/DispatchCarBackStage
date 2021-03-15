@@ -55,6 +55,7 @@
 <script>
 import { VueEditor, Quill } from "vue2-editor";
 import ImageResize from "quill-image-resize-vue";
+import { getToken } from "@/utils/auth"; // 驗權
 Quill.register("modules/imageResize", ImageResize);
 import axios from "axios";
 // import * as upload from "@/api/upload";
@@ -137,6 +138,9 @@ export default {
         url: `${process.env.VUE_APP_BASE_API}Files/Upload`,
         method: "POST",
         data: formData,
+        headers: {
+          "X-Token": getToken(),
+        },
       })
         .then((res) => {
           console.log(res);

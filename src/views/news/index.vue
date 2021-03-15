@@ -28,7 +28,7 @@
               <span>{{ scope.row.isTop ?'是':'否' }}</span>
             </template>
           </el-table-column>
-          <el-table-column property="createDate" label="發布日期" width="150" align="center">
+          <el-table-column property="createDate" label="發布日期" align="center">
             <template slot-scope="scope">
               <span>{{ scope.row.releaseDate | dateFilter }}</span>
             </template>
