@@ -34,16 +34,14 @@
             <el-col :sm="12" :md="6">
               <el-form-item label="鄉鎮" prop="town">
                 <el-select v-model="temp.town" placeholder="請選擇鄉鎮" style="width: 100%">
-                  <el-option :value="'尖石鄉'" :label="'尖石鄉'"></el-option>
+                  <el-option :value="'SSTW'" :label="'尖石鄉'"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
 
             <el-col :sm="12" :md="6">
               <el-form-item label="村里" prop="village">
-                <el-select v-model="temp.village" placeholder="請選擇村里" style="width: 100%">
-                  <el-option :value="'尖石鄉'" :label="'尖石鄉'"></el-option>
-                </el-select>
+                <el-input v-model="temp.village" placeholder="請輸入村里"></el-input>
               </el-form-item>
             </el-col>
 
@@ -62,8 +60,9 @@
             <el-col :sm="12" :md="6">
               <el-form-item label="身分" prop="userType">
                 <el-select v-model="temp.userType" placeholder="請選擇身分" style="width: 100%">
-                  <el-option :value="'身份1'" :label="'身份1'"></el-option>
-                  <el-option :value="'身份2'" :label="'身份2'"></el-option>
+                  <el-option :value="'一般'" :label="'一般'"></el-option>
+                  <el-option :value="'學生'" :label="'學生'"></el-option>
+                  <el-option :value="'年長者'" :label="'年長者'"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>

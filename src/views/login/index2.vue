@@ -4,7 +4,7 @@
       <!-- loginTitle -->
       <div class="loginTitle">
         <h1 class="cityTitle" @click="handleSuperLogin">
-          尖石鄉政府
+          尖石鄉公所
         </h1>
         <h5 class="cityDescrip">
           長照交通接送統一預約服務及管理系統

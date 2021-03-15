@@ -107,7 +107,16 @@
 
             <el-col :sm="12" :md="6">
               <el-form-item label="最高學歷" prop="highestEdu">
-                <el-input v-model="temp.highestEdu" placeholder="請輸入最高學歷"></el-input>
+                <el-select v-model="temp.highestEdu" placeholder="請輸入最高學歷" style="width: 100%">
+                  <el-option :value="'國小'" :label="'國小'"></el-option>
+                  <el-option :value="'國中'" :label="'國中'"></el-option>
+                  <el-option :value="'二專'" :label="'二專'"></el-option>
+                  <el-option :value="'高中'" :label="'高中'"></el-option>
+                  <el-option :value="'高職'" :label="'高職'"></el-option>
+                  <el-option :value="'大學'" :label="'大學'"></el-option>
+                  <el-option :value="'碩士'" :label="'碩士'"></el-option>
+                  <el-option :value="'博士'" :label="'博士'"></el-option>
+                </el-select>
               </el-form-item>
             </el-col>
 

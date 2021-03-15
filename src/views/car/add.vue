@@ -25,7 +25,7 @@
             <el-col :sm="12" :md="6">
               <el-form-item label="鄉鎮" prop="township">
                 <el-select v-model="temp.township" placeholder="請選擇鄉鎮" style="width: 100%">
-                  <el-option :value="'尖石鄉'" :label="'尖石鄉'"></el-option>
+                  <el-option :value="'SSTW'" :label="'尖石鄉'"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
