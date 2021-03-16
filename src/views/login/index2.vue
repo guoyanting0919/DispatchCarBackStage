@@ -16,8 +16,8 @@
         <h5 class="adminLoginDescrip">
           為了保障您的帳號安全，建議您最少於三個月變更一次密碼
         </h5>
-      </div>
-      <!-- forgetBox -->
+      </div>s
+      <!-- forgetBox 1-->
       <div class="forgetBox" v-if="isForget == 2">
         <h2 class="forgetTitle">忘記密碼</h2>
         <h5 class="forgetDescrip">請準備好您的手機</h5>
